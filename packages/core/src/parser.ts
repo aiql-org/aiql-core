@@ -775,7 +775,7 @@ export class Parser {
     }
     
     // Parse optional statement block for explicit relationship expression
-    let statements: AST.Statement[] = [];
+    const statements: AST.Statement[] = [];
     let relationName: string = contextParams.type; // Default to relationship type
     
     if (this.check(TokenType.SYMBOL) && this.peek().value === '{') {

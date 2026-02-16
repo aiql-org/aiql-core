@@ -17,7 +17,7 @@
     "build": "npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/cli && npm run build -w packages/api",
     "test": "npm run test --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "lint:workspaces": "npm run lint --workspaces --if-present",
     "sync-versions": "node scripts/sync-versions.js",
@@ -54,7 +54,8 @@
     "@typescript-eslint/parser": "^8.56.0",
     "eslint": "^10.0.0",
     "prettier": "^3.8.1",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.56.0"
   },
   "engines": {
     "node": ">=20.0.0",
