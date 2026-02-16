@@ -1149,3 +1149,32 @@ See the design case studies documented in feature implementation sections above 
 - **v2.6.0 Quantum Consciousness**: 100% aligned ✅ (quantum semantics, not computation)
 - **Overall**: 95%+ philosophy alignment achieved across all features ✅
 
+
+## Open Source Community Principles
+
+These principles guide how we work together as a community to build and evolve AIQL.
+
+### 1. **Radical Transparency**
+- **Public by Default:** All design discussions, roadmaps, and decisions happen in public repositories and issues.
+- **Why over What:** We document the *reasoning* behind decisions, not just the decisions themselves (see "Design Case Studies").
+- **Mistakes represent Growth:** We acknowledge bugs and architectural missteps openly so we can learn from them.
+
+### 2. **Inclusive Evolution**
+- **No Gatekeeping:** Great ideas can come from anyone, regardless of their background or experience level with AIQL.
+- **Request for Comments (RFC):** Major changes start as RFCs to gather community feedback before a single line of code is committed.
+- **Mentorship:** Experienced contributors actively mentor new comers, helping them land their first PRs.
+
+### 3. **Stable Foundation, Experimental Edge**
+- **Core Stability:** We fiercely protect the stability of the core language (`packages/core`). Breaking changes here are a last resort.
+- **Edge Innovation:** We encourage experimentation in `packages/extensions`, `examples`, and community plugins.
+- **Gradual Adoption:** Successful experiments are gradually promoted to the core after rigorous testing and community consensus.
+
+### 4. **Pragmatic Idealism**
+- **Visionary but Grounded:** We aim for "Quantum Consciousness" but we build it one reliable unit test at a time.
+- **Perfect is the Enemy of Good:** We ship iterative improvements rather than waiting for a theoretical perfection.
+- **Use Cases First:** New features must be driven by real-world use cases, not academic purity.
+
+### 5. **Respect for the Triple**
+- **Shared Language:** We all agree that the Subject-Relation-Object triple is the canonical unit of knowledge.
+- **Consistency:** We reject features that break this consistency, even if they seem convenient in the short term.
+- **Interoperability:** We ensure AIQL remains compatible with the broader ecosystem of knowledge graphs and semantic web standards.
