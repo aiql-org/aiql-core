@@ -20,7 +20,7 @@ import { Tokenizer, Parser, Transpiler } from '@aiql-org/core';
 
 const code = `!Assert { <AI> [learns] <Knowledge> } @0.95`;
 
-const tokens = new Tokenizer().tokenize(code);
+const tokens = new Tokenizer(code).tokenize();
 const ast = new Parser(tokens).parse();
 const output = new Transpiler().transpile(ast, 'python');
 ```

@@ -16,6 +16,7 @@
   "scripts": {
     "build": "npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/cli && npm run build -w packages/api",
     "test": "npm run test --workspaces --if-present",
+    "test:examples": "node scripts/verify-examples.js",
     "clean": "npm run clean --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",

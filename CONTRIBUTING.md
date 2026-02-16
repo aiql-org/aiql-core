@@ -26,7 +26,7 @@ We follow a generic **Test Driven Development (TDD)** approach.
 
 - **Run all tests:** `npm test`
 - **Coverage Target:** 95%+ for core modules.
-- **Requirement:** All 93 tests must pass before merging.
+- **Requirement:** All 111 tests must pass before merging.
 
 ## 🏗 Project Structure
 

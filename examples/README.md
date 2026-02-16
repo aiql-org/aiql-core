@@ -206,7 +206,13 @@ Run playground examples test suite to verify all examples parse correctly:
 
 ```bash
 cd aiql-core
-node test-all-playground-examples.js
+npm run test:examples
+```
+
+Alternatively, run the script directly:
+
+```bash
+node scripts/verify-examples.js
 ```
 
 Expected output: **64/64 examples pass** ✅
@@ -217,9 +223,9 @@ When adding new AIQL features:
 
 1. Create example(s) in appropriate category directory
 2. Update this README with example description
-3. Add corresponding test case to `aiql-core/test-all-playground-examples.ts`
-4. Update `aiql-org-web/src/components/Playground.tsx` with new examples
-5. Verify all tests pass: `./run-comprehensive-tests.sh`
+3. Add corresponding test case to package test files (e.g., `packages/core/src/test.ts`).
+4. Update `aiql-org-web/src/components/Playground.tsx` with new examples.
+5. Verify all tests pass: `npm test` and `npm run test:examples`.
 
 ## License
 
