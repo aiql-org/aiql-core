@@ -1,0 +1,19 @@
+// Property Cardinality Violation (v2.5.0)
+// OntologyReasoner enforces cardinality constraints on properties.
+// Objects can only have ONE value for certain properties (temperature, age, shape).
+// Multiple different values for same property = semantic contradiction.
+!Assert {
+  <Object> [has_temperature] <100C> {
+    measurement_time: "10:00am"
+  }
+} @0.95
+
+!Assert {
+  <Object> [has_temperature] <50C> {
+    measurement_time: "10:00am"
+  }
+} @0.90
+
+// Conflict detected: cardinality:'one' constraint violated
+// Same object cannot have two different temperatures at same time
+// Severity: major (physical impossibility)

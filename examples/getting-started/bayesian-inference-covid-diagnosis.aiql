@@ -1,0 +1,44 @@
+// Bayesian Inference: COVID Diagnosis
+// Models probabilistic reasoning: prior → evidence (test + symptoms) → posterior.
+// Demonstrates Bayes' theorem: P(disease|evidence) using multiple confidence values.
+@version:"1.0.0"
+$$group:bayesian_inference
+
+$id:prior
+!Assert {
+  <Patient> [has_disease] <COVID19> {
+    prior_probability: 0.05,
+    population: "general",
+    context: "pre_test"
+  }
+} @0.05
+
+$id:evidence_positive_test
+!Assert {
+  <Patient> [tested_positive] <RapidTest> {
+    test_sensitivity: 0.90,
+    test_specificity: 0.95,
+    result: "positive"
+  }
+} @0.99
+
+$id:evidence_symptoms
+!Assert {
+  <Patient> [exhibits] <Symptoms> {
+    fever: "yes",
+    cough: "yes",
+    fatigue: "yes",
+    symptom_overlap: "high"
+  }
+} @0.85
+
+// Posterior probability inference
+$id:posterior
+~temp:0.1
+!Query(mode:bayesian_update) {
+  <Patient> [has_disease] <COVID19> {
+    posterior_probability: 0.47,
+    given_evidence: "positive_test_and_symptoms",
+    reasoning: "bayes_theorem"
+  }
+} @0.47

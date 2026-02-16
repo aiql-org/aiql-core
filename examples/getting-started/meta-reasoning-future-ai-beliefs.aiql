@@ -1,0 +1,11 @@
+// Meta-Reasoning: Future AI Beliefs
+// Represents nested beliefs using context parameters (time:future, mode:possibility).
+// Models meta-cognitive reasoning: beliefs about predictions, second-order knowledge.
+!Assert(time:future, mode:possibility) {
+  <Futurists> [believe] <Prediction> {
+    claim: "AI will surpass human intelligence",
+    confidence: 0.75,
+    timeframe: "2050",
+    basis: "exponential_growth"
+  }
+} @0.80

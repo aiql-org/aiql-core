@@ -1,0 +1,14 @@
+// Full Metadata System
+// Shows all 5 metadata markers: $id (identifier), $$group (grouping),
+// ##seq (sequence ordering), ~temp (AI temperature 0-2), ~~entropy (0-1).
+// Essential for tracking, organizing, and controlling AI reasoning chains.
+$id:statement001
+$$group:research
+##seq:1
+~temp:0.7
+~~entropy:0.5
+!Assert {
+  <AI> [capable_of] <CreativeReasoning> {
+    domain: "mathematics"
+  }
+} @0.85

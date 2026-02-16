@@ -1,0 +1,22 @@
+// Knowledge Gap Detection (v2.2.0)
+// Agent identifies concepts mentioned but not well-defined.
+// Semantic gaps detected through low graph connectivity.
+// Triggers curiosity-driven exploration when gaps found.
+!Assert {
+  <Python> [is_a] <ProgrammingLanguage>
+  <MachineLearning> [uses] <Python>
+} @0.90
+
+// MachineLearning mentioned but not defined - GAP!
+!Query {
+  <Self> [lacks_knowledge_about] <?MissingTopic>
+}
+// Returns: { concept: "MachineLearning", confidence: 0.8 }
+
+// Express curiosity about the gap (existing !Desire syntax!)
+!Desire(intensity:high) {
+  <Self> [seeks] <Knowledge> {
+    about: "MachineLearning",
+    priority: "exploration"
+  }
+} @0.88

@@ -1,0 +1,22 @@
+// AIQL Syntax: Comments
+// Full comment support: // single-line and /* multi-line */ for documentation.
+// Comments preserved during tokenization but not included in AST output.
+@version:"1.0.0"
+
+/* 
+  Multi-line comment block
+  Useful for documenting complex reasoning chains
+  or providing context for AI agents
+*/
+
+!Assert {
+  <AIQL> [supports] <Comments> {
+    single_line: "//",
+    multi_line: "/* */"
+  }
+} @1.0
+
+// Comments are preserved during parsing but not in AST
+!Query {
+  <Comments> [enhance] <Readability>
+}

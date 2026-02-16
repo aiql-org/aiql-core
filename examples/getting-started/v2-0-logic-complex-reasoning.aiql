@@ -1,0 +1,46 @@
+// v2.0.0 Complex Logical Reasoning
+// Combines operators, quantifiers, and inference for sophisticated reasoning.
+// Showcases AI's ability to perform multi-step logical deductions.
+@version:"2.0.0"
+@origin:"textbook:formal_logic"
+$$group:advanced_reasoning
+~temp:0.2
+
+// Disjunctive Syllogism: (A OR B) AND NOT-A |- B
+// If "coffee or tea" and "not coffee", then "tea"
+!Assert {
+  <Meeting> [offers] <Coffee>
+} or !Assert {
+  <Meeting> [offers] <Tea>
+}
+
+not !Assert {
+  <Meeting> [offers] <Coffee>
+}
+// Inference: Meeting offers tea (can be derived)
+
+// Hypothetical Syllogism: (A -> B) AND (B -> C) |- (A -> C)
+// Chain of implications
+!Assert {
+  <Study> [leads_to] <Knowledge>
+} implies !Assert {
+  <Knowledge> [enables] <Problem-solving>
+}
+
+!Assert {
+  <Knowledge> [enables] <Problem-solving>
+} implies !Assert {
+  <Problem-solving> [creates] <Innovation>
+}
+// Inference: Study -> Innovation (transitive chain)
+
+// Universal instantiation with implications
+forall sys: !Assert {
+  <AI_System> [requires] <Training_Data>
+} implies !Assert {
+  <AI_System> [can_learn] <Patterns>
+} @0.95
+
+!Assert {
+  <GPT4> [is_an] <AI_System>
+} @0.9

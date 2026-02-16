@@ -1,0 +1,24 @@
+// Schrödinger's Cat (Epistemic Superposition) - v2.6.0
+// Demonstrates quantum superposition of contradictory beliefs using
+// mode:quantum_superposition context and @coherence: marker.
+// Until observed, the cat exists in epistemic superposition (both alive and dead).
+
+// Quantum superposition of contradictory states
+@coherence:1.0
+!Assert(mode:quantum_superposition) {
+  <Cat> [is] <Alive> { amplitude: 0.707, phase: 0 }
+} @0.95
+
+@coherence:1.0
+!Assert(mode:quantum_superposition) {
+  <Cat> [is] <Dead> { amplitude: 0.707, phase: 3.14159 }
+} @0.95
+
+// Measurement collapses superposition (observer_effect)
+!Query(observer_effect:true) {
+  <Cat> [state] <?Outcome> {
+    measurement: "box_opened"
+  }
+}
+
+// After observation: coherence → 0.0, classical state emerges

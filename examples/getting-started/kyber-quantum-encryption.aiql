@@ -1,0 +1,9 @@
+// KYBER Quantum Encryption
+// Quantum-resistant encryption using NIST KYBER KEM + AES-256-GCM.
+// Protects confidential agent communications from quantum computer attacks.
+#encrypt("claude-3-instance-001")
+!Query {
+  <AI> [is_capable_of] <ReasoningAboutItsOwnLimitations> {
+    security: "KYBER_KEM"
+  }
+} @0.7

@@ -1,0 +1,39 @@
+// v2.1.0 Relationship: Bidirectional Temporal
+// Some relationships are symmetric (bidirectional): simultaneous, concurrent.
+// AIQL automatically sets bidirectional flag for these relation types.
+// Use cases: Concurrent events, parallel processes, synchronization.
+$id:apollo11_launch
+!Assert {
+  <Apollo11> [launched] <1969-07-16> {
+    location: "Kennedy_Space_Center"
+  }
+} @0.99
+
+$id:global_broadcast
+!Assert {
+  <TV> [broadcasted] <MoonLanding> {
+    viewers: "600_million"
+  }
+} @0.99
+
+// Events happening SIMULTANEOUSLY (bidirectional: true)
+!Relationship(type:temporal, source:$id:apollo11_launch, target:$id:global_broadcast) {
+  <LaunchEvent> [simultaneous] <BroadcastEvent>
+} @0.90
+
+$id:ai_training
+!Task {
+  <GPU_Cluster> [trains] <LLM> {
+    model_size: "70B"
+  }
+} @0.95
+
+$id:data_preprocessing
+!Task {
+  <Pipeline> [processes] <Dataset>
+} @0.92
+
+// Tasks running CONCURRENTLY (also bidirectional)
+!Relationship(type:temporal, source:$id:ai_training, target:$id:data_preprocessing) {
+  <Training> [concurrent] <Preprocessing>
+} @0.85

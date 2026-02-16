@@ -1,0 +1,72 @@
+{
+  "name": "@aiql-org/core",
+  "version": "2.6.0",
+  "description": "AIQL language parser and multi-target transpiler (JSON/YAML/Python/SQL/Coq/Lean)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "tsc && node dist/test.js",
+    "lint:package": "publint",
+    "check:types": "attw --pack ."
+  },
+  "keywords": [
+    "aiql",
+    "agi",
+    "transpiler",
+    "parser",
+    "ast",
+    "semantic-graph",
+    "knowledge-representation",
+    "python",
+    "sql",
+    "coq",
+    "lean",
+    "json",
+    "yaml"
+  ],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/AI-Memory/aiql.ws/issues"
+  },
+  "homepage": "https://aiql.org",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "^4.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

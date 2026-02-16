@@ -1,0 +1,29 @@
+// Uncertainty Acknowledgment (v2.2.0)
+// Agent identifies statements with low confidence.
+// Meta-cognitive awareness of epistemic limitations.
+// Honest about what it doesn't know well.
+!Assert {
+  <DarkMatter> [constitutes] <Universe> {
+    percentage: 0.27
+  }
+} @0.40  // Low confidence!
+
+!Assert {
+  <QuantumComputing> [will_achieve] <Supremacy> {
+    timeline: "2030"
+  }
+} @0.55  // Medium confidence
+
+// Agent recognizes uncertainty
+!Query {
+  <Self> [uncertain_about] <?Topic>
+}
+// Returns statements with confidence < 0.6:
+// <DarkMatter>, <QuantumComputing>
+
+// Can express confusion (reuse existing semantics!)
+!Feel {
+  <Self> [confused_about] <DarkMatter> {
+    reason: "insufficient_data"
+  }
+} @0.70

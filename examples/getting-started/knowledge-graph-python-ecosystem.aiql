@@ -1,0 +1,22 @@
+// Knowledge Graph: Python Ecosystem
+// Multi-relation knowledge graph: is_a, created_by, has_version, used_for.
+// Demonstrates rich ontology construction for programming language ecosystems.
+@version:"1.0.0"
+@origin:"knowledge-base-v2"
+
+$id:kb_001
+!Assert(scope:global) {
+  <Python> [is_a] <ProgrammingLanguage>
+  <Python> [created_by] <GuidoVanRossum>
+  <Python> [has_version] <Python3_12> { release: "2023-10" }
+  <Python> [used_for] <WebDevelopment>
+  <Python> [used_for] <MachineLearning>
+  <Python> [used_for] <DataScience>
+} @0.99
+
+$id:kb_002
+!Assert {
+  <Django> [is_framework_for] <Python>
+  <Flask> [is_framework_for] <Python>
+  <FastAPI> [is_framework_for] <Python>
+} @0.95

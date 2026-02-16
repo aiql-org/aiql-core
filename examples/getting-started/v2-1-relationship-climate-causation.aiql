@@ -1,0 +1,32 @@
+// v2.1.0 Relationship: Climate Causal Chain
+// Causal relationships express cause-effect dependencies.
+// Relation types: causes, enables, prevents, depends_on, triggers
+// Use cases: Scientific reasoning, policy analysis, intervention planning.
+$id:co2_emissions
+!Assert {
+  <CO2Emissions> [increasing] <Atmosphere> {
+    rate: "2ppm/year"
+  }
+} @0.99
+
+$id:global_warming
+!Assert {
+  <GlobalWarming> [threatening] <Ecosystems> {
+    temperature_rise: "1.5C"
+  }
+} @0.95
+
+// Causal relationship: emissions CAUSE warming
+!Relationship(type:causal, source:$id:co2_emissions, target:$id:global_warming) {
+  <CO2Emissions> [causes] <GlobalWarming>
+} @0.92
+
+$id:extreme_weather
+!Assert {
+  <ExtremeWeather> [increasing] <Frequency>
+} @0.90
+
+// Another causal link in the chain
+!Relationship(type:causal, source:$id:global_warming, target:$id:extreme_weather) {
+  <GlobalWarming> [triggers] <ExtremeWeather>
+} @0.88

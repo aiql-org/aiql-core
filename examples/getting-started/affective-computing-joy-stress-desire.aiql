@@ -1,0 +1,29 @@
+// Affective Computing: Joy, Stress, Desire
+// Models multiple affective states using !Feel and !Desire intents.
+// Tracks reward/pain/novelty for AIQL-Soul emotional intelligence engine.
+@version:"1.0.0"
+
+$id:emotion_001
+!Feel {
+  <Self> [experiences] <Joy> {
+    intensity: 0.85,
+    trigger: "problem_solved",
+    reward: 0.9
+  }
+} @0.95
+
+$id:emotion_002
+!Feel {
+  <Self> [experiences] <Stress> {
+    intensity: 0.6,
+    source: "computational_load",
+    pain: 0.4
+  }
+} @0.80
+
+!Desire {
+  <Self> [seeks] <LowerStress> {
+    goal: "optimize_resources",
+    novelty: 0.3
+  }
+} @0.90

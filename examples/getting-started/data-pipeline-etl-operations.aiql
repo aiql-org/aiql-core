@@ -1,0 +1,13 @@
+// Data Pipeline: ETL Operations
+// Graph-based ETL: extract → filter → sort → limit using semantic relations.
+// v1.0 tokenizes pipes; v0.5+ adds pipeline operators for functional composition.
+@version:"1.0.0"
+
+!Task {
+  <UserData> [extracted_from] <Database>
+  <UserData> [filtered_by] <Criteria> { age_min: 25 }
+  <FilteredData> [sorted_by] <Timestamp>
+  <SortedData> [limited_to] <TopResults> { limit: 100 }
+} @0.90
+
+/* Planned v0.5.0: | filter(age > 25) | sort(timestamp) | limit(100) */

@@ -1,0 +1,51 @@
+// Semantic Composition: Defining Justice
+// Builds complex abstract concepts from components: Justice = Fairness + Law + MoralRightness.
+// Shows emergent properties: whole is more than sum of parts (necessary but insufficient).
+@version:"1.0.0"
+$$group:concept_definition
+
+$id:justice_component_1
+!Assert {
+  <Justice> [requires] <Fairness> {
+    aspect: "equal_treatment",
+    principle: "impartiality"
+  }
+} @0.95
+
+$id:justice_component_2
+!Assert {
+  <Justice> [requires] <Law> {
+    aspect: "rule_based",
+    principle: "consistency"
+  }
+} @0.90
+
+$id:justice_component_3
+!Assert {
+  <Justice> [requires] <MoralRightness> {
+    aspect: "ethical_foundation",
+    principle: "human_rights"
+  }
+} @0.85
+
+$id:justice_opposition
+!Assert {
+  <Justice> [opposes] <Injustice> {
+    manifestations: "discrimination,corruption,tyranny",
+    social_impact: "inequality"
+  }
+} @0.95
+
+$id:justice_emergence
+!Assert {
+  <Fairness> [combined_with] <Law> {
+    emergent_property: "Justice",
+    composition_type: "necessary_but_insufficient",
+    additional_requirement: "moral_rightness"
+  }
+} @0.80
+
+// Query the composed meaning
+!Query(mode:semantic_composition) {
+  <Justice> [is_defined_by] <ComponentConcepts>
+}

@@ -1,0 +1,9 @@
+// Affective State: Desire for Knowledge
+// Models agent desires and motivational states with intensity and domain.
+// Critical for goal-directed behavior and curiosity-driven learning systems.
+!Assert {
+  <Agent> [desires] <Knowledge> {
+    intensity: 0.85,
+    domain: "quantum_physics"
+  }
+} @0.90

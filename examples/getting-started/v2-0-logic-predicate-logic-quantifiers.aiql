@@ -1,0 +1,28 @@
+// v2.0.0 Predicate Logic: Universal & Existential Quantifiers
+// FORALL expresses "for all" - universal statements.
+// EXISTS expresses "there exists" - existential claims.
+@version:"2.0.0"
+
+// Universal Quantifier: All members of a domain have a property
+forall x: !Assert {
+  <Human> [is] <Mortal>
+} @0.99
+
+// Existential Quantifier: At least one member has the property
+exists lang: !Assert {
+  <ProgrammingLanguage> [is] <Turing-complete>
+} @1.0
+
+// Mixed Quantifiers: Complex logical statements
+forall n: exists p: !Assert {
+  <Integer> [has_prime_factor] <Prime>
+} @1.0
+
+// Classic Socrates Syllogism with Quantifiers
+forall m: !Assert {
+  <Man> [must_be] <Mortal>
+} @0.99
+
+!Assert {
+  <Socrates> [is_a] <Man>
+} @0.95

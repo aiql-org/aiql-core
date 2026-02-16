@@ -1,0 +1,31 @@
+// v2.0.0 Inference Rules: Modus Ponens (A, A -> B |- B)
+// Classic inference rule: If A is true and A implies B, then B is true.
+// Foundation for automated reasoning and proof systems.
+@version:"2.0.0"
+$id:modus_ponens_demo
+
+// Premise 1: Fact A is true
+!Assert {
+  <Rain> [is_falling] <Now>
+} @1.0
+
+// Premise 2: A implies B
+!Assert {
+  <Rain> [is_falling] <Now>
+} implies !Assert {
+  <Ground> [becomes] <Wet>
+} @0.98
+
+// Conclusion: B can be inferred (ground is wet)
+// Inference engine automatically derives this fact
+
+// Another example: Knowledge implication
+!Assert {
+  <Student> [studies] <Mathematics>
+} implies !Assert {
+  <Student> [develops] <LogicalThinking>
+} @0.9
+
+!Assert {
+  <Alice> [studies] <Mathematics>
+} @0.85

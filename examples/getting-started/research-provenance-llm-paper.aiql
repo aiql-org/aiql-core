@@ -1,0 +1,22 @@
+// Research Provenance: LLM Paper
+// Tracks research lineage with @version, @origin (DOI), and @cite (papers).
+// Essential for AI-generated research, literature reviews, and academic integrity.
+@version:"0.4.0"
+@origin:"doi:10.1234/ai-reasoning-2026"
+@cite:["arxiv:2401.12345", "doi:10.5555/foundation", "isbn:978-0-262-03384-8"]
+
+!Assert {
+  <LargeLanguageModels> [demonstrate] <EmergentReasoning> {
+    capability: "chain-of-thought",
+    threshold: "100B+ parameters"
+  }
+} @0.88
+
+$id:finding02
+@cite:["doi:10.1145/experiment"]
+!Assert {
+  <ScalingLaws> [predict] <PerformanceGains> {
+    domain: "mathematical_reasoning",
+    confidence_interval: "95%"
+  }
+} @0.92

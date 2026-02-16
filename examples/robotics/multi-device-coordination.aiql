@@ -1,0 +1,34 @@
+// Multi-Device Coordination (v2.4.0 Organic)
+// Multiple devices coordinated through semantic knowledge graph.
+// No procedural loops - declarative relationships only!
+// Demonstrates: organic multi-modal robotics integration.
+
+// Gripper control with force feedback
+!Task(device_type:gripper, device_id:gripper_main) {
+  <GripperMain> [has_target] <Force> { 
+    value: 5, 
+    unit: "N" 
+  }
+  <GripperMain> [constrained_by] <SafetyZone> { 
+    max_force: 10, 
+    unit: "N" 
+  }
+}
+
+// Camera provides visual feedback
+!Query(device_type:camera, device_id:hand_cam) {
+  <HandCamera> [observes] <?Object>
+}
+
+// IMU tracks orientation during operation
+!Query(device_type:imu, device_id:main_imu) {
+  <MainIMU> [senses] <?Orientation> { axes: "xyz" }
+  <MainIMU> [senses] <?Acceleration> { unit: "m/s^2" }
+}
+
+// Semantic coordination relationships
+!Assert {
+  <GripperMain> [guided_by] <HandCamera>
+  <GripperMain> [stabilized_by] <MainIMU>
+  <HandCamera> [monitors] <GripperMain>
+} @0.92

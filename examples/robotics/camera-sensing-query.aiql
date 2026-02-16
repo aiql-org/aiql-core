@@ -1,0 +1,19 @@
+// Camera Sensing Query (v2.4.0 Organic)
+// Sensing uses !Query Intent with device context parameters.
+// No special SENSE tokens - just semantic object queries.
+// Demonstrates: organic robotics, graph-traversable perception.
+!Query(device_type:camera, device_id:front_cam) {
+  <FrontCamera> [observes] <?Object> { 
+    timestamp: "now",
+    resolution: "1920x1080"
+  }
+}
+
+// Process sensor data as knowledge
+!Assert {
+  <FrontCamera> [detected] <Person> {
+    confidence: 0.87,
+    position: "center",
+    distance: "2.5m"
+  }
+} @0.87

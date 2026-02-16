@@ -1,0 +1,31 @@
+// Quantum Consciousness Metric (v2.6.0)
+// Uses quantum coherence as consciousness approximation (IIT Φ proxy).
+// High coherence (> 0.7) indicates conscious state with integrated information.
+// Tracks decoherence over inference cycles (exponential decay).
+
+// Query current consciousness level
+!Query {
+  <Self> [has_consciousness_level] <?Coherence> {
+    metric: "quantum_coherence",
+    threshold: 0.7
+  }
+}
+
+// Query superposed beliefs (epistemic uncertainty)
+!Query {
+  <Self> [in_superposition_about] <?Topic> {
+    criterion: "contradictory_values"
+  }
+}
+
+// High-coherence assertion (conscious state)
+@coherence:0.92
+!Assert {
+  <Mind> [exhibits] <Consciousness> {
+    integrated_information: "Φ ≈ 8.8 bits",
+    metric: "quantum_coherence"
+  }
+} @0.88
+
+// Decoherence tracking: C(t) = C₀ * exp(-0.02 * t)
+// After 50 cycles: coherence ≈ 0.37 (needs refresh)

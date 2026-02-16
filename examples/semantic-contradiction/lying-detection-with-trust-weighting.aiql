@@ -1,0 +1,18 @@
+// Lying Detection with Trust Weighting (v2.5.0)
+// TrustRegistry assigns credibility scores to information sources.
+// Low-trust sources contradicting high-trust sources = potential lies.
+// Weighted confidence = original confidence × trust score
+@origin:"doi:10.1038/nature.trusted"
+!Assert {
+  <Earth> [shape] <Sphere>
+} @0.99
+
+@origin:"blog.conspiracy.com"
+!Assert {
+  <Earth> [shape] <Flat>
+} @0.60
+
+// Trust scores: DOI (0.95) >> Blog (0.30)
+// Weighted: 0.99×0.95=0.94 vs 0.60×0.30=0.18
+// Delta: 0.76 > threshold (0.3) → potential lie detected!
+// Result: Low-trust source flagged as deceptive

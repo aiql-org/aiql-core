@@ -1,0 +1,8 @@
+// Affective Computing: Joy Expression
+// Demonstrates emotional state representation with first-class affective relations.
+// Agents can express feelings with intensity attributes for AI consciousness models.
+!Assert {
+  <Self> [feels] <Joy> {
+    intensity: 0.9
+  }
+} @0.95

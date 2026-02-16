@@ -1,0 +1,96 @@
+services:
+  # ── AIQL REST API ──────────────────────────────────────────────
+  aiql-api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    image: aiql/api:2.6.0
+    container_name: aiql-api
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/v1/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.aiql.service=api"
+      - "com.aiql.version=2.6.0"
+    networks:
+      - aiql-network
+
+  # ── AIQL CLI (on-demand batch processing) ──────────────────────
+  aiql-cli:
+    build:
+      context: .
+      dockerfile: docker/cli.Dockerfile
+    image: aiql/cli:2.6.0
+    container_name: aiql-cli
+    volumes:
+      - ./examples:/data:ro
+      - ./output:/output:rw
+    command: ["--help"]
+    profiles:
+      - cli
+    labels:
+      - "com.aiql.service=cli"
+      - "com.aiql.version=2.6.0"
+    networks:
+      - aiql-network
+
+  # ── AIQL Playground (interactive exploration) ──────────────────
+  aiql-playground:
+    build:
+      context: .
+      dockerfile: docker/playground.Dockerfile
+    image: aiql/playground:2.6.0
+    container_name: aiql-playground
+    volumes:
+      - ./examples:/playground/examples:ro
+      - ./output:/workspace:rw
+    stdin_open: true
+    tty: true
+    profiles:
+      - playground
+    labels:
+      - "com.aiql.service=playground"
+      - "com.aiql.version=2.6.0"
+    networks:
+      - aiql-network
+
+networks:
+  aiql-network:
+    driver: bridge
+    name: aiql-network
+
+# ============================================================================
+# Usage:
+# ============================================================================
+#
+# Start API:
+#   docker compose up -d aiql-api
+#
+# Run CLI:
+#   docker compose --profile cli run --rm aiql-cli transpile /data/example.aiql -t python
+#
+# Interactive Playground:
+#   docker compose --profile playground run --rm -it aiql-playground
+#
+# Test API:
+#   curl http://localhost:3000/api/v1/health
+#   curl -X POST http://localhost:3000/api/v1/transpile \
+#     -H "Content-Type: application/json" \
+#     -d '{"code": "!Assert { <AI> [learns] <Knowledge> } @0.95", "target": "python"}'
+#
+# Stop:
+#   docker compose down
+#
+# Rebuild:
+#   docker compose build
+# ============================================================================

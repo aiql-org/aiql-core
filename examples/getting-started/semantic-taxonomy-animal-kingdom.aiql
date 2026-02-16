@@ -1,0 +1,43 @@
+// Semantic Taxonomy: Animal Kingdom
+// Hierarchical is_a ontology: Animal → Mammal → Primate → Human/Chimpanzee.
+// Supports property inheritance queries: Human inherits traits from all ancestors.
+@version:"1.0.0"
+$$group:ontology_definition
+
+##seq:1
+!Assert {
+  <Mammal> [is_a] <Animal> {
+    defining_trait: "warm_blooded",
+    reproduction: "live_birth"
+  }
+} @1.0
+
+##seq:2
+!Assert {
+  <Primate> [is_a] <Mammal> {
+    defining_trait: "opposable_thumbs",
+    brain_size: "large"
+  }
+} @1.0
+
+##seq:3
+!Assert {
+  <Human> [is_a] <Primate> {
+    defining_trait: "advanced_cognition",
+    language_capable: "yes",
+    tool_use: "complex"
+  }
+} @1.0
+
+##seq:4
+!Assert {
+  <Chimpanzee> [is_a] <Primate> {
+    genetic_similarity_to_human: "0.98",
+    social_structure: "hierarchical"
+  }
+} @1.0
+
+// Property inheritance query
+!Query(mode:inheritance) {
+  <Human> [inherits_properties_from] <Animal>
+}

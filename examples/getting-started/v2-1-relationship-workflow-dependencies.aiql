@@ -1,0 +1,32 @@
+// v2.1.0 Relationship: Workflow Dependencies
+// Causal relationship with 'depends_on' expresses required prerequisites.
+// Use cases: Project management, task scheduling, dependency tracking.
+$id:design_phase
+!Task {
+  <Designer> [creates] <UIPrototype> {
+    tool: "Figma",
+    deadline: "Week1"
+  }
+} @0.95
+
+$id:implementation
+!Task {
+  <Developer> [implements] <Frontend> {
+    framework: "React"
+  }
+} @0.90
+
+// Implementation DEPENDS_ON completed design
+!Relationship(type:causal, source:$id:implementation, target:$id:design_phase) {
+  <Implementation> [depends_on] <DesignPhase>
+} @0.98
+
+$id:testing
+!Task {
+  <Tester> [validates] <Features>
+} @0.92
+
+// Testing DEPENDS_ON implementation
+!Relationship(type:causal, source:$id:testing, target:$id:implementation) {
+  <Testing> [depends_on] <Implementation>
+} @0.99

@@ -1,0 +1,27 @@
+// Rich Context: AGI Speculation
+// Demonstrates multiple context parameters per statement (time, mode, scope).
+// Enables rich semantic queries across temporal, modal, and spatial dimensions.
+@version:"1.0.0"
+
+!Query(time:future, mode:possibility, scope:global) {
+  <AI> [achieves] <AGI> {
+    capability: "general_reasoning",
+    alignment: "human_values"
+  }
+}
+
+!Query(time:past, scope:historical) {
+  <DeepLearning> [enabled] <AIRevolution> {
+    breakthrough: "neural_networks",
+    year_range: "2010-2025"
+  }
+}
+
+$id:speculation_001
+~temp:0.9
+!Query(mode:hypothetical, scope:research) {
+  <QuantumComputing> [accelerates] <AITraining> {
+    speedup: "exponential",
+    timeline: "2030s"
+  }
+} @0.70

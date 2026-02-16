@@ -1,0 +1,32 @@
+// v2.0.0 Consistency Checking: Detect Contradictions
+// Inference engine detects logical inconsistencies (A AND NOT-A).
+// Essential for knowledge base validation and contradiction resolution.
+@version:"2.0.0"
+$id:consistency_demo
+~~entropy:0.3
+
+// Consistent knowledge: No contradictions
+!Assert {
+  <Earth> [orbits] <Sun>
+} @1.0
+
+!Assert {
+  <Moon> [orbits] <Earth>
+} @1.0
+
+// Implication consistency
+!Assert {
+  <Object> [has] <Mass>
+} implies !Assert {
+  <Object> [experiences] <Gravity>
+}
+
+// Example of detectable contradiction (for testing):
+// !Assert { <X> [is] <Y> } @0.9
+// not !Assert { <X> [is] <Y> } @0.85
+// ↑ Inference engine would flag this as inconsistent
+
+// Contradictory implications (detectable):
+// !Assert { <A> [p] <B> } implies !Assert { <C> [q] <D> }
+// !Assert { <A> [p] <B> } implies not !Assert { <C> [q] <D> }
+// Up-arrow Engine detects: same antecedent -> conflicting consequents

@@ -1,0 +1,8 @@
+// Multi-Relation Data Pipeline
+// Shows multiple semantic relations within one !Task for data transformations.
+// Models ETL workflows: extraction → filtering → transformation chains.
+!Task {
+  <UserData> [extracted_from] <Database>
+  <UserData> [filtered_by] <AgeFilter> { min_age: 25 }
+  <UserData> [transformed_to] <CleanDataset>
+} @0.90

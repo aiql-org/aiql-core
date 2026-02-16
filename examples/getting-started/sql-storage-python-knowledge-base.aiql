@@ -1,0 +1,25 @@
+// SQL Storage: Python Knowledge Base
+// Transpiles AIQL to SQL: creates 4-table schema (statements, concepts, relations, attributes).
+// Generates INSERT statements and graph-traversal queries for knowledge bases.
+@version:"1.0.0"
+@origin:"aiql-playground"
+
+$id:knowledge_001
+!Assert(scope:database) {
+  <Python> [is_a] <ProgrammingLanguage> {
+    paradigm: "multi-paradigm",
+    typing: "dynamic",
+    year: 1991
+  }
+} @0.99
+
+$id:knowledge_002
+!Assert {
+  <Python> [created_by] <GuidoVanRossum> {
+    role: "creator",
+    affiliation: "CWI"
+  }
+} @0.95
+
+// Transpiles to SQL tables: statements, concepts, relations, attributes
+// Plus example queries: MATCH patterns, provenance tracking

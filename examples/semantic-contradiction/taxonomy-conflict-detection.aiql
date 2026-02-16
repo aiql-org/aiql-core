@@ -1,0 +1,17 @@
+// Taxonomy Conflict Detection (v2.5.0)
+// OntologyReasoner detects when entities belong to disjoint classes.
+// Uses transitive closure to find taxonomy violations in class hierarchies.
+// Example: Mammal and Reptile are mutually exclusive categories.
+!Assert {
+  <Fido> [is_a] <Dog>
+  <Dog> [is_a] <Mammal>
+} @0.99
+
+!Assert {
+  <Fido> [is_a] <Reptile>
+} @0.80
+
+// The inference engine detects this semantic contradiction:
+// Fido cannot be both Mammal and Reptile (disjoint classes)
+// Conflict type: taxonomy, severity: critical
+// No resolution strategy - AIQL only detects and represents

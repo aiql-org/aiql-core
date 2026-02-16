@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.github
+.vscode
+.idea
+*.md
+!README.md
+!packages/*/README.md
+coverage
+.nyc_output
+*.log
+.DS_Store
+.env
+.env.*
+docker-output
+output

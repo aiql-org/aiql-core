@@ -1,0 +1,873 @@
+
+import type { Token } from './tokenizer.js';
+import { TokenType } from './tokenizer.js';
+import * as AST from './ast.js';
+
+export class Parser {
+  private tokens: Token[];
+  private current: number = 0;
+  private warnings: string[] = [];  // v2.1.0: Collect validation warnings
+
+  constructor(tokens: Token[]) {
+    this.tokens = tokens;
+  }
+
+  parse(): AST.Program {
+    // Parse program-level metadata first
+    // Any VERSION/ORIGIN/CITE markers that appear before the first intent
+    // (before any INTENT, DIRECTIVE, or other statement markers) are program-level
+    let programVersion: string | undefined;
+    let programOrigin: string | undefined;
+    const programCitations: string[] = [];
+    
+    // Consume all leading metadata markers as program-level
+    while (!this.isAtEnd() && (this.check(TokenType.VERSION_MARKER) || 
+           this.check(TokenType.ORIGIN_MARKER) || this.check(TokenType.CITE_MARKER))) {
+      if (this.check(TokenType.VERSION_MARKER)) {
+        const token = this.advance();
+        programVersion = this.extractValue(token.value, '@version:');
+      } else if (this.check(TokenType.ORIGIN_MARKER)) {
+        const token = this.advance();
+        programOrigin = this.extractValue(token.value, '@origin:');
+      } else if (this.check(TokenType.CITE_MARKER)) {
+        const token = this.advance();
+        const citations = this.parseCitations(token.value);
+        programCitations.push(...citations);
+      }
+    }
+    
+    const body: AST.LogicalNode[] = [];
+    while (!this.isAtEnd()) {
+      body.push(this.parseStatement());
+    }
+    
+    const program: AST.Program = { type: 'Program', body };
+    if (programVersion) program.version = programVersion;
+    if (programOrigin) program.origin = programOrigin;
+    if (programCitations.length > 0) program.citations = programCitations;
+    
+    return program;
+  }
+
+  /**
+   * Get all warnings generated during parsing (v2.1.0)
+   */
+  public getWarnings(): string[] {
+    return this.warnings;
+  }
+
+  /**
+   * Parse a top-level statement: Intent, LogicalExpression, QuantifiedExpression, or RuleDefinition
+   * Handles operator precedence: not > and > or > implies > iff
+   */
+  private parseStatement(): AST.LogicalNode {
+    return this.parseImplication();
+  }
+
+  /**
+   * Parse implication/iff operators (lowest precedence)
+   * Grammar: <or> (('implies' | 'iff' | 'then') <or>)*
+   */
+  private parseImplication(): AST.LogicalNode {
+    let left = this.parseOr();
+
+    while (this.check(TokenType.IMPLIES) || this.check(TokenType.IFF) || this.check(TokenType.THEN)) {
+      const operator = this.advance();
+      const operatorType = operator.type === TokenType.THEN ? 'implies' : 
+                          operator.type === TokenType.IFF ? 'iff' : 'implies';
+      const right = this.parseOr();
+      left = {
+        type: 'LogicalExpression',
+        operator: operatorType as AST.LogicalOperator,
+        left,
+        right
+      };
+    }
+
+    return left;
+  }
+
+  /**
+   * Parse OR operator (medium-low precedence)
+   * Grammar: <and> ('or' <and>)*
+   */
+  private parseOr(): AST.LogicalNode {
+    let left = this.parseAnd();
+
+    while (this.check(TokenType.OR)) {
+      this.advance();
+      const right = this.parseAnd();
+      left = {
+        type: 'LogicalExpression',
+        operator: 'or',
+        left,
+        right
+      };
+    }
+
+    return left;
+  }
+
+  /**
+   * Parse AND operator (medium-high precedence)
+   * Grammar: <not> ('and' <not>)*
+   */
+  private parseAnd(): AST.LogicalNode {
+    let left = this.parseNot();
+
+    while (this.check(TokenType.AND)) {
+      this.advance();
+      const right = this.parseNot();
+      left = {
+        type: 'LogicalExpression',
+        operator: 'and',
+        left,
+        right
+      };
+    }
+
+    return left;
+  }
+
+  /**
+   * Parse NOT operator (highest precedence)
+   * Grammar: 'not' <primary> | <primary>
+   */
+  private parseNot(): AST.LogicalNode {
+    if (this.check(TokenType.NOT)) {
+      this.advance();
+      const operand = this.parsePrimary();
+      return {
+        type: 'LogicalExpression',
+        operator: 'not',
+        left: operand,
+        right: undefined
+      };
+    }
+
+    return this.parsePrimary();
+  }
+
+  /**
+   * Parse primary expression: Intent, QuantifiedExpression, RuleDefinition, Robotics nodes, or grouped expression
+   * Grammar: <quantified> | <robotics> | <relationship> | <intent> | <rule> | '(' <statement> ')'
+   */
+  private parsePrimary(): AST.LogicalNode {
+    // Check for quantifiers (forall, exists)
+    if (this.check(TokenType.FORALL) || this.check(TokenType.EXISTS)) {
+      return this.parseQuantifiedExpression();
+    }
+
+    // Check for relationship intent (v2.1.0)
+    if (this.check(TokenType.INTENT)) {
+      const intentToken = this.peek();
+      if (intentToken.value === '!Relationship') {
+        return this.parseRelationshipIntent();
+      }
+    }
+
+    // Check for parenthesized expression
+    if (this.check(TokenType.SYMBOL) && this.peek().value === '(') {
+      this.advance(); // consume '('
+      const expr = this.parseStatement();
+      this.consume(TokenType.SYMBOL, "Expect ')' after expression.");
+      if (this.previous().value !== ')') {
+        throw this.error(this.previous(), "Expect ')' after expression.");
+      }
+      return expr;
+    }
+
+    // Otherwise, parse an intent
+    return this.parseIntent();
+  }
+
+  /**
+   * Parse quantified expression: forall/exists
+   * Grammar: ('forall' | 'exists') <identifier> ('in' <identifier>)? ':' <statement>
+   */
+  private parseQuantifiedExpression(): AST.QuantifiedExpression {
+    const quantifierToken = this.advance();
+    const quantifier = quantifierToken.type === TokenType.FORALL ? 'forall' : 'exists';
+
+    // Parse variable name
+    if (!this.check(TokenType.IDENTIFIER)) {
+      throw this.error(this.peek(), `Expect variable name after '${quantifier}'.`);
+    }
+    const variable = this.advance().value;
+
+    // Parse 'in' keyword for domain (optional for exists)
+    let domain: string | undefined;
+    if (this.check(TokenType.IN)) {
+      this.advance();
+      // Domain should be an identifier (e.g., "Human", "Planet")
+      if (!this.check(TokenType.IDENTIFIER)) {
+        throw this.error(this.peek(), `Expect domain name after 'in'.`);
+      }
+      domain = this.advance().value;
+    }
+
+    // Parse ':' separator
+    if (!this.check(TokenType.SYMBOL) || this.peek().value !== ':') {
+      throw this.error(this.peek(), `Expect ':' after quantifier variable/domain.`);
+    }
+    this.advance(); // consume ':'
+
+    // Parse body
+    const body = this.parseStatement();
+
+    return {
+      type: 'QuantifiedExpression',
+      quantifier,
+      variable,
+      domain,
+      body
+    };
+  }
+
+  private parseIntent(): AST.Intent {
+    // Check for security directive first
+    let securityDirective: { type: string; params: string[] } | undefined;
+    
+    // Parse metadata markers before the intent
+    let identifier: string | undefined;
+    let groupIdentifier: string | undefined;
+    let sequenceNumber: number | undefined;
+    let temperature: number | undefined;
+    let entropy: number | undefined;
+    let coherence: number | undefined;  // v2.6.0: Quantum coherence
+    let version: string | undefined;
+    let origin: string | undefined;
+    const citations: string[] = [];
+    
+    // Parse all metadata markers that appear before the intent
+    while (this.check(TokenType.DIRECTIVE) || this.check(TokenType.ID_MARKER) || 
+           this.check(TokenType.GROUP_ID) || this.check(TokenType.SEQ_NUM) || 
+           this.check(TokenType.TEMPERATURE) || this.check(TokenType.ENTROPY) ||
+           this.check(TokenType.COHERENCE) ||  // v2.6.0
+           this.check(TokenType.VERSION_MARKER) || this.check(TokenType.ORIGIN_MARKER) ||
+           this.check(TokenType.CITE_MARKER)) {
+      
+      if (this.check(TokenType.DIRECTIVE)) {
+        securityDirective = this.parseSecurityDirective();
+      } else if (this.check(TokenType.ID_MARKER)) {
+        const token = this.advance();
+        identifier = this.extractValue(token.value, '$');
+      } else if (this.check(TokenType.GROUP_ID)) {
+        const token = this.advance();
+        groupIdentifier = this.extractValue(token.value, '$$');
+      } else if (this.check(TokenType.SEQ_NUM)) {
+        const token = this.advance();
+        const seqValue = parseFloat(this.extractValue(token.value, '##'));
+        if (isNaN(seqValue)) {
+          throw this.error(token, `Invalid sequence number format: ${token.value}`);
+        }
+        sequenceNumber = seqValue;
+      } else if (this.check(TokenType.TEMPERATURE)) {
+        const token = this.advance();
+        const tempValue = parseFloat(this.extractValue(token.value, '~'));
+        if (isNaN(tempValue)) {
+          throw this.error(token, `Invalid temperature format: ${token.value}`);
+        }
+        if (tempValue < 0 || tempValue > 2.0) {
+          throw this.error(token, `Temperature must be between 0.0 and 2.0, got ${tempValue}`);
+        }
+        temperature = tempValue;
+      } else if (this.check(TokenType.ENTROPY)) {
+        const token = this.advance();
+        const entValue = parseFloat(this.extractValue(token.value, '~~'));
+        if (isNaN(entValue)) {
+          throw this.error(token, `Invalid entropy format: ${token.value}`);
+        }
+        if (entValue < 0 || entValue > 1.0) {
+          throw this.error(token, `Entropy must be between 0.0 and 1.0, got ${entValue}`);
+        }
+        entropy = entValue;
+      } else if (this.check(TokenType.COHERENCE)) {
+        const token = this.advance();
+        const cohValue = parseFloat(this.extractValue(token.value, '@coherence:'));
+        if (isNaN(cohValue)) {
+          throw this.error(token, `Invalid coherence format: ${token.value}`);
+        }
+        if (cohValue < 0 || cohValue > 1.0) {
+          throw this.error(token, `Coherence must be between 0.0 and 1.0, got ${cohValue}`);
+        }
+        coherence = cohValue;
+      } else if (this.check(TokenType.VERSION_MARKER)) {
+        const token = this.advance();
+        version = this.extractValue(token.value, '@version:');
+      } else if (this.check(TokenType.ORIGIN_MARKER)) {
+        const token = this.advance();
+        origin = this.extractValue(token.value, '@origin:');
+      } else if (this.check(TokenType.CITE_MARKER)) {
+        const token = this.advance();
+        const cites = this.parseCitations(token.value);
+        citations.push(...cites);
+      }
+    }
+    
+    if (this.check(TokenType.INTENT)) {
+      const intent = this.intent();
+      
+      // Apply security directive if present
+      if (securityDirective) {
+        intent.security = this.buildSecurityMetadata(securityDirective);
+      }
+      
+      // Apply metadata from intent level
+      if (identifier) intent.identifier = identifier;
+      if (groupIdentifier) intent.groupIdentifier = groupIdentifier;
+      if (sequenceNumber !== undefined) intent.sequenceNumber = sequenceNumber;
+      if (temperature !== undefined) intent.temperature = temperature;
+      if (entropy !== undefined) intent.entropy = entropy;
+      if (coherence !== undefined) intent.coherence = coherence;  // v2.6.0
+      if (version) intent.version = version;
+      if (origin) intent.origin = origin;
+      if (citations.length > 0) intent.citations = citations;
+      
+      return intent;
+    }
+    throw this.error(this.peek(), "Expect start of intent (Intent marker like !Query, !Assert, etc.).");
+  }
+
+  private parseSecurityDirective(): { type: string; params: string[] } {
+    const directiveToken = this.consume(TokenType.DIRECTIVE, "Expect directive.");
+    const directiveType = directiveToken.value.substring(1); // Remove '#'
+    
+    const params: string[] = [];
+    
+    // Parse directive parameters if present: #sign(agentId) or #secure(signer, recipient)
+    if (this.check(TokenType.SYMBOL) && this.peek().value === '(') {
+      this.advance(); // consume '('
+      
+      while (!this.isAtEnd() && !(this.check(TokenType.SYMBOL) && this.peek().value === ')')) {
+        if (this.check(TokenType.IDENTIFIER) || this.check(TokenType.STRING)) {
+          const param = this.advance().value;
+          // Remove quotes from strings
+          params.push(param.startsWith('"') ? param.substring(1, param.length - 1) : param);
+          
+          // Handle comma separator
+          if (this.check(TokenType.SYMBOL) && this.peek().value === ',') {
+            this.advance(); // consume ','
+          }
+        } else {
+          throw this.error(this.peek(), "Expect identifier or string in directive parameters.");
+        }
+      }
+      
+      this.consume(TokenType.SYMBOL, "Expect closing )");
+    }
+    
+    return { type: directiveType, params };
+  }
+
+  private buildSecurityMetadata(directive: { type: string; params: string[] }): AST.SecurityMetadata {
+    const metadata: AST.SecurityMetadata = {
+      timestamp: Date.now(),
+    };
+    
+    switch (directive.type) {
+      case 'sign':
+        metadata.signed = true;
+        metadata.signerAgentId = directive.params[0];
+        break;
+      case 'encrypt':
+        metadata.encrypted = true;
+        metadata.recipientAgentId = directive.params[0];
+        break;
+      case 'secure':
+        metadata.signed = true;
+        metadata.encrypted = true;
+        metadata.signerAgentId = directive.params[0];
+        metadata.recipientAgentId = directive.params[1];
+        break;
+      default:
+        throw new Error(`Unknown security directive: ${directive.type}`);
+    }
+    
+    return metadata;
+  }
+
+  private intent(): AST.Intent {
+    const intentToken = this.consume(TokenType.INTENT, "Expect Intent marker (!Query, !Assert, etc.).");
+    let scope: string | undefined;
+    const contextParams: Record<string, string> = {};
+
+    if (this.check(TokenType.SYMBOL) && this.peek().value === '(') {
+        this.advance(); // consume '('
+        
+        // Parse context parameters (key:value, key:value, ...)
+        while (this.check(TokenType.IDENTIFIER)) {
+            const key = this.consume(TokenType.IDENTIFIER, "Expect parameter key").value;
+            this.consume(TokenType.SYMBOL, "Expect :"); // :
+            
+            // Accept IDENTIFIER, NUMBER, TRUE, or FALSE as parameter values
+            let value: string;
+            if (this.match(TokenType.IDENTIFIER)) {
+                value = this.previous().value;
+            } else if (this.match(TokenType.NUMBER)) {
+                value = this.previous().value;
+            } else if (this.match(TokenType.TRUE)) {
+                value = 'true';
+            } else if (this.match(TokenType.FALSE)) {
+                value = 'false';
+            } else {
+                throw this.error(this.peek(), "Expect parameter value");
+            }
+            
+            contextParams[key] = value;
+            
+            // Backward compatibility: if key is "scope", also set scope field
+            if (key === 'scope') {
+                scope = value;
+            }
+            
+            // Check for comma (more parameters) or closing paren
+            if (this.check(TokenType.SYMBOL) && this.peek().value === ',') {
+                this.advance(); // consume ','
+            } else {
+                break;
+            }
+        }
+        
+        this.consume(TokenType.SYMBOL, "Expect closing )"); 
+    }
+
+    this.consume(TokenType.SYMBOL, "Expect { to start statement block");
+    
+    const statements: AST.Statement[] = [];
+    while (!this.check(TokenType.SYMBOL) || this.peek().value !== '}') {
+        statements.push(this.statement());
+    }
+    
+    this.consume(TokenType.SYMBOL, "Expect } to end statement block");
+    
+    let confidence: number | undefined;
+    if (this.check(TokenType.CONFIDENCE)) {
+        const token = this.consume(TokenType.CONFIDENCE, "Expect confidence");
+        const confValue = parseFloat(token.value.substring(1));
+        if (isNaN(confValue)) {
+          throw this.error(token, `Invalid confidence format: ${token.value}`);
+        }
+        if (confValue < 0 || confValue > 1.0) {
+          throw this.error(token, `Confidence must be between 0.0 and 1.0, got ${confValue}`);
+        }
+        confidence = confValue;
+    }
+    
+    return {
+        type: 'Intent',
+        intentType: intentToken.value,
+        scope,
+        contextParams: Object.keys(contextParams).length > 0 ? contextParams : undefined,
+        statements,
+        confidence
+    };
+  }
+
+  private extractValue(token: string, prefix: string): string {
+    // Extract value from tokens like "$id:xyz" -> "xyz" or "@version:"0.4.0"" -> "0.4.0"
+    // The prefix includes the marker and colon (e.g., "@version:", "$id:", "~temp:")
+    let value = token.substring(prefix.length);
+    
+    // For markers like "~temp:" or "##seq:", there might be an optional label before the value
+    // e.g., "~temp:0.7" or "~0.7", "$id:xyz" or just "$xyz"
+    // But for @version:, @origin:, @cite:, the value comes immediately after the colon
+    
+    // Special handling for old-style markers that might have format like "$id:abc" or "$id:key:value"
+    if (prefix.startsWith('$') || prefix.startsWith('#') || prefix.startsWith('~')) {
+      const colonIndex = value.indexOf(':');
+      if (colonIndex !== -1) {
+        value = value.substring(colonIndex + 1);
+      }
+    }
+    
+    // Remove surrounding quotes if present
+    if (value.startsWith('"') && value.endsWith('"')) {
+      value = value.substring(1, value.length - 1);
+    }
+    
+    return value;
+  }
+
+  private parseCitations(tokenValue: string): string[] {
+    // Parse @cite:"ref" or @cite:["a","b","c"]
+    const valueStart = tokenValue.indexOf(':') + 1;
+    const value = tokenValue.substring(valueStart);
+    
+    // Check if it's an array
+    if (value.startsWith('[')) {
+      // Parse array: ["a","b","c"]
+      const citations: string[] = [];
+      let current = '';
+      let inString = false;
+      let escaped = false;
+      
+      for (let i = 1; i < value.length - 1; i++) { // Skip opening and closing brackets
+        const char = value[i];
+        
+        if (escaped) {
+          current += char;
+          escaped = false;
+        } else if (char === '\\') {
+          escaped = true;
+        } else if (char === '"') {
+          if (inString) {
+            // End of string
+            citations.push(current);
+            current = '';
+            inString = false;
+          } else {
+            // Start of string
+            inString = true;
+          }
+        } else if (inString) {
+          current += char;
+        }
+        // Ignore commas, spaces outside strings
+      }
+      
+      return citations;
+    } else {
+      // Single value - remove quotes if present
+      let citation = value.trim();
+      if (citation.startsWith('"') && citation.endsWith('"')) {
+        citation = citation.substring(1, citation.length - 1);
+      }
+      return [citation];
+    }
+  }
+
+  private statement(): AST.Statement {
+      const subject = this.concept();
+      const relation = this.relation();
+      const object = this.concept();
+      
+      let attributes: Record<string, string | number | boolean> | undefined;
+      
+      if (this.check(TokenType.SYMBOL) && this.peek().value === '{') {
+          this.advance(); // consume '{'
+          attributes = {};
+          while (!this.check(TokenType.SYMBOL) || this.peek().value !== '}') {
+              const key = this.consume(TokenType.IDENTIFIER, "Expect attribute key").value;
+              this.consume(TokenType.SYMBOL, "Expect :"); 
+              let value: string | number | boolean;
+              if (this.match(TokenType.STRING)) {
+                  const raw = this.previous().value;
+                  value = raw.substring(1, raw.length - 1);
+              } else if (this.match(TokenType.NUMBER)) {
+                  value = parseFloat(this.previous().value);
+              } else if (this.match(TokenType.TRUE)) {
+                  value = true;
+              } else if (this.match(TokenType.FALSE)) {
+                  value = false;
+              } else {
+                  throw this.error(this.peek(), "Expect attribute value");
+              }
+              attributes[key] = value;
+              
+              if (this.check(TokenType.SYMBOL) && this.peek().value === ',') {
+                  this.advance(); // consume ','
+                  continue;
+              } else {
+                  break;
+              }
+          }
+          this.consume(TokenType.SYMBOL, "Expect } after attributes");
+      }
+      
+      return {
+          type: 'Statement',
+          subject,
+          relation,
+          object,
+          attributes
+      };
+  }
+
+  private concept(): AST.Concept {
+      const token = this.consume(TokenType.CONCEPT, "Expect Concept.");
+      return { type: 'Concept', name: token.value };
+  }
+
+  private relation(): AST.Relation {
+      const token = this.consume(TokenType.RELATION, "Expect Relation.");
+      
+      // Parse relation value: [relation_name] or [relation_name@tense:value]
+      let relationValue = token.value;
+      
+      // Remove brackets
+      if (relationValue.startsWith('[') && relationValue.endsWith(']')) {
+          relationValue = relationValue.slice(1, -1);
+      }
+      
+      // Check for tense annotation marker anywhere in the relation
+      if (relationValue.includes('@tense:')) {
+          const tenseMatch = relationValue.match(/^([^@]+)@tense:(.+)$/);
+          
+          if (!tenseMatch) {
+              throw new Error(`[line ${token.line}] Malformed tense annotation in '${token.value}'. Expected format: [relation@tense:value]`);
+          }
+          
+          const relationName = tenseMatch[1].trim();
+          const tenseValue = tenseMatch[2].trim();
+          
+          // Check for empty or whitespace-only tense value
+          if (!tenseValue || tenseValue.length === 0) {
+              throw new Error(`[line ${token.line}] Empty tense value in '${token.value}'. Expected format: [relation@tense:value]`);
+          }
+          
+          // Check for spaces in tense value (invalid)
+          if (tenseValue.includes(' ')) {
+              throw new Error(`[line ${token.line}] Invalid tense value '${tenseValue}' contains spaces. Use underscores for multi-word tenses (e.g., past_perfect)`);
+          }
+          
+          // Validate tense value against allowed values
+          const validTenses: AST.TenseValue[] = [
+              'past', 'present', 'future',
+              'present_perfect', 'past_perfect', 'future_perfect',
+              'present_progressive', 'past_progressive', 'future_progressive',
+              'present_perfect_progressive', 'past_perfect_progressive', 'future_perfect_progressive'
+          ];
+          
+          if (!validTenses.includes(tenseValue as AST.TenseValue)) {
+              throw new Error(`[line ${token.line}] Invalid tense value '${tenseValue}'. Valid values: ${validTenses.join(', ')}`);
+          }
+          
+          return { type: 'Relation', name: `[${relationName}]`, tense: tenseValue as AST.TenseValue };
+      }
+      
+      return { type: 'Relation', name: token.value };
+  }
+
+  private match(type: TokenType): boolean {
+    if (this.check(type)) {
+      this.advance();
+      return true;
+    }
+    return false;
+  }
+
+  private check(type: TokenType): boolean {
+    if (this.isAtEnd()) return false;
+    return this.peek().type === type;
+  }
+
+  private advance(): Token {
+    if (!this.isAtEnd()) this.current++;
+    return this.previous();
+  }
+
+  private isAtEnd(): boolean {
+    return this.peek().type === TokenType.EOF;
+  }
+
+  private peek(): Token {
+    return this.tokens[this.current];
+  }
+
+  private previous(): Token {
+    return this.tokens[this.current - 1];
+  }
+
+  private consume(type: TokenType, message: string): Token {
+    if (this.check(type)) return this.advance();
+    throw this.error(this.peek(), message);
+  }
+
+  private error(token: Token, message: string): Error {
+    return new Error(`[line ${token.line}] Error at '${token.value}': ${message}`);
+  }
+
+  /**
+   * Emit warning (don't throw error) - v2.1.0
+   */
+  private warn(token: Token, message: string): void {
+    const warning = `[line ${token.line}] Warning at '${token.value}': ${message}`;
+    this.warnings.push(warning);
+    console.warn(`[line ${token.line}] Warning: ${message}`);
+  }
+
+  // ===================================================================
+  // Inter-Statement Relationship Parsing (v2.1.0)
+  // ===================================================================
+
+  /**
+   * Parse relationship intent: !Relationship(type:temporal, source:$id:a, target:$id:b) { ... } @0.85
+   * v2.1.0 - Inter-statement/inter-intent relationships
+   */
+  private parseRelationshipIntent(): AST.RelationshipNode {
+    // Consume !Relationship token
+    const intentToken = this.consume(TokenType.INTENT, "Expect !Relationship.");
+    
+    // Parse required context parameters: type, source, target
+    if (!this.check(TokenType.SYMBOL) || this.peek().value !== '(') {
+      throw this.error(this.peek(), "Relationship requires context parameters: (type:..., source:..., target:...)");
+    }
+    
+    this.advance(); // consume '('
+    
+    const contextParams = this.parseContextParameters();
+    
+    // Validate required parameters
+    if (!contextParams.type) {
+      throw this.error(intentToken, "Relationship requires 'type' parameter (temporal, causal, or logical)");
+    }
+    if (!contextParams.source) {
+      throw this.error(intentToken, "Relationship requires 'source' parameter ($id:... reference)");
+    }
+    if (!contextParams.target) {
+      throw this.error(intentToken, "Relationship requires 'target' parameter ($id:... reference)");
+    }
+    
+    // Validate relationship type
+    const validTypes = ['temporal', 'causal', 'logical'];
+    if (!validTypes.includes(contextParams.type)) {
+      this.warn(intentToken, `Unknown relationship type '${contextParams.type}'. Valid types: ${validTypes.join(', ')}`);
+    }
+    
+    // Validate source/target format (should start with $id:)
+    if (!contextParams.source.startsWith('$id:')) {
+      this.warn(intentToken, `Source should be an $id: reference, got '${contextParams.source}'`);
+    }
+    if (!contextParams.target.startsWith('$id:')) {
+      this.warn(intentToken, `Target should be an $id: reference, got '${contextParams.target}'`);
+    }
+    
+    // Check for self-referential relationship
+    if (contextParams.source === contextParams.target) {
+      this.warn(intentToken, `Self-referential relationship: source and target are the same (${contextParams.source})`);
+    }
+    
+    // Parse optional statement block for explicit relationship expression
+    let statements: AST.Statement[] = [];
+    let relationName: string = contextParams.type; // Default to relationship type
+    
+    if (this.check(TokenType.SYMBOL) && this.peek().value === '{') {
+      this.advance(); // consume '{'
+      
+      // Parse statements until we hit '}'
+      while (!this.isAtEnd() && !(this.check(TokenType.SYMBOL) && this.peek().value === '}')) {
+        // Parse a statement (semantic triple)
+        const stmt = this.statement();
+        statements.push(stmt);
+        
+        // Extract relation name from first statement if present (strip brackets)
+        if (statements.length === 1) {
+          relationName = stmt.relation.name.replace(/^\[|\]$/g, ''); // Remove [ and ]
+        }
+      }
+      
+      this.consume(TokenType.SYMBOL, "Expect '}' after relationship statements.");
+    } else {
+      // No explicit statement block - use relation parameter if provided
+      if (contextParams.relation) {
+        relationName = contextParams.relation;
+      }
+    }
+    
+    // Parse optional confidence score
+    let confidence: number | undefined;
+    if (this.check(TokenType.CONFIDENCE)) {
+      const confToken = this.advance();
+      confidence = parseFloat(confToken.value.substring(1));
+    }
+    
+    // Validate relationship name based on type
+    this.validateRelationName(contextParams.type, relationName, intentToken);
+    
+    // Build relationship node
+    const relationship: AST.RelationshipNode = {
+      type: 'Relationship',
+      relationshipType: contextParams.type as 'temporal' | 'causal' | 'logical',
+      source: contextParams.source,
+      target: contextParams.target,
+      relationName: relationName,
+      confidence: confidence
+    };
+    
+    if (statements.length > 0) {
+      relationship.statements = statements;
+    }
+    
+    // Check if relationship is bidirectional (symmetric)
+    // Compare against cleaned relation name (without brackets)
+    const cleanRelationName = relationName.replace(/^\[|\]$/g, '');
+    const symmetricRelations = ['simultaneous', 'concurrent', 'equivalent_to'];
+    if (symmetricRelations.includes(cleanRelationName)) {
+      relationship.bidirectional = true;
+    }
+    
+    return relationship;
+  }
+
+  /**
+   * Validate relationship name matches relationship type (v2.1.0)
+   */
+  private validateRelationName(type: string, relationName: string, token: Token): void {
+    const validRelations: Record<string, string[]> = {
+      temporal: ['before', 'after', 'simultaneous', 'concurrent', 'during', 'starts', 'finishes', 'overlaps'],
+      causal: ['causes', 'caused_by', 'enables', 'enabled_by', 'prevents', 'prevented_by', 'depends_on', 'triggers', 'triggered_by'],
+      logical: ['supports', 'contradicts', 'equivalent_to', 'consistent_with', 'inconsistent_with']
+    };
+    
+    if (validRelations[type] && !validRelations[type].includes(relationName)) {
+      this.warn(token, `Relation '${relationName}' may not be appropriate for ${type} relationships. Valid relations: ${validRelations[type].join(', ')}`);
+    }
+  }
+
+  /**
+   * Parse context parameters for intents and relationships (v2.1.0 - extracted for reuse)
+   */
+  private parseContextParameters(): Record<string, string> {
+    const contextParams: Record<string, string> = {};
+    
+    while (!this.isAtEnd() && !(this.check(TokenType.SYMBOL) && this.peek().value === ')')) {
+      // Parse parameter key
+      if (!this.check(TokenType.IDENTIFIER)) {
+        break;
+      }
+      const key = this.advance().value;
+      
+      // Expect ':'
+      if (!this.check(TokenType.SYMBOL) || this.peek().value !== ':') {
+        throw this.error(this.peek(), "Expect ':' after parameter key");
+      }
+      this.advance(); // consume ':'
+      
+      // Accept IDENTIFIER, NUMBER, TRUE, FALSE, STRING, or ID_MARKER as parameter values
+      let value: string;
+      if (this.match(TokenType.IDENTIFIER)) {
+        value = this.previous().value;
+      } else if (this.match(TokenType.NUMBER)) {
+        value = this.previous().value;
+      } else if (this.match(TokenType.TRUE)) {
+        value = 'true';
+      } else if (this.match(TokenType.FALSE)) {
+        value = 'false';
+      } else if (this.match(TokenType.STRING)) {
+        // Handle string values (remove quotes)
+        value = this.previous().value;
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.substring(1, value.length - 1);
+        }
+      } else if (this.match(TokenType.ID_MARKER)) {
+        // Handle $id: references as parameter values (v2.1.0)
+        value = this.previous().value;
+      } else {
+        throw this.error(this.peek(), "Expect parameter value");
+      }
+      
+      contextParams[key] = value;
+      
+      // Check for comma (more parameters) or closing paren
+      if (this.check(TokenType.SYMBOL) && this.peek().value === ',') {
+        this.advance(); // consume ','
+      } else {
+        break;
+      }
+    }
+    
+    this.consume(TokenType.SYMBOL, "Expect closing )");
+    return contextParams;
+  }
+}

@@ -1,0 +1,22 @@
+// Capability Self-Assessment (v2.2.0)
+// Agent infers its own capabilities from KB structure.
+// Has logical statements → can reason logically.
+// Has affective statements → can model emotions.
+// Demonstrates meta-cognitive capability inference.
+
+// Define logical implication (demonstrates reasoning capability)
+!Assert { <Animal> [is_a] <Mammal> } implies !Assert { <Animal> [has] <Spine> }
+
+// Add affective statement (demonstrates affective capability)
+!Assert {
+  <Agent> [experiences] <Curiosity> {
+    about: "quantum_physics",
+    intensity: 0.7
+  }
+} @0.85
+
+// Agent introspects on capabilities
+!Query {
+  <Self> [has_capability] <?Skill>
+}
+// Returns: <LogicalReasoning>, <AffectiveReasoning>

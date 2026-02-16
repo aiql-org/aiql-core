@@ -1,0 +1,24 @@
+// Trust Score Management (v2.5.0)
+// Define trust levels for various information sources.
+// Trust scores range 0.0 (untrust) to 1.0 (fully trusted).
+// Used for weighted confidence calculation and lying detection.
+
+// High-trust scientific sources
+!Assert {
+  <DOI_Source> [trusted_at] <TrustLevel> { value: 0.95 }
+  <ArXiv_Source> [trusted_at] <TrustLevel> { value: 0.85 }
+  <PeerReviewed> [trusted_at] <TrustLevel> { value: 0.90 }
+} @0.99
+
+// Medium-trust sources
+!Assert {
+  <Wikipedia> [trusted_at] <TrustLevel> { value: 0.70 }
+  <NewsMedia> [trusted_at] <TrustLevel> { value: 0.65 }
+} @0.85
+
+// Low-trust sources
+!Assert {
+  <SocialMedia> [trusted_at] <TrustLevel> { value: 0.40 }
+  <PersonalBlog> [trusted_at] <TrustLevel> { value: 0.30 }
+  <Anonymous> [trusted_at] <TrustLevel> { value: 0.20 }
+} @0.80

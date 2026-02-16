@@ -1,0 +1,31 @@
+// Goal-Driven Learning: Quantum Physics
+// !Goal intent models agent objectives with prerequisites and progress tracking.
+// Demonstrates hierarchical goal decomposition with subgoal dependencies.
+@version:"1.0.0"
+
+$id:goal_main
+!Goal {
+  <Agent> [aims_to] <UnderstandQuantumPhysics> {
+    priority: "high",
+    deadline: "2026-12-31",
+    progress: 0.45
+  }
+} @0.85
+
+$id:subgoal_001
+$$group:learning_path
+!Goal {
+  <Agent> [must_learn] <LinearAlgebra> {
+    prerequisite_for: "quantum_mechanics",
+    status: "completed"
+  }
+} @1.0
+
+$id:subgoal_002
+$$group:learning_path
+!Goal {
+  <Agent> [must_learn] <ComplexNumbers> {
+    prerequisite_for: "quantum_mechanics",
+    status: "in_progress"
+  }
+} @0.70

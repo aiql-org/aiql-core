@@ -1,0 +1,16 @@
+// Temporal Tense Annotations (v1.1.0)
+// Relations can express temporal tense using @tense: annotations.
+// Supports 12 tense values: past, present, future, and aspect combinations
+// (perfect, progressive, perfect_progressive) for each time.
+!Assert {
+  <Napoleon> [conquered@tense:past] <Europe> {
+    year: 1805
+  }
+  <AI> [transforms@tense:present] <Industry>
+  <AGI> [will_achieve@tense:future] <Singularity>
+} @0.95
+
+// Query with past perfect tense
+!Query {
+  <Scientists> [had_discovered@tense:past_perfect] <Vaccine>
+}

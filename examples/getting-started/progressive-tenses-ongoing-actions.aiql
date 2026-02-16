@@ -1,0 +1,14 @@
+// Progressive Tenses: Ongoing Actions (v1.1.0)
+// Present, past, and future progressive tenses describe actions in progress.
+// Use cases: Real-time monitoring, continuous processes, status tracking.
+!Assert {
+  <Athlete> [is_running@tense:present_progressive] <Marathon> {
+    distance_remaining: "10km"
+  }
+  <Developer> [was_coding@tense:past_progressive] <Feature> {
+    interrupted_by: "meeting"
+  }
+  <Robot> [will_be_working@tense:future_progressive] <Factory> {
+    shift: "night"
+  }
+} @0.92

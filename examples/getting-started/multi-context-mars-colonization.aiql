@@ -1,0 +1,10 @@
+// Multi-Context: Mars Colonization
+// Demonstrates context parameters (time, scope) for temporal and spatial reasoning.
+// v1.0 parses contexts; v0.5+ will add full temporal semantics (dates, durations).
+// Future: time:+3d, time:"2026-01-01", time:[start,end]
+!Assert(time:future, scope:global) {
+  <Mars> [colonized_by] <Humans> {
+    estimated_date: "2050-2100",
+    probability: 0.65
+  }
+} @0.85

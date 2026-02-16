@@ -1,0 +1,28 @@
+{
+  "name": "@aiql-org/security",
+  "version": "2.6.0",
+  "description": "AIQL Security - Quantum-proof cryptography (Dilithium/Kyber), trust registry",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node dist/test.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": ["aiql", "security", "quantum-proof", "dilithium", "kyber", "cryptography", "trust"],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/AI-Memory/aiql.ws.git", "directory": "packages/security" },
+  "publishConfig": { "access": "public" },
+  "peerDependencies": { "@aiql-org/core": "^2.6.0" },
+  "devDependencies": { "typescript": "^5.0.0" },
+  "engines": { "node": ">=20.0.0" }
+}

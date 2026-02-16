@@ -1,0 +1,8 @@
+// Statement Grouping: Physics Laws
+// Groups logically related statements using $$group and ##seq markers.
+// Essential for organizing knowledge bases, proofs, and multi-step reasoning.
+$$group:physics_laws
+##seq:1
+!Assert {
+  <Energy> [is_conserved] <ClosedSystem>
+} @1.0

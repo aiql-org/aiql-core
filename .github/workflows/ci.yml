@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Verify package exports
+        run: |
+          node -e "const core = require('./packages/core/dist/index.js'); console.log('✅ @aiql-org/core loaded, version:', core.version)"
+          node -e "const cli = require('./packages/cli/dist/cli.js'); console.log('✅ @aiql-org/cli loaded')"
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build CLI image
+        run: docker build -f docker/cli.Dockerfile -t aiql/cli:test .
+
+      - name: Build API image
+        run: docker build -f docker/api.Dockerfile -t aiql/api:test .
+
+      - name: Build Playground image
+        run: docker build -f docker/playground.Dockerfile -t aiql/playground:test .
+
+      - name: Smoke test CLI
+        run: docker run --rm aiql/cli:test --help
+
+      - name: Smoke test API
+        run: |
+          docker run -d --name api-test -p 3000:3000 aiql/api:test
+          sleep 5
+          curl -f http://localhost:3000/api/v1/health
+          curl -f http://localhost:3000/api/v1/formats
+          docker stop api-test

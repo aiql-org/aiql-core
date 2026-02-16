@@ -1,0 +1,26 @@
+// Motor Control with Safety (v2.4.0 Organic)
+// Uses !Task Intent with context params instead of special syntax.
+// Safety expressed as semantic knowledge (!Assert monitoring).
+// No special tokens - pure triple-based representation!
+!Task(device_type:motor, device_id:motor_left, mode:realtime) {
+  <MotorLeft> [has_target] <Velocity> { 
+    value: 100, 
+    unit: "rpm" 
+  }
+  <MotorLeft> [monitored_by] <CollisionDetector> { 
+    margin: 0.1 
+  }
+  <Task> [has_deadline] <Timing> { 
+    max_duration: 50, 
+    unit: "ms" 
+  }
+} @0.95
+
+// Safety as knowledge (not special syntax!)
+!Assert {
+  <CollisionDetector> [monitors] <MotorLeft>
+  <MotorLeft> [constrained_by] <SafetyZone> { 
+    min_distance: 0.1, 
+    unit: "m" 
+  }
+} @0.99  // High confidence for safety rules

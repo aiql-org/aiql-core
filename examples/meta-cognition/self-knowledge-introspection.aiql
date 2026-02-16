@@ -1,0 +1,19 @@
+// Self-Knowledge Introspection (v2.2.0)
+// Agent queries its own knowledge base using meta-semantic relations.
+// No new syntax - just !Query with <Self> meta-concept!
+// Demonstrates: reflexive querying, epistemic self-awareness.
+!Assert {
+  <Python> [is_a] <ProgrammingLanguage>
+  <Python> [used_for] <DataScience>
+} @0.95
+
+// Agent introspects: "What do I know about?"
+!Query {
+  <Self> [has_knowledge_about] <?Topic>
+}
+// Returns: <Python>, <ProgrammingLanguage>, <DataScience>
+
+!Query {
+  <Self> [has_knowledge_about] <Python>
+}
+// Returns all statements mentioning Python

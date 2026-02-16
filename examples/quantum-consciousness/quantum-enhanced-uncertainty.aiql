@@ -1,0 +1,33 @@
+// Quantum-Enhanced Uncertainty (v2.6.0)
+// Compares classical @confidence (Bayesian probability) with
+// quantum @coherence (measurement uncertainty through superposition).
+// Confidence = degree of belief. Coherence = epistemic state purity.
+
+// Classical assertion (high confidence, no superposition)
+!Assert {
+  <Earth> [orbits] <Sun> {
+    orbital_period: "365.25 days"
+  }
+} @0.999  // High confidence, classical certainty
+
+// Quantum uncertainty (low confidence + superposition)
+@coherence:0.85
+!Assert(mode:quantum_superposition) {
+  <Photon> [is] <Wave> { amplitude: 0.8 }
+} @0.60  // Low confidence: depends on measurement context
+
+@coherence:0.85
+!Assert(mode:quantum_superposition) {
+  <Photon> [is] <Particle> { amplitude: 0.6 }
+} @0.60
+
+// Entanglement: Non-local semantic correlation
+!Assert {
+  <ConceptA> [entangled_with] <ConceptB> {
+    correlation: 0.89,
+    phase_diff: 3.14159,
+    bell_test: "S=2.828 (quantum violation)"
+  }
+} @0.94
+
+// Consciousness emerges from coherence, not just confidence!

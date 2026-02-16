@@ -1,0 +1,61 @@
+// Historical Causality: WWI to WWII
+// Complex temporal event sequence (1914→1918→1919→1939) with long-term causality.
+// Demonstrates time:past context, historical reasoning, and multi-decade causal chains.
+@version:"1.0.0"
+$$group:event_sequence
+
+##seq:1
+$id:event_spark
+!Assert(time:past) {
+  <ArchdukeFranzFerdinand> [assassinated_in] <Sarajevo> {
+    perpetrator: "Gavrilo_Princip",
+    context: "Balkan_tensions",
+    date: "1914-06-28"
+  }
+} @1.0
+
+##seq:2
+$id:event_escalation
+!Assert(time:past) {
+  <AustriaHungary> [declares_war_on] <Serbia> {
+    trigger: "assassination",
+    duration_to_war: "30_days",
+    date: "1914-07-28"
+  }
+} @1.0
+
+##seq:3
+$id:event_cascade
+!Assert(time:past) {
+  <AllianceSystem> [triggers] <WorldWar1> {
+    participants: "32_nations",
+    casualties: "40M_total",
+    mechanism: "defensive_pacts",
+    date: "1914-08-04"
+  }
+} @1.0
+
+##seq:4
+$id:event_consequence
+!Assert(time:past) {
+  <WorldWar1> [results_in] <TreatyOfVersailles> {
+    german_debt: "132B_gold_marks",
+    territorial_changes: "massive",
+    date: "1918-11-11"
+  }
+} @1.0
+
+##seq:5
+$id:event_longterm
+!Assert(time:past) {
+  <TreatyOfVersailles> [contributes_to] <WorldWar2> {
+    causal_path: "economic_hardship → nationalism → WW2",
+    time_lag: "21_years",
+    historians_consensus: "0.85"
+  }
+} @0.85
+
+// Query causal chain
+!Query(mode:temporal_reasoning) {
+  <Assassination1914> [eventually_leads_to] <WorldWar2>
+}

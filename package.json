@@ -1,0 +1,57 @@
+{
+  "name": "aiql-sdk",
+  "version": "2.6.0",
+  "private": true,
+  "description": "AIQL SDK - AI Query Language transpilers, tools, and runtime packages",
+  "workspaces": [
+    "packages/core",
+    "packages/inference",
+    "packages/security",
+    "packages/semantics",
+    "packages/soul",
+    "packages/cli",
+    "packages/api",
+    "packages/utils"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/cli && npm run build -w packages/api",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "sync-versions": "node scripts/sync-versions.js",
+    "docker:cli": "docker build -f docker/cli.Dockerfile -t aiql/cli:latest .",
+    "docker:api": "docker build -f docker/api.Dockerfile -t aiql/api:latest .",
+    "docker:playground": "docker build -f docker/playground.Dockerfile -t aiql/playground:latest .",
+    "docker:all": "npm run docker:cli && npm run docker:api && npm run docker:playground",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AI-Memory/aiql.ws.git"
+  },
+  "keywords": [
+    "aiql",
+    "agi",
+    "transpiler",
+    "semantic-graph",
+    "knowledge-representation",
+    "logic",
+    "inference",
+    "quantum-computing",
+    "sdk"
+  ],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AI-Memory/aiql.ws/issues"
+  },
+  "homepage": "https://aiql.org",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

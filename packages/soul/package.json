@@ -1,0 +1,28 @@
+{
+  "name": "@aiql-org/soul",
+  "version": "2.6.0",
+  "description": "AIQL Soul - Affective AI engine for emotional computation (Reward/Pain/Stress/Novelty)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": ["aiql", "affective-computing", "emotions", "ai", "soul", "consciousness"],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/AI-Memory/aiql.ws.git", "directory": "packages/soul" },
+  "publishConfig": { "access": "public" },
+  "peerDependencies": { "@aiql-org/core": "^2.6.0" },
+  "peerDependenciesMeta": { "@aiql-org/core": { "optional": true } },
+  "devDependencies": { "typescript": "^5.0.0" },
+  "engines": { "node": ">=20.0.0" }
+}

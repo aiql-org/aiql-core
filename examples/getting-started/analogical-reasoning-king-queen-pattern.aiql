@@ -1,0 +1,44 @@
+// Analogical Reasoning: King-Queen Pattern
+// Encodes analogies (A:B :: C:D) with structural and functional similarity mappings.
+// Classic example: King:Queen :: Man:Woman (gender transformation pattern).
+@version:"1.0.0"
+$$group:analogy_reasoning
+
+$id:analogy_base
+!Assert {
+  <King> [relates_to] <Queen> {
+    relationship: "gender_transformed",
+    domain: "monarchy",
+    vector_offset: "male_to_female"
+  }
+} @0.95
+
+$id:analogy_target
+!Query(mode:analogical) {
+  <Man> [relates_to] <Woman> {
+    relationship: "gender_transformed",
+    domain: "humans",
+    analogy_source: "King:Queen"
+  }
+} @0.93
+
+// Cross-domain mapping
+$id:structure_analogy
+!Assert {
+  <Atom> [analogous_to] <SolarSystem> {
+    nucleus: "sun",
+    electrons: "planets",
+    force: "electromagnetic:gravitational",
+    mapping_type: "structural_similarity"
+  }
+} @0.75
+
+$id:function_analogy
+!Assert {
+  <Brain> [analogous_to] <Computer> {
+    neurons: "transistors",
+    synapses: "connections",
+    function: "information_processing",
+    limitation: "metaphor_not_identity"
+  }
+} @0.70

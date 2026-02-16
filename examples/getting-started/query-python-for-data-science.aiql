@@ -1,0 +1,8 @@
+// Query: Python for Data Science
+// Demonstrates basic !Query intent with global scope and confidence scoring.
+// Tests knowledge retrieval with semantic relations and attribute metadata.
+!Query(scope:global) {
+  <Python> [is_suited_for] <DataScience> {
+    popularity: "High"
+  }
+} @0.99

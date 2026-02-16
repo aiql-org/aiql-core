@@ -1,0 +1,26 @@
+// Maximum Feature Density: AIQL v1.0
+// Combines ALL v1.0 features: security (#sign), 5 metadata types, provenance (@version/@origin/@cite),
+// multi-context params, multi-relation graph. The ultimate showcase example.
+@version:"1.0.0"
+@origin:"doi:10.5555/aiql-complete-example"
+@cite:["arxiv:2501.56789", "isbn:978-1-234-56789-0"]
+
+#sign("alpha-researcher-agent")
+$id:complete_statement_001
+$$group:breakthrough_research
+##seq:42
+~temp:0.85
+~~entropy:0.4
+
+!Assert(time:present, mode:declarative, scope:global) {
+  <QuantumAI> [achieves] <SuperhumanReasoning> {
+    domain: "mathematical_proofs",
+    benchmark_score: 0.98,
+    architecture: "hybrid_quantum_classical",
+    training_data: "10^15_tokens"
+  }
+  <QuantumAI> [developed_by] <ResearchTeam> {
+    institution: "AI Safety Institute",
+    location: "global_collaboration"
+  }
+} @0.92

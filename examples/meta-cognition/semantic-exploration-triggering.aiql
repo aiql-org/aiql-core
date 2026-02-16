@@ -1,0 +1,21 @@
+// Semantic Exploration Triggering (v2.2.0)
+// Curiosity emerges from knowledge gaps + novelty.
+// Agent autonomously generates exploration queries.
+// Demonstrates organic knowledge graph evolution.
+!Assert {
+  <AI> [is_subfield_of] <ComputerScience>
+  <AGI> [related_to] <AI>
+} @0.90
+
+// AGI mentioned but low connectivity (only 1 relation)
+// Semantic weight high → exploration triggered
+
+// Integration with soul.ts affective engine:
+// novelty > 70 → curiosity increases
+// Generates exploration query automatically:
+!Query(scope:exploration, curiosity_driven:true) {
+  <?Concept> [relates_to] <AGI>
+  <AGI> [has_property] <?Property>
+}
+
+// Goal: Fill semantic gaps while preserving graph coherence

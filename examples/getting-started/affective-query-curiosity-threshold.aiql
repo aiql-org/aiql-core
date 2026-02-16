@@ -1,0 +1,8 @@
+// Affective Query: Curiosity Threshold
+// Queries emotional states with conditional thresholds for introspection.
+// Enables AI agents to check their own affective states and curiosity levels.
+!Query {
+  <AI> [experiences] <Curiosity> {
+    threshold: 0.5
+  }
+}

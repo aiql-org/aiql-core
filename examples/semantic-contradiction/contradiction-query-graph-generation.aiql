@@ -1,0 +1,30 @@
+// Contradiction Query & Graph Generation (v2.5.0)
+// Query detected contradictions and generate relationship graphs.
+// InferenceEngine.detectSemanticContradictions() finds conflicts.
+// generateContradictionGraph() creates !Relationship nodes.
+
+// Define conflicting statements
+!Assert {
+  <Cat> [is_a] <Mammal>
+  <Cat> [has_temperature] <38C>
+} @0.95
+
+!Assert {
+  <Cat> [is_a] <Reptile>  // Taxonomy conflict!
+  <Cat> [has_temperature] <35C>  // Cardinality violation!
+} @0.70
+
+// Query contradictions
+!Query {
+  <System> [detected] <?Contradiction> {
+    conflict_type: "taxonomy",
+    severity: "critical"
+  }
+}
+
+// Auto-generated contradiction graph:
+// !Relationship(type:logical) {
+//   <Statement1> [contradicts] <Statement2> {
+//     reason: "Disjoint classes: Mammal/Reptile"
+//   }
+// }

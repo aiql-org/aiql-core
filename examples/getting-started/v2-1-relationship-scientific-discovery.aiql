@@ -1,0 +1,36 @@
+// v2.1.0 Relationship: Scientific Discovery Relationships
+// Logical relationships express support, contradiction, equivalence.
+// Relation types: supports, contradicts, equivalent_to
+// Use cases: Hypothesis testing, theory validation, knowledge integration.
+$id:theory_relativity
+!Assert {
+  <GeneralRelativity> [predicts] <GravitationalWaves> {
+    author: "Einstein",
+    year: 1915
+  }
+} @0.99
+
+$id:observation_ligo
+!Assert {
+  <LIGO> [detected] <GravitationalWaves> {
+    year: 2015,
+    event: "BH_merger"
+  }
+} @0.99
+
+// Observation SUPPORTS theory
+!Relationship(type:logical, source:$id:observation_ligo, target:$id:theory_relativity) {
+  <Observation> [supports] <Theory>
+} @0.95
+
+$id:newtonian_gravity
+!Assert {
+  <NewtonianGravity> [describes] <WeakFields>
+} @0.98
+
+// Einstein's theory CONTRADICTS Newton's at strong fields
+!Relationship(type:logical, source:$id:theory_relativity, target:$id:newtonian_gravity) {
+  <Relativity> [contradicts] <NewtonianGravity> {
+    context: "strong_gravitational_fields"
+  }
+} @0.85

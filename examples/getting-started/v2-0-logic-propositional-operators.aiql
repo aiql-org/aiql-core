@@ -1,0 +1,30 @@
+// v2.0.0 Logic: Propositional Operators
+// Demonstrates AND, OR, NOT, IMPLIES operators.
+// Foundation for formal reasoning, proofs, and knowledge inference.
+@version:"2.0.0"
+
+// Conjunction: Both conditions must be true
+!Assert {
+  <AI> [can_learn] <FromData>
+} and !Assert {
+  <AI> [can_improve] <OverTime>
+} @0.95
+
+// Disjunction: At least one condition is true
+!Assert {
+  <AGI> [achieved_via] <NeuralNetworks>
+} or !Assert {
+  <AGI> [achieved_via] <SymbolicAI>
+} @0.85
+
+// Negation: Expressing false or absence
+not !Assert {
+  <CurrentAI> [has] <TrueConsciousness>
+} @0.9
+
+// Implication: If-then reasoning
+!Assert {
+  <System> [is] <Turing-complete>
+} implies !Assert {
+  <System> [can_compute] <AnyAlgorithm>
+} @0.99

@@ -1,0 +1,11 @@
+// Secure Agent Communication
+// Combines DILITHIUM signing + KYBER encryption for full security.
+// Achieves both integrity (signed) and confidentiality (encrypted) guarantees.
+#secure("alice-agent", "bob-agent")
+!Assert {
+  <SecretKnowledge> [shared_with] <TrustedAgent> {
+    classification: "top-secret",
+    integrity: "signed",
+    confidentiality: "encrypted"
+  }
+} @1.0

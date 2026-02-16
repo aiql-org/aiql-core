@@ -1,0 +1,43 @@
+// v2.0.1 Lean 4 Transpilation: Interactive Theorem Proving
+// Transpiles AIQL logic to Lean 4 with Unicode symbols (∀, ∃, ∧, ∨, ¬, →).
+// Lean excels at constructive mathematics and computer-verified proofs.
+// Use LEAN tab to see theorem definitions with 'by sorry' tactics.
+@version:"2.0.1"
+@origin:"lean_proof_assistant_demo"
+
+// Classical logic: Law of excluded middle
+!Assert {
+  <Proposition> [is_true_or_false] <Always>
+} or not !Assert {
+  <Proposition> [is_true_or_false] <Always>
+} @1.0
+
+// Modus ponens as a lemma
+!Assert {
+  <P> [holds] <True>
+} implies !Assert {
+  <Q> [holds] <True>
+}
+
+// Contrapositive: NOT-Q implies NOT-P
+not !Assert {
+  <Q> [holds] <True>
+} implies not !Assert {
+  <P> [holds] <True>
+}
+
+// Existential proof: There exists a prime number
+exists p: !Assert {
+  <Number> [is] <Prime>
+} @1.0
+
+// Lean Output:
+// theorem theorem_1 : (P_holds_True → Q_holds_True) := by sorry
+// lemma inference_rule_1 : (¬Q_holds_True → ¬P_holds_True) := by intro; sorry
+
+// Set theory in Lean
+forall s: forall e: !Assert {
+  <Element> [belongs_to] <Set>
+} implies !Assert {
+  <Set> [contains] <Element>
+} @1.0

@@ -1,0 +1,27 @@
+{
+  "name": "@aiql-org/semantics",
+  "version": "2.6.0",
+  "description": "AIQL Semantics - Semantic runtime, exploration, quantum-semantics, symbolic-neural bridge",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": ["aiql", "semantics", "quantum", "consciousness", "symbolic-neural", "exploration"],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/AI-Memory/aiql.ws.git", "directory": "packages/semantics" },
+  "publishConfig": { "access": "public" },
+  "peerDependencies": { "@aiql-org/core": "^2.6.0", "@aiql-org/inference": "^2.6.0" },
+  "devDependencies": { "typescript": "^5.0.0" },
+  "engines": { "node": ">=20.0.0" }
+}

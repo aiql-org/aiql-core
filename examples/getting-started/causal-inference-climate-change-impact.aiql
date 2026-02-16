@@ -1,0 +1,38 @@
+// Causal Inference: Climate Change Impact
+// Multi-hop causal chain (A→B→C→D) with confidence decay across inferences.
+// Demonstrates transitive reasoning: if A causes B and B causes C, then A indirectly causes C.
+@version:"1.0.0"
+$$group:causal_analysis
+
+$id:cause_001
+!Assert {
+  <ClimateChange> [causes] <RisingSeas> {
+    mechanism: "thermal_expansion",
+    rate: "3.2mm/year",
+    confidence_source: "IPCC_AR6"
+  }
+} @0.95
+
+$id:cause_002
+!Assert {
+  <RisingSeas> [causes] <CoastalFlooding> {
+    threshold: "0.5m_rise",
+    affected_population: "410M_people",
+    timeframe: "2100"
+  }
+} @0.90
+
+$id:cause_003
+!Assert {
+  <CoastalFlooding> [causes] <MassDisplacement> {
+    scale: "climate_refugees",
+    regions: "Bangladesh,Pacific_Islands,Florida"
+  }
+} @0.85
+
+// Transitive inference: ClimateChange → MassDisplacement
+$id:inference_001
+~temp:0.2
+!Query(mode:inference) {
+  <ClimateChange> [transitively_causes] <MassDisplacement>
+} @0.72

@@ -1,0 +1,691 @@
+
+/**
+ * AIQL Token Categories (v2.5.0)
+ * 
+ * Tokens are organized into semantic categories for maintainability and extensibility.
+ * Total: 34 token types across 7 categories.
+ */
+export enum TokenType {
+  // ===================================================================
+  // Category 1: Core Syntax Tokens (5 types)
+  // Purpose: Fundamental AIQL language constructs
+  // ===================================================================
+  INTENT = "INTENT",           // !Query, !Assert, !Task - Goal-oriented statements
+  CONCEPT = "CONCEPT",         // <Entity> - Semantic nodes
+  RELATION = "RELATION",       // [relation_name] - Semantic edges
+  CONFIDENCE = "CONFIDENCE",   // @0.95 - Probability scores (0.0-1.0)
+  DIRECTIVE = "DIRECTIVE",     // #sign, #encrypt, #secure - Security directives
+  
+  // ===================================================================
+  // Category 2: Statement Metadata Markers (5 types)
+  // Purpose: Statement-level annotations for tracking and execution
+  // ===================================================================
+  ID_MARKER = "ID_MARKER",         // $id:identifier - Statement identifiers
+  GROUP_ID = "GROUP_ID",           // $$group:group_id - Group identifiers
+  SEQ_NUM = "SEQ_NUM",             // ##seq:1 - Sequence numbers
+  TEMPERATURE = "TEMPERATURE",     // ~temp:0.7 - AI temperature (0.0-2.0)
+  ENTROPY = "ENTROPY",             // ~~entropy:0.5 - Entropy level (0.0-1.0)
+  
+  // ===================================================================
+  // Category 2.5: Quantum Consciousness Markers (1 type) - v2.6.0
+  // Purpose: Quantum coherence as consciousness metric
+  // ===================================================================
+  COHERENCE = "COHERENCE",         // @coherence:0.95 - Quantum coherence (0.0-1.0)
+  
+  // ===================================================================
+  // Category 3: Provenance Metadata (3 types)
+  // Purpose: Source tracking and citation management (v0.4.0)
+  // ===================================================================
+  VERSION_MARKER = "VERSION_MARKER",  // @version:"x.y.z" - AIQL version
+  ORIGIN_MARKER = "ORIGIN_MARKER",    // @origin:"doi:10.1234/xyz" - Document source
+  CITE_MARKER = "CITE_MARKER",        // @cite:"ref" or @cite:["refs"] - Citations
+  
+  // ===================================================================
+  // Category 3.5: Example Markers (2 types) - v2.2.0
+  // Purpose: Native syntax for embedding examples to clarify semantics
+  // ===================================================================
+  EXAMPLE_MARKER = "EXAMPLE_MARKER",       // #example: - Inline example marker
+  EXAMPLE_PATTERN = "EXAMPLE_PATTERN",     // #example_pattern: - Pattern example marker
+  
+  // ===================================================================
+  // Category 4: Logic & Reasoning Tokens (13 types) - v2.0.0
+  // Purpose: Propositional logic, quantifiers, and inference rules
+  // ===================================================================
+  // Propositional logic operators
+  AND = "AND",                 // and - Conjunction (A ∧ B)
+  OR = "OR",                   // or - Disjunction (A ∨ B)
+  NOT = "NOT",                 // not - Negation (¬A)
+  IMPLIES = "IMPLIES",         // implies - Implication (A → B)
+  IFF = "IFF",                 // iff - Bi-implication (A ↔ B)
+  
+  // Quantifiers
+  FORALL = "FORALL",           // forall - Universal quantification (∀x)
+  EXISTS = "EXISTS",           // exists - Existential quantification (∃x)
+  
+  // Proof operators
+  PROVES = "PROVES",           // proves - Entailment (⊢)
+  ENTAILS = "ENTAILS",         // entails - Alternative to proves
+  
+  // Logic keywords
+  IN = "IN",                   // in - Domain specification (forall x in Domain)
+  THEN = "THEN",               // then - Alternative to implies
+  TRUE = "TRUE",               // true - Boolean literal
+  FALSE = "FALSE",             // false - Boolean literal
+  
+  // ===================================================================
+  // Category 5: Primitive Types (4 types)
+  // Purpose: Basic data types for values and literals
+  // ===================================================================
+  STRING = "STRING",           // "text" - String literals
+  NUMBER = "NUMBER",           // 123, 0.99 - Numeric literals
+  IDENTIFIER = "IDENTIFIER",   // scope, global - Variable names
+  SYMBOL = "SYMBOL",           // { } ( ) : | [ ] - Structural symbols
+  
+  // ===================================================================
+  // Category 7: Control Token (1 type)
+  // Purpose: End-of-file marker
+  // ===================================================================
+  EOF = "EOF"                  // End of file
+}
+
+export interface Token {
+  type: TokenType;
+  value: string;
+  line: number;
+  column: number;
+}
+
+export class Tokenizer {
+  private input: string;
+  private position: number = 0;
+  private line: number = 1;
+  private column: number = 1;
+
+  constructor(input: string) {
+    this.input = input;
+  }
+
+  tokenize(): Token[] {
+    // Prevent DoS attacks with excessively large inputs
+    const MAX_INPUT_SIZE = 10 * 1024 * 1024; // 10MB
+    if (this.input.length > MAX_INPUT_SIZE) {
+      throw new Error(`Input exceeds maximum size of ${MAX_INPUT_SIZE} bytes (${Math.round(this.input.length / 1024 / 1024)}MB provided)`);
+    }
+
+    const tokens: Token[] = [];
+    while (this.position < this.input.length) {
+      const char = this.peek();
+
+      if (/\s/.test(char)) {
+        this.advance();
+        continue;
+      }
+
+      // Handle comments
+      if (char === '/') {
+        if (this.peek(1) === '/') {
+          // Single-line comment: skip until end of line
+          this.advance(); // consume first '/'
+          this.advance(); // consume second '/'
+          while (this.peek() !== '\n' && !this.isAtEnd()) {
+            this.advance();
+          }
+          continue;
+        } else if (this.peek(1) === '*') {
+          // Block comment: skip until */
+          const startLine = this.line;
+          const startColumn = this.column;
+          this.advance(); // consume '/'
+          this.advance(); // consume '*'
+          let terminated = false;
+          while (!this.isAtEnd()) {
+            if (this.peek() === '*' && this.peek(1) === '/') {
+              this.advance(); // consume '*'
+              this.advance(); // consume '/'
+              terminated = true;
+              break;
+            }
+            if (this.peek() === '\n') {
+              this.line++;
+              this.column = 0;
+            }
+            this.advance();
+          }
+          if (!terminated) {
+            throw new Error(`Unterminated block comment starting at line ${startLine}, column ${startColumn}`);
+          }
+          continue;
+        } else {
+          throw new Error(`Unexpected character: ${char} at line ${this.line}, column ${this.column}`);
+        }
+      }
+
+      if (char === '!') {
+        tokens.push(this.scanIntent());
+      } else if (char === '#') {
+        // Check for ## (sequence number) or # (directive)
+        if (this.peek(1) === '#') {
+          tokens.push(this.scanSequenceNumber());
+        } else {
+          tokens.push(this.scanDirective());
+        }
+      } else if (char === '<') {
+        tokens.push(this.scanConcept());
+      } else if (char === '[') {
+        // New relation syntax: [is_suited_for]
+        tokens.push(this.scanRelation());
+      } else if (char === '-') {
+        // Hyphen or arrow symbol
+        if (this.peek(1) === '>') {
+          tokens.push(this.createToken(TokenType.SYMBOL, "->"));
+          this.advance(); this.advance();
+        } else {
+          tokens.push(this.createToken(TokenType.SYMBOL, "-"));
+          this.advance();
+        }
+      } else if (char === '$') {
+        // Check for $$ (group identifier) or $ (identifier)
+        if (this.peek(1) === '$') {
+          tokens.push(this.scanGroupIdentifier());
+        } else {
+          tokens.push(this.scanIdMarker());
+        }
+      } else if (char === '~') {
+        // Check for ~~ (entropy) or ~ (temperature)
+        if (this.peek(1) === '~') {
+          tokens.push(this.scanEntropy());
+        } else {
+          tokens.push(this.scanTemperature());
+        }
+      } else if (char === '@') {
+        // Check for @coherence:, @version:, @origin:, @cite: before @confidence
+        const nextChars = this.input.substring(this.position, this.position + 12);
+        if (nextChars.startsWith('@coherence:')) {
+          tokens.push(this.scanCoherenceMarker());
+        } else if (nextChars.startsWith('@version:')) {
+          tokens.push(this.scanVersionMarker());
+        } else if (nextChars.startsWith('@origin:')) {
+          tokens.push(this.scanOriginMarker());
+        } else if (nextChars.startsWith('@cite:')) {
+          tokens.push(this.scanCiteMarker());
+        } else {
+          tokens.push(this.scanConfidence());
+        }
+      } else if (char === '"') {
+        tokens.push(this.scanString());
+      } else if (/[0-9]/.test(char)) {
+        tokens.push(this.scanNumber());
+      } else if (/[a-zA-Z_]/.test(char)) {
+        tokens.push(this.scanIdentifier());
+      } else {
+        // Symbols
+        if (['{', '}', '(', ')', ':', '|', ',', '&', ']'].includes(char)) {
+            tokens.push(this.createToken(TokenType.SYMBOL, char));
+            this.advance();
+        } else {
+            throw new Error(`Unexpected character: ${char} at line ${this.line}, column ${this.column}`);
+        }
+      }
+    }
+    tokens.push(this.createToken(TokenType.EOF, ""));
+    return tokens;
+  }
+
+  private scanIntent(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '!'
+    while (/[a-zA-Z0-9_]/.test(this.peek())) {
+      value += this.advance();
+    }
+    
+    return { type: TokenType.INTENT, value, line: startLine, column: startCol };
+  }
+
+  private scanDirective(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '#'
+    
+    // Check for #example: and #example_pattern: markers (v2.2.0)
+    const nextChars = '#' + this.input.slice(this.position, this.position + 20);
+    if (nextChars.startsWith('#example_pattern:')) {
+      while (this.peek() !== ':' && !this.isAtEnd()) {
+        value += this.advance();
+      }
+      if (this.peek() === ':') {
+        value += this.advance(); // consume ':'
+      }
+      return { type: TokenType.EXAMPLE_PATTERN, value, line: startLine, column: startCol };
+    } else if (nextChars.startsWith('#example:')) {
+      while (this.peek() !== ':' && !this.isAtEnd()) {
+        value += this.advance();
+      }
+      if (this.peek() === ':') {
+        value += this.advance(); // consume ':'
+      }
+      return { type: TokenType.EXAMPLE_MARKER, value, line: startLine, column: startCol };
+    }
+    
+    while (/[a-zA-Z0-9_]/.test(this.peek())) {
+      value += this.advance();
+    }
+    
+    return { type: TokenType.DIRECTIVE, value, line: startLine, column: startCol };
+  }
+
+  private scanIdMarker(): Token {
+    // $id:xyz or $identifier
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '$'
+    while (/[a-zA-Z0-9_:]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.ID_MARKER, value, line: startLine, column: startCol };
+  }
+
+  private scanGroupIdentifier(): Token {
+    // $$group:xyz or $$groupId
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '$'
+    value += this.advance(); // consume second '$'
+    while (/[a-zA-Z0-9_:]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.GROUP_ID, value, line: startLine, column: startCol };
+  }
+
+  private scanSequenceNumber(): Token {
+    // ##seq:1 or ##1
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '#'
+    value += this.advance(); // consume second '#'
+    while (/[a-zA-Z0-9_:]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.SEQ_NUM, value, line: startLine, column: startCol };
+  }
+
+  private scanTemperature(): Token {
+    // ~temp:0.7 or ~0.7
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '~'
+    while (/[a-zA-Z0-9_:.]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.TEMPERATURE, value, line: startLine, column: startCol };
+  }
+
+  private scanEntropy(): Token {
+    // ~~entropy:0.5 or ~~0.5
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '~'
+    value += this.advance(); // consume second '~'
+    while (/[a-zA-Z0-9_:.]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.ENTROPY, value, line: startLine, column: startCol };
+  }
+
+  private scanConcept(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '<'
+    while (this.peek() !== '>' && this.peek() !== '') {
+      value += this.advance();
+    }
+    if (this.peek() === '>') {
+      value += this.advance(); // consume '>'
+    } else {
+        throw new Error("Unterminated concept");
+    }
+    return { type: TokenType.CONCEPT, value, line: startLine, column: startCol };
+  }
+
+  private scanRelation(): Token {
+    // New syntax: [is_suited_for]
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '['
+    
+    while (this.peek() !== ']' && this.peek() !== '') {
+        value += this.advance();
+    }
+    
+    if (this.peek() === ']') {
+        value += this.advance(); // consume ']'
+    } else {
+         throw new Error("Unterminated relation bracket");
+    }
+    
+    return { type: TokenType.RELATION, value, line: startLine, column: startCol };
+  }
+
+  private scanConfidence(): Token {
+      const startLine = this.line;
+      const startCol = this.column;
+      let value = this.advance(); // consume '@'
+      while (/[0-9.]/.test(this.peek())) {
+          value += this.advance();
+      }
+      return { type: TokenType.CONFIDENCE, value, line: startLine, column: startCol };
+  }
+
+  private scanCoherenceMarker(): Token {
+    // @coherence:0.95
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = '';
+    // Consume "@coherence:"
+    while (this.peek() !== ':' && !this.isAtEnd()) {
+      value += this.advance();
+    }
+    if (this.peek() === ':') {
+      value += this.advance(); // consume ':'
+    }
+    // Now read the numeric value
+    while (!this.isAtEnd() && /[0-9.]/.test(this.peek())) {
+      value += this.advance();
+    }
+    return { type: TokenType.COHERENCE, value, line: startLine, column: startCol };
+  }
+
+  private scanVersionMarker(): Token {
+    // @version:"0.3.0" or @version:"x.y.z"
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = '';
+    // Consume "@version:"
+    while (this.peek() !== ':' && !this.isAtEnd()) {
+      value += this.advance();
+    }
+    if (this.peek() === ':') {
+      value += this.advance(); // consume ':'
+    }
+    // Now read the value - if it starts with quote, read until matching quote
+    if (this.peek() === '"') {
+      value += this.advance(); // consume opening quote
+      while (this.peek() !== '"' && !this.isAtEnd()) {
+        if (this.peek() === '\\') {
+          value += this.advance(); // escape character
+        }
+        value += this.advance();
+      }
+      if (this.peek() === '"') {
+        value += this.advance(); // consume closing quote
+      }
+    } else {
+      // Read identifier without quotes
+      while (!this.isAtEnd() && !(/\s/.test(this.peek())) && this.peek() !== '!' && this.peek() !== '@' && this.peek() !== '$' && this.peek() !== '#' && this.peek() !== '~' && this.peek() !== '<' && this.peek() !== '{') {
+        value += this.advance();
+      }
+    }
+    return { type: TokenType.VERSION_MARKER, value, line: startLine, column: startCol };
+  }
+
+  private scanOriginMarker(): Token {
+    // @origin:"doi:10.1234" or @origin:"url"
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = '';
+    // Consume "@origin:"
+    while (this.peek() !== ':' && !this.isAtEnd()) {
+      value += this.advance();
+    }
+    if (this.peek() === ':') {
+      value += this.advance(); // consume ':'
+    }
+    // Now read the value - if it starts with quote, read until matching quote
+    if (this.peek() === '"') {
+      value += this.advance(); // consume opening quote
+      while (this.peek() !== '"' && !this.isAtEnd()) {
+        if (this.peek() === '\\') {
+          value += this.advance(); // escape character
+        }
+        value += this.advance();
+      }
+      if (this.peek() === '"') {
+        value += this.advance(); // consume closing quote
+      }
+    } else {
+      // Read identifier without quotes
+      while (!this.isAtEnd() && !(/\s/.test(this.peek())) && this.peek() !== '!' && this.peek() !== '@' && this.peek() !== '$' && this.peek() !== '#' && this.peek() !== '~' && this.peek() !== '<' && this.peek() !== '{') {
+        value += this.advance();
+      }
+    }
+    return { type: TokenType.ORIGIN_MARKER, value, line: startLine, column: startCol };
+  }
+
+  private scanCiteMarker(): Token {
+    // @cite:"ref" or @cite:["a","b","c"]
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = '';
+    // Consume "@cite:"
+    while (this.peek() !== ':' && !this.isAtEnd()) {
+      value += this.advance();
+    }
+    if (this.peek() === ':') {
+      value += this.advance(); // consume ':'
+    }
+    // Now read the value - could be a string or array
+    // Handle arrays: @cite:["a","b"]
+    if (this.peek() === '[') {
+      let bracketDepth = 0;
+      do {
+        const char = this.peek();
+        if (char === '[') bracketDepth++;
+        if (char === ']') bracketDepth--;
+        value += this.advance();
+      } while (bracketDepth > 0 && !this.isAtEnd());
+    } else {
+      // Single value (string or identifier)
+      while (!this.isAtEnd() && !(/\s/.test(this.peek())) && this.peek() !== '!' && this.peek() !== '@' && this.peek() !== '$' && this.peek() !== '#' && this.peek() !== '~' && this.peek() !== '<' && this.peek() !== '{') {
+        value += this.advance();
+      }
+    }
+    return { type: TokenType.CITE_MARKER, value, line: startLine, column: startCol };
+  }
+
+  private scanString(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '"'
+    while (this.peek() !== '"' && this.peek() !== '') {
+      if (this.peek() === '\\') {
+          value += this.advance(); // escape
+      }
+      value += this.advance();
+    }
+    if (this.peek() === '"') {
+      value += this.advance();
+    } else {
+        throw new Error("Unterminated string");
+    }
+    return { type: TokenType.STRING, value, line: startLine, column: startCol };
+  }
+
+  private scanNumber(): Token {
+      const startLine = this.line;
+      const startCol = this.column;
+      let value = "";
+      while (/[0-9.]/.test(this.peek())) {
+          value += this.advance();
+      }
+      return { type: TokenType.NUMBER, value, line: startLine, column: startCol };
+  }
+
+  private scanIdentifier(): Token {
+      const startLine = this.line;
+      const startCol = this.column;
+      let value = "";
+      while (/[a-zA-Z0-9_]/.test(this.peek())) {
+          value += this.advance();
+      }
+      
+      // Check for logical keywords (v2.0.0)
+      const keywords: Record<string, TokenType> = {
+        'and': TokenType.AND,
+        'or': TokenType.OR,
+        'not': TokenType.NOT,
+        'implies': TokenType.IMPLIES,
+        'iff': TokenType.IFF,
+        'forall': TokenType.FORALL,
+        'exists': TokenType.EXISTS,
+        'proves': TokenType.PROVES,
+        'entails': TokenType.ENTAILS,
+        'in': TokenType.IN,
+        'then': TokenType.THEN,
+        'true': TokenType.TRUE,
+        'false': TokenType.FALSE
+      };
+      
+      const lowerValue = value.toLowerCase();
+      if (keywords[lowerValue]) {
+        return { type: keywords[lowerValue], value: lowerValue, line: startLine, column: startCol };
+      }
+      
+      return { type: TokenType.IDENTIFIER, value, line: startLine, column: startCol };
+  }
+
+  private peek(offset: number = 0): string {
+    if (this.position + offset >= this.input.length) return '';
+    return this.input[this.position + offset];
+  }
+
+  private advance(): string {
+    const char = this.input[this.position++];
+    if (char === '\n') {
+      this.line++;
+      this.column = 1;
+    } else {
+      this.column++;
+    }
+    return char;
+  }
+
+  private createToken(type: TokenType, value: string): Token {
+    return { type, value, line: this.line, column: this.column - value.length };
+  }
+
+  private isAtEnd(): boolean {
+    return this.position >= this.input.length;
+  }
+}
+
+/**
+ * Token Category Utilities (v2.0.1)
+ * 
+ * Helper functions for checking token categories. Useful for parser validation,
+ * error messages, and semantic analysis.
+ */
+
+// Category 1: Core Syntax Tokens
+export function isCoreSyntaxToken(type: TokenType): boolean {
+  return [
+    TokenType.INTENT,
+    TokenType.CONCEPT,
+    TokenType.RELATION,
+    TokenType.CONFIDENCE,
+    TokenType.DIRECTIVE
+  ].includes(type);
+}
+
+// Category 2: Statement Metadata Markers
+export function isStatementMetadata(type: TokenType): boolean {
+  return [
+    TokenType.ID_MARKER,
+    TokenType.GROUP_ID,
+    TokenType.SEQ_NUM,
+    TokenType.TEMPERATURE,
+    TokenType.ENTROPY
+  ].includes(type);
+}
+
+// Category 3: Provenance Metadata
+export function isProvenanceMetadata(type: TokenType): boolean {
+  return [
+    TokenType.VERSION_MARKER,
+    TokenType.ORIGIN_MARKER,
+    TokenType.CITE_MARKER
+  ].includes(type);
+}
+
+// Category 4: Logic & Reasoning Tokens
+export function isLogicOperator(type: TokenType): boolean {
+  return [
+    TokenType.AND,
+    TokenType.OR,
+    TokenType.NOT,
+    TokenType.IMPLIES,
+    TokenType.IFF
+  ].includes(type);
+}
+
+export function isQuantifier(type: TokenType): boolean {
+  return [
+    TokenType.FORALL,
+    TokenType.EXISTS
+  ].includes(type);
+}
+
+export function isProofOperator(type: TokenType): boolean {
+  return [
+    TokenType.PROVES,
+    TokenType.ENTAILS
+  ].includes(type);
+}
+
+export function isLogicKeyword(type: TokenType): boolean {
+  return [
+    TokenType.IN,
+    TokenType.THEN,
+    TokenType.TRUE,
+    TokenType.FALSE
+  ].includes(type);
+}
+
+export function isLogicToken(type: TokenType): boolean {
+  return isLogicOperator(type) || isQuantifier(type) || isProofOperator(type) || isLogicKeyword(type);
+}
+
+// Category 5: Primitive Types
+export function isPrimitiveType(type: TokenType): boolean {
+  return [
+    TokenType.STRING,
+    TokenType.NUMBER,
+    TokenType.IDENTIFIER,
+    TokenType.SYMBOL
+  ].includes(type);
+}
+
+// Composite category checkers
+export function isMetadataToken(type: TokenType): boolean {
+  return isStatementMetadata(type) || isProvenanceMetadata(type);
+}
+
+export function isKeyword(type: TokenType): boolean {
+  return isLogicToken(type);
+}
+
+/**
+ * Get human-readable category name for a token type.
+ * Useful for error messages and debugging.
+ */
+export function getTokenCategory(type: TokenType): string {
+  if (isCoreSyntaxToken(type)) return "Core Syntax";
+  if (isStatementMetadata(type)) return "Statement Metadata";
+  if (isProvenanceMetadata(type)) return "Provenance Metadata";
+  if (isLogicOperator(type)) return "Logic Operator";
+  if (isQuantifier(type)) return "Quantifier";
+  if (isProofOperator(type)) return "Proof Operator";
+  if (isLogicKeyword(type)) return "Logic Keyword";
+  if (isPrimitiveType(type)) return "Primitive Type";
+  if (type === TokenType.EOF) return "Control Token";
+  return "Unknown";
+}

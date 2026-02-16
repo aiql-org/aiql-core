@@ -1,0 +1,17 @@
+// Perfect Progressive Tenses: Duration + Completion (v1.1.0)
+// Combines completion aspect with ongoing duration emphasis.
+// Use cases: Long-term processes, sustained efforts, continuous improvement.
+!Assert {
+  <Student> [has_been_studying@tense:present_perfect_progressive] <Physics> {
+    duration: "3 years",
+    still_ongoing: true
+  }
+  <Artist> [had_been_painting@tense:past_perfect_progressive] <Mural> {
+    duration: "6 months",
+    completed: "2025-12-15"
+  }
+  <AI> [will_have_been_learning@tense:future_perfect_progressive] <Language> {
+    duration: "10 years",
+    by_year: 2036
+  }
+} @0.90

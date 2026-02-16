@@ -1,0 +1,35 @@
+// Theory of Mind: Nested Agent Beliefs
+// Models nested beliefs: Alice believes X, Bob believes Alice believes X, Charlie believes Bob believes...
+// Enables AI agents to reason about other agents' mental states and perspectives.
+@version:"1.0.0"
+$$group:multi_agent_beliefs
+
+$id:alice_belief
+!Assert(agent:Alice) {
+  <QuantumComputing> [will_achieve] <Supremacy> {
+    timeframe: "2030s",
+    certainty: "high"
+  }
+} @0.85
+
+$id:bob_belief_about_alice
+!Assert(agent:Bob, meta_level:first_order) {
+  <Alice> [believes] <QuantumSupremacy2030s> {
+    bob_assessment: "overly_optimistic",
+    evidence_gap: "engineering_challenges"
+  }
+} @0.75
+
+$id:charlie_meta_belief
+!Assert(agent:Charlie, meta_level:second_order) {
+  <Bob> [believes_that] <AliceIsOptimistic> {
+    charlie_view: "bob_is_too_conservative",
+    reasoning: "exponential_progress_precedent"
+  }
+} @0.70
+
+// Nested belief query: What does Charlie think Bob thinks about Alice?
+~temp:0.3
+!Query(mode:theory_of_mind, depth:nested) {
+  <Charlie> [models] <BobsBeliefAboutAlice>
+}
