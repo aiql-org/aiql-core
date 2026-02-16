@@ -25,13 +25,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Build all packages
         run: npm run build
+
+      - name: Run tests
+        run: npm test
 
       - name: Verify package exports
         run: |
           node -e "const core = require('./packages/core/dist/index.js'); console.log('✅ @aiql-org/core loaded, version:', core.version)"
           node -e "const cli = require('./packages/cli/dist/cli.js'); console.log('✅ @aiql-org/cli loaded')"
+
+      - name: Verify examples
+        run: node scripts/verify-examples.js
 
   docker-build:
     runs-on: ubuntu-latest

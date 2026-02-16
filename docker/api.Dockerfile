@@ -19,7 +19,7 @@ COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 
 RUN npm ci
-RUN npm run build --workspaces --if-present
+RUN npm run build
 
 # Verify
 RUN ls -la packages/core/dist/ && \

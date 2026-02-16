@@ -20,7 +20,7 @@ COPY tsconfig.base.json ./
 COPY packages/ ./packages/
 
 RUN npm ci
-RUN npm run build --workspaces --if-present
+RUN npm run build
 
 # ============================================================================
 # Stage 2: Playground Runtime

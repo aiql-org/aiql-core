@@ -25,7 +25,7 @@ COPY packages/ ./packages/
 RUN npm ci
 
 # Build all packages in dependency order
-RUN npm run build --workspaces --if-present
+RUN npm run build
 
 # Verify build artifacts
 RUN ls -la packages/core/dist/ && \

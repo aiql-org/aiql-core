@@ -157,7 +157,9 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-if (require.main === module) {
+// Check if running directly in ESM
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   program.parse();
 }
 
