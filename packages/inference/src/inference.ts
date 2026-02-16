@@ -114,6 +114,18 @@ export class InferenceEngine {
   private ontologyReasoner: OntologyReasoner;
   private trustRegistry: TrustRegistry;
 
+  /**
+   * Initialize the Inference Engine with an AIQL Program.
+   * 
+   * Initialization Process:
+   * 1. **Knowledge Base Loading**: Extracts all initial Facts (Intents) and Rules from the program body.
+   * 2. **Fact Indexing**: Serializes facts for O(1) existence checks during reasoning.
+   * 3. **Semantic Module bootstrapping** (v2.5.0):
+   *    - **Ontology Reasoner**: Learns class hierarchies and property definitions from statements.
+   *    - **Trust Registry**: Extracts trust scores and credibility metadata.
+   * 
+   * @param program - The parsed AIQL program containing the initial knowledge state.
+   */
   constructor(program: AST.Program) {
     this.knowledgeBase = [...program.body];
     this.rules = program.body.filter(AST.isRuleDefinition);

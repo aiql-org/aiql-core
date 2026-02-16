@@ -71,16 +71,25 @@ export interface SemanticWeight {
 export class SemanticExplorer {
   
   /**
-   * Detect semantic gaps in knowledge base
+   * Detect Semantic Gaps in the Knowledge Base.
    * 
-   * Gap types:
-   * - Connectivity: Low-connected nodes (< 2 edges)
-   * - Confidence: Low-confidence statements (< 0.5)
-   * - Definition: Concepts mentioned but not defined
-   * - Coherence: Statements that violate semantic constraints
+   * Scans the graph topology and semantic content to identify areas where the AI's knowledge
+   * is incomplete, inconsistent, or uncertain. This drives the "Curiosity" loop.
    * 
-   * @param kb - InferenceEngine with knowledge base
-   * @returns Array of detected semantic gaps
+   * Gap Types Detected:
+   * 1. **Connectivity Gaps**: Concepts that are isolated or have very few connections (Degree < 2).
+   *    - *Action*: Trigger queries to find relationships for these orphans.
+   * 
+   * 2. **Confidence Gaps**: Statements with low confidence scores (< 0.5).
+   *    - *Action*: Trigger verification queries to boost or drop confidence.
+   * 
+   * 3. **Definition Gaps**: Concepts that appear as objects but never as subjects (undefined).
+   *    - *Action*: Trigger ontological queries (e.g., `[is_a]`, `[defined_as]`).
+   * 
+   * 4. **Coherence Gaps**: (Placeholder) Statements that violate soft semantic constraints.
+   * 
+   * @param kb - The InferenceEngine instance containing the current knowledge graph.
+   * @returns {SemanticGap[]} Sorted list of detected gaps to be prioritized for exploration.
    */
   public detectSemanticGaps(kb: InferenceEngine): SemanticGap[] {
     const gaps: SemanticGap[] = [];

@@ -16,6 +16,7 @@
     "build": "tsc",
     "postbuild": "chmod +x dist/cli.js",
     "clean": "rm -rf dist",
+    "test": "tsc && node dist/test_integration.js",
     "prepublishOnly": "npm run clean && npm run build",
     "dev": "tsx src/cli.ts"
   },

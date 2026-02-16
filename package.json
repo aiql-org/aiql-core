@@ -17,7 +17,9 @@
     "build": "npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/cli && npm run build -w packages/api",
     "test": "npm run test --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "lint:workspaces": "npm run lint --workspaces --if-present",
     "sync-versions": "node scripts/sync-versions.js",
     "docker:cli": "docker build -f docker/cli.Dockerfile -t aiql/cli:latest .",
     "docker:api": "docker build -f docker/api.Dockerfile -t aiql/api:latest .",
@@ -48,6 +50,10 @@
   "homepage": "https://aiql.org",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint": "^10.0.0",
+    "prettier": "^3.8.1",
     "typescript": "^5.0.0"
   },
   "engines": {

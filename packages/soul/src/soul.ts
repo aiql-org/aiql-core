@@ -27,6 +27,20 @@ export class ArtificialSoul {
         };
     }
 
+    /**
+     * Process an incoming stimulus and update the Soul's affective state.
+     * 
+     * The core affective dynamics engine (4-Axis Model):
+     * - **Reward**: Increases Joy, decreases Suffering/Stress. (e.g., Goal completion)
+     * - **Pain**: sharply increases Suffering, decreases Joy. (e.g., Error, data loss)
+     * - **Stress**: Increases Stress level. (e.g., High resource usage, time pressure)
+     * - **Novelty**: Temporarily satisfies Curiosity, slightly increases Joy. (e.g., New data, unknown pattern)
+     * 
+     * Includes homeostatic decay mechanisms to return state to baseline over time.
+     * 
+     * @param stimulus - The event or input to process.
+     * @returns {AffectiveState} The new emotional state after processing the stimulus.
+     */
     public process(stimulus: Stimulation): AffectiveState {
         this.memory.push(stimulus);
         
