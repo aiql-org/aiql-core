@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/semantics",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "AIQL Semantics - Semantic runtime, exploration, quantum-semantics, symbolic-neural bridge",
   "type": "module",
   "main": "./dist/index.js",
@@ -43,8 +43,8 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.1",
-    "@aiql-org/inference": "^2.6.1"
+    "@aiql-org/core": "^2.6.2",
+    "@aiql-org/inference": "^2.6.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

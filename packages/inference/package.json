@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/inference",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "AIQL Inference Engine - Ontology reasoning, meta-ontology, and logical inference",
   "type": "module",
   "main": "./dist/index.js",
@@ -42,8 +42,8 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.1",
-    "@aiql-org/security": "^2.6.1"
+    "@aiql-org/core": "^2.6.2",
+    "@aiql-org/security": "^2.6.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

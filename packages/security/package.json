@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/security",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "AIQL Security - Quantum-proof cryptography (Dilithium/Kyber), trust registry",
   "type": "module",
   "main": "./dist/index.js",
@@ -44,7 +44,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.1"
+    "@aiql-org/core": "^2.6.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
