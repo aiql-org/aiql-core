@@ -1,17 +1,26 @@
 {
   "name": "@aiql-org/cli",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "AIQL CLI - Command-line tool for parsing and transpiling AIQL code",
   "type": "module",
   "main": "./dist/cli.js",
   "types": "./dist/cli.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/cli.d.ts", "default": "./dist/cli.js" }
+      "import": {
+        "types": "./dist/cli.d.ts",
+        "default": "./dist/cli.js"
+      }
     }
   },
-  "bin": { "aiql": "dist/cli.js" },
-  "files": ["dist", "README.md", "LICENSE"],
+  "bin": {
+    "aiql": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "postbuild": "chmod +x dist/cli.js",
@@ -20,13 +29,25 @@
     "prepublishOnly": "npm run clean && npm run build",
     "dev": "tsx src/cli.ts"
   },
-  "keywords": ["aiql", "cli", "transpiler", "parser", "command-line"],
+  "keywords": [
+    "aiql",
+    "cli",
+    "transpiler",
+    "parser",
+    "command-line"
+  ],
   "author": "AIQL Contributors",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/AI-Memory/aiql.ws.git", "directory": "packages/cli" },
-  "publishConfig": { "access": "public" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
-    "@aiql-org/core": "^2.6.0",
+    "@aiql-org/core": "^2.6.1",
     "chalk": "^5.3.0",
     "commander": "^12.0.0"
   },
@@ -35,5 +56,7 @@
     "tsx": "^4.0.0",
     "typescript": "^5.0.0"
   },
-  "engines": { "node": ">=20.0.0" }
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }
