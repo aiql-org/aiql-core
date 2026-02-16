@@ -39,7 +39,7 @@ for (const name of packages) {
   for (const depType of ['dependencies', 'peerDependencies', 'devDependencies']) {
     if (pkg[depType]) {
       for (const [dep, ver] of Object.entries(pkg[depType])) {
-        if (dep.startsWith('@aiql/')) {
+        if (dep.startsWith('@aiql-org/')) {
           pkg[depType][dep] = `^${targetVersion}`;
         }
       }
