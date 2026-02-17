@@ -27,8 +27,7 @@
     "docker:cli": "docker build -f docker/cli.Dockerfile -t aiql/cli:latest .",
     "docker:api": "docker build -f docker/api.Dockerfile -t aiql/api:latest .",
     "docker:playground": "docker build -f docker/playground.Dockerfile -t aiql/playground:latest .",
-    "docker:all": "npm run docker:cli && npm run docker:api && npm run docker:playground",
-    "prepublishOnly": "npm run clean && npm run build"
+    "docker:all": "npm run docker:cli && npm run docker:api && npm run docker:playground"
   },
   "repository": {
     "type": "git",

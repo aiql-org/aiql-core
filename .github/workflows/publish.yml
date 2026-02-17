@@ -33,10 +33,3 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Dispatch Sync to Web
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.DISPATCH_TOKEN }}
-          repository: aiql-org/aiql-org-web
-          event-type: sync-sdk
-          client-payload: '{"version": "${{ github.event.release.tag_name }}"}'
