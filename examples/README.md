@@ -233,8 +233,5 @@ MIT - See LICENSE file in repository root.
 
 ## Resources
 
-- **Language Specification**: [aiql-doc/aiql-spec.md](../aiql-doc/aiql-spec.md)
-- **Roadmap**: [aiql-doc/ROADMAP.md](../aiql-doc/ROADMAP.md)
 - **Playground**: https://aiql.org/playground
-- **GitHub**: https://github.com/AI-Memory/aiql.org_ng
 - **NPM Package**: [@aiql-org/core](https://www.npmjs.com/package/@aiql-org/core)

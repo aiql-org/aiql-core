@@ -43,7 +43,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@aiql-org/core": "^2.6.3"
   },
   "devDependencies": {

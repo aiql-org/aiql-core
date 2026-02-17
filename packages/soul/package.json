@@ -44,13 +44,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@aiql-org/core": "^2.6.3"
-  },
-  "peerDependenciesMeta": {
-    "@aiql-org/core": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "typescript": "^5.0.0"
