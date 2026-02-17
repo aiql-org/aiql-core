@@ -52,7 +52,8 @@ COPY --from=builder /build/packages/utils/dist/ ./packages/utils/dist/
 COPY --from=builder /build/packages/cli/dist/ ./packages/cli/dist/
 
 # Copy all examples
-COPY examples/ ./examples/
+# Copy all examples
+COPY packages/examples/src/ ./examples/
 
 # Create CLI symlink
 RUN ln -s /playground/packages/cli/dist/cli.js /usr/local/bin/aiql && \

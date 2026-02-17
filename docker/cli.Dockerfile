@@ -64,7 +64,8 @@ COPY --from=builder /build/packages/utils/dist/ ./packages/utils/dist/
 COPY --from=builder /build/packages/cli/dist/ ./packages/cli/dist/
 
 # Copy example AIQL files for immediate use
-COPY examples/ ./examples/
+# Copy example AIQL files for immediate use
+COPY packages/examples/src/ ./examples/
 
 # Create symlink for CLI access
 RUN ln -s /app/packages/cli/dist/cli.js /usr/local/bin/aiql && \

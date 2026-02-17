@@ -17,3 +17,15 @@ description: Verify codebase (Build, Test, Examples) and check for warnings befo
 7. Verify Website (Build & Lint)
 // turbo
 8. cd ../aiql-org-web && npm run build
+
+9. Verify Docker Build (CLI)
+// turbo
+10. docker build -f docker/cli.Dockerfile .
+
+11. Verify Docker Build (API)
+// turbo
+12. docker build -f docker/api.Dockerfile .
+
+13. Verify Docker Build (Playground)
+// turbo
+14. docker build -f docker/playground.Dockerfile .
