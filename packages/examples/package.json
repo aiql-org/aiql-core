@@ -10,7 +10,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "generate-manifest": "node scripts/generate-manifest.js",
+    "build": "tsc && npm run generate-manifest",
     "prepublishOnly": "npm run build"
   },
   "repository": {

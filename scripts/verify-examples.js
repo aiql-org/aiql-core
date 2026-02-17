@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const examplesDir = path.join(process.cwd(), 'examples');
+const examplesDir = path.join(process.cwd(), 'packages/examples/src');
 const cliPath = path.join(process.cwd(), 'packages/cli/dist/cli.js');
 
 let totalFiles = 0;
