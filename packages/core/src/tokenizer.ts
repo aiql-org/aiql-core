@@ -82,6 +82,30 @@ export enum TokenType {
   SYMBOL = "SYMBOL",           // { } ( ) : | [ ] - Structural symbols
   
   // ===================================================================
+  // Category 6: Mathematical Tokens (v2.1.0)
+  // Purpose: Math operators, set theory, and constants
+  // ===================================================================
+  PLUS = "PLUS",               // +
+  MINUS = "MINUS",             // -
+  MULTIPLY = "MULTIPLY",       // * (when not in comments)
+  DIVIDE = "DIVIDE",           // / (when not in comments)
+  POWER = "POWER",             // ^
+  MODULO = "MODULO",           // %
+  ASSIGN = "ASSIGN",           // =
+  
+  // Set Theory & Functional
+  UNION = "UNION",             // union
+  INTERSECT = "INTERSECT",     // intersect
+  LAMBDA = "LAMBDA",           // lambda
+  SUMMATION = "SUMMATION",     // sum
+  INTEGRAL = "INTEGRAL",       // integral
+  
+  // Constants
+  PI = "PI",                   // pi
+  INFINITY = "INFINITY",       // infinity, inf
+  EULER = "EULER",             // e
+  
+  // ===================================================================
   // Category 7: Control Token (1 type)
   // Purpose: End-of-file marker
   // ===================================================================
@@ -180,9 +204,24 @@ export class Tokenizer {
           tokens.push(this.createToken(TokenType.SYMBOL, "->"));
           this.advance(); this.advance();
         } else {
-          tokens.push(this.createToken(TokenType.SYMBOL, "-"));
+          tokens.push(this.createToken(TokenType.MINUS, "-"));
           this.advance();
         }
+      } else if (char === '+') {
+        tokens.push(this.createToken(TokenType.PLUS, "+"));
+        this.advance();
+      } else if (char === '*') {
+        tokens.push(this.createToken(TokenType.MULTIPLY, "*"));
+        this.advance();
+      } else if (char === '%') {
+        tokens.push(this.createToken(TokenType.MODULO, "%"));
+        this.advance();
+      } else if (char === '^') {
+        tokens.push(this.createToken(TokenType.POWER, "^"));
+        this.advance();
+      } else if (char === '=') {
+        tokens.push(this.createToken(TokenType.ASSIGN, "="));
+        this.advance();
       } else if (char === '$') {
         // Check for $$ (group identifier) or $ (identifier)
         if (this.peek(1) === '$') {
@@ -542,7 +581,18 @@ export class Tokenizer {
         'in': TokenType.IN,
         'then': TokenType.THEN,
         'true': TokenType.TRUE,
-        'false': TokenType.FALSE
+        'false': TokenType.FALSE,
+        // Math keywords (v2.1.0)
+
+        'union': TokenType.UNION,
+        'intersect': TokenType.INTERSECT,
+        'lambda': TokenType.LAMBDA,
+        'sum': TokenType.SUMMATION,
+        'integral': TokenType.INTEGRAL,
+        'pi': TokenType.PI,
+        'infinity': TokenType.INFINITY,
+        'inf': TokenType.INFINITY,
+        'e': TokenType.EULER
       };
       
       const lowerValue = value.toLowerCase();
@@ -664,13 +714,25 @@ export function isPrimitiveType(type: TokenType): boolean {
   ].includes(type);
 }
 
+// Category 6: Mathematical Tokens
+export function isMathToken(type: TokenType): boolean {
+  return [
+    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE,
+    TokenType.POWER, TokenType.MODULO, TokenType.ASSIGN,
+    TokenType.UNION, TokenType.INTERSECT, TokenType.LAMBDA, 
+    TokenType.SUMMATION, TokenType.INTEGRAL,
+    TokenType.PI, TokenType.INFINITY, TokenType.EULER
+  ].includes(type);
+}
+
 // Composite category checkers
 export function isMetadataToken(type: TokenType): boolean {
   return isStatementMetadata(type) || isProvenanceMetadata(type);
 }
 
 export function isKeyword(type: TokenType): boolean {
-  return isLogicToken(type);
+  return isLogicToken(type) || 
+         [TokenType.UNION, TokenType.INTERSECT, TokenType.LAMBDA, TokenType.SUMMATION, TokenType.INTEGRAL].includes(type);
 }
 
 /**
@@ -685,6 +747,7 @@ export function getTokenCategory(type: TokenType): string {
   if (isQuantifier(type)) return "Quantifier";
   if (isProofOperator(type)) return "Proof Operator";
   if (isLogicKeyword(type)) return "Logic Keyword";
+  if (isMathToken(type)) return "Math Token";
   if (isPrimitiveType(type)) return "Primitive Type";
   if (type === TokenType.EOF) return "Control Token";
   return "Unknown";

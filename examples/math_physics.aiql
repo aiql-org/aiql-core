@@ -1,0 +1,26 @@
+!PhysicsModel {
+    // 1. Constants
+    <Gravity> = 9.81
+    <SpeedOfLight> = 299792458
+    <Pi> = 3.14159265359
+
+    // 2. Formulas (Kinematics)
+    // d = v*t + 0.5*a*t^2
+    <Distance> = <Velocity> * <Time> + 0.5 * <Acceleration> * <Time> ^ 2
+
+    // 3. Energy Mass Equivalence
+    <Energy> = <Mass> * <SpeedOfLight> ^ 2
+
+    // 4. Wave Function (Function Application)
+    // y = A * sin(omega * t + phi)
+    <WaveHeight> = <Amplitude> * sin(<AngularFrequency> * <Time> + <PhaseShift>)
+
+    // 5. Custom Function (Lambda)
+    // Kinetic Energy Calculation
+    <CalculateKE> = lambda m, v: 0.5 * m * v ^ 2
+    
+    // 6. Set Operations (Particle Classification)
+    <Fermions> = <Quarks> union <Leptons>
+    <Hadrons> = <Baryons> union <Mesons>
+    <Matter> = <Fermions> intersect <Hadrons> // Not physically accurate, just for demo
+}

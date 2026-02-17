@@ -147,8 +147,14 @@ export class TrustRegistry {
       const relation = stmt.relation.name.replace(/^\[/, '').replace(/\]$/, '');
       
       if (relation === 'trusted_at') {
-        // Strip angle brackets from source name
-        const source = stmt.subject.name.replace(/^</, '').replace(/>$/, '');
+        // Extract source from subject using type guard
+        let source = '';
+        if (AST.isConcept(stmt.subject)) {
+            source = stmt.subject.name.replace(/^</, '').replace(/>$/, '');
+        } else {
+            // If subject is not a concept, we cannot extract a source name in the expected format
+            continue; 
+        }
         
         // Extract trust score from attributes
         if (stmt.attributes && 'value' in stmt.attributes) {

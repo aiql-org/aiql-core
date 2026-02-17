@@ -63,9 +63,9 @@ export interface Intent extends Node {
 // Level 1: Statement (atomic semantic triple)
 export interface Statement extends Node {
   type: 'Statement';
-  subject: Concept;
+  subject: Expression; // v2.1.0: Was Concept
   relation: Relation;
-  object: Concept;
+  object: Expression;  // v2.1.0: Was Concept
   attributes?: Record<string, string | number | boolean>;
   examples?: InlineExample[];    // v2.2.0: Inline examples with #example: marker
 }
@@ -186,6 +186,78 @@ export interface SignatureIntent extends Node {
   signerAgentId: string;
 }
 
+// ===================================================================
+// Mathematical Expressions (v2.1.0)
+// ===================================================================
+
+export type MathOperator = 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' | 'POWER' | 'MODULO' | 'ASSIGN';
+export type SetOperator = 'UNION' | 'INTERSECT';
+
+export interface Literal extends Node {
+  type: 'Literal';
+  value: string | number | boolean;
+}
+
+export interface MathExpression extends Node {
+  type: 'MathExpression';
+  operator: MathOperator;
+  left: Expression;
+  right: Expression;
+}
+
+export interface SetExpression extends Node {
+  type: 'SetExpression';
+  operator: SetOperator;
+  left: Expression;
+  right: Expression;
+}
+
+export interface FunctionApplication extends Node {
+  type: 'FunctionApplication';
+  functionName: string; // e.g. "sin", "sum", "integral"
+  arguments: Expression[];
+}
+
+export interface LambdaExpression extends Node {
+  type: 'LambdaExpression';
+  parameters: string[];
+  body: Expression;
+}
+
+export interface Identifier extends Node {
+  type: 'Identifier';
+  name: string;
+}
+
+export interface UnaryExpression extends Node {
+  type: 'UnaryExpression';
+  operator: 'MINUS' | 'NOT';
+  argument: Expression;
+}
+
+// Unified Expression Type
+export type Expression = Concept | Literal | MathExpression | SetExpression | FunctionApplication | LambdaExpression | Identifier | UnaryExpression;
+
+export function isUnaryExpression(node: Expression): node is UnaryExpression {
+  return node.type === 'UnaryExpression';
+}
+
+export function isIdentifier(node: Expression): node is Identifier {
+  return node.type === 'Identifier';
+}
+
+/**
+ * Helper function to extract the name from an Expression.
+ * Returns the name if the expression is a Concept or Identifier, otherwise returns undefined.
+ * This is useful for legacy code that expects `.name` to be directly accessible.
+ */
+export function extractExpressionName(expr: Expression): string | undefined {
+  if (isConcept(expr)) return expr.name;
+  if (isIdentifier(expr)) return expr.name;
+  if (isLiteral(expr)) return String(expr.value);
+  return undefined;
+}
+
 // Type guard utilities for v2.0.0 AST (helps with TypeScript narrowing)
 export function isIntent(node: LogicalNode): node is Intent {
   return node.type === 'Intent';
@@ -216,4 +288,29 @@ export function isExampleNode(node: LogicalNode): node is ExampleNode {
 // Helper to filter Program body to get only Intents
 export function getIntents(program: Program): Intent[] {
   return program.body.filter(isIntent);
+}
+
+// Type Guards for Math (v2.1.0)
+export function isConcept(node: Expression): node is Concept {
+  return node.type === 'Concept';
+}
+
+export function isLiteral(node: Expression): node is Literal {
+  return node.type === 'Literal';
+}
+
+export function isMathExpression(node: Expression): node is MathExpression {
+  return node.type === 'MathExpression';
+}
+
+export function isSetExpression(node: Expression): node is SetExpression {
+  return node.type === 'SetExpression';
+}
+
+export function isFunctionApplication(node: Expression): node is FunctionApplication {
+  return node.type === 'FunctionApplication';
+}
+
+export function isLambdaExpression(node: Expression): node is LambdaExpression {
+  return node.type === 'LambdaExpression';
 }

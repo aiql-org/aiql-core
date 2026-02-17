@@ -176,8 +176,8 @@ export class OntologyReasoner {
     for (const stmt of statements) {
       // Strip brackets from relation and concept names
       const relation = this.stripBrackets(stmt.relation.name);
-      const subject = this.stripBrackets(stmt.subject.name);
-      const object = this.stripBrackets(stmt.object.name);
+      const subject = this.stripBrackets(AST.extractExpressionName(stmt.subject) || '');
+      const object = this.stripBrackets(AST.extractExpressionName(stmt.object) || '');
       
       if (relation === 'is_a' || relation === 'subclass_of') {
         // subject is a subclass of object
@@ -287,8 +287,8 @@ export class OntologyReasoner {
    */
   public detectSemanticConflict(stmt1: AST.Statement, stmt2: AST.Statement): ConflictResult {
     // Strip brackets for comparison
-    const subject1 = this.stripBrackets(stmt1.subject.name);
-    const subject2 = this.stripBrackets(stmt2.subject.name);
+    const subject1 = this.stripBrackets(AST.extractExpressionName(stmt1.subject) || '');
+    const subject2 = this.stripBrackets(AST.extractExpressionName(stmt2.subject) || '');
     
     // Check if statements reference the same subject
     if (subject1 !== subject2) {
@@ -298,8 +298,8 @@ export class OntologyReasoner {
     const subject = subject1;
     const rel1 = this.stripBrackets(stmt1.relation.name);
     const rel2 = this.stripBrackets(stmt2.relation.name);
-    const obj1 = this.stripBrackets(stmt1.object.name);
-    const obj2 = this.stripBrackets(stmt2.object.name);
+    const obj1 = this.stripBrackets(AST.extractExpressionName(stmt1.object) || '');
+    const obj2 = this.stripBrackets(AST.extractExpressionName(stmt2.object) || '');
     
     // 1. Taxonomy conflicts: Disjoint classes
     if ((rel1 === 'is_a' || rel1 === 'instance_of') && 
@@ -378,7 +378,7 @@ export class OntologyReasoner {
     // Group statements by subject for efficient comparison
     const statementsBySubject = new Map<string, AST.Statement[]>();
     for (const stmt of statements) {
-      const subject = stmt.subject.name;
+      const subject = AST.extractExpressionName(stmt.subject) || '';
       if (!statementsBySubject.has(subject)) {
         statementsBySubject.set(subject, []);
       }

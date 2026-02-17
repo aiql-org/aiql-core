@@ -1,7 +1,7 @@
+import * as AST from '../../ast.js';
+import { TranspilerBase } from '../base.js';
 
-import * as AST from '../ast.js';
-
-export class PythonTranspiler {
+export class PythonTranspiler extends TranspilerBase {
     public transpile(program: AST.Program): string {
         const lines: string[] = [];
         
@@ -16,7 +16,7 @@ export class PythonTranspiler {
             lines.push("");
         }
         
-        // Transpile all node types (v2.0.0 full logic support, v2.1.0 relationships)
+        // Transpile all node types
         for (const node of program.body) {
             if (AST.isIntent(node)) {
                 lines.push(this.transpileIntent(node));
@@ -189,7 +189,7 @@ export class PythonTranspiler {
         const graphRep = intent.statements.map((node: AST.Statement) => {
             const attrs = node.attributes ? `, attributes=${JSON.stringify(node.attributes)}` : "";
             const tense = node.relation.tense ? `, tense="${node.relation.tense}"` : "";
-            return `Relation(subject="${node.subject.name}", predicate="${node.relation.name}", object="${node.object.name}"${attrs}${tense})`;
+            return `Relation(subject=${this.expressionToPython(node.subject)}, predicate="${node.relation.name}", object=${this.expressionToPython(node.object)}${attrs}${tense})`;
         }).join(",\n    ");
         
         const lines: string[] = [];
@@ -290,47 +290,47 @@ export class PythonTranspiler {
         return lines.join('\n');
     }
 
-    private detectAffectiveRelations(intent: AST.Intent): string[] {
-        const affectiveRelations = ['feels', 'desires', 'experiences', 'seeks', 'wants', 'avoids'];
-        const affectiveEmotions = [
-            'Joy', 'Happiness', 'Delight', // Positive emotions → Reward
-            'Suffering', 'Pain', 'Sadness', // Negative emotions → Pain
-            'Stress', 'Anxiety', 'Tension', // Stress emotions → Stress
-            'Curiosity', 'Interest', 'Wonder', // Curiosity emotions → Novelty
-            'Fear', 'Hope', 'Surprise', 'Empathy', 'Compassion'
-        ];
+
+    private expressionToPython(expr: AST.Expression): string {
+        if (AST.isConcept(expr)) return `"${expr.name}"`;
+        if (AST.isIdentifier(expr)) return expr.name;
+        if (AST.isLiteral(expr)) return JSON.stringify(expr.value);
         
-        const detected: string[] = [];
-        
-        for (const node of intent.statements) {
-            const relation = node.relation.name.toLowerCase();
-            
-            // Check for affective relations
-            if (affectiveRelations.includes(relation)) {
-                const emotion = node.object.name;
-                let stimulusType = 'Unknown';
-                
-                // Map emotions to soul stimulus types
-                if (['Joy', 'Happiness', 'Delight'].includes(emotion)) {
-                    stimulusType = 'Reward';
-                } else if (['Suffering', 'Pain', 'Sadness'].includes(emotion)) {
-                    stimulusType = 'Pain';
-                } else if (['Stress', 'Anxiety', 'Tension'].includes(emotion)) {
-                    stimulusType = 'Stress';
-                } else if (['Curiosity', 'Interest', 'Wonder'].includes(emotion)) {
-                    stimulusType = 'Novelty';
-                }
-                
-                const intensity = node.attributes?.intensity || 'unspecified';
-                detected.push(`${node.subject.name} [${relation}] ${emotion} → soul.process({type: "${stimulusType}", intensity: ${intensity}})`);
-            }
-            
-            // Check for affective objects even without affective relations
-            if (affectiveEmotions.includes(node.object.name)) {
-                detected.push(`Emotion concept: ${node.object.name}`);
-            }
+        if (AST.isUnaryExpression(expr)) {
+            const op = expr.operator === 'MINUS' ? '-' : 'not ';
+            return `${op}(${this.expressionToPython(expr.argument)})`;
         }
         
-        return detected;
+        if (AST.isMathExpression(expr)) {
+            const left = this.expressionToPython(expr.left);
+            const right = this.expressionToPython(expr.right);
+             const opMap: Record<AST.MathOperator, string> = {
+                 'PLUS': '+', 'MINUS': '-', 'MULTIPLY': '*', 'DIVIDE': '/', 'POWER': '**', 'MODULO': '%', 'ASSIGN': '=='
+             };
+            return `(${left} ${opMap[expr.operator]} ${right})`;
+        }
+        
+        if (AST.isSetExpression(expr)) {
+             const left = this.expressionToPython(expr.left);
+             const right = this.expressionToPython(expr.right);
+             if (expr.operator === 'UNION') return `(${left} | ${right})`;
+             if (expr.operator === 'INTERSECT') return `(${left} & ${right})`;
+        }
+        
+        if (AST.isFunctionApplication(expr)) {
+             const args = expr.arguments.map(arg => this.expressionToPython(arg)).join(', ');
+             if (expr.functionName === 'sin') return `math.sin(${args})`;
+             if (expr.functionName === 'cos') return `math.cos(${args})`;
+             if (expr.functionName === 'tan') return `math.tan(${args})`;
+             if (expr.functionName === 'log') return `math.log(${args})`;
+             if (expr.functionName === 'sqrt') return `math.sqrt(${args})`;
+             return `${expr.functionName}(${args})`;
+        }
+        
+        if (AST.isLambdaExpression(expr)) {
+            return `lambda ${expr.parameters.join(', ')}: ${this.expressionToPython(expr.body)}`;
+        }
+
+        return JSON.stringify(expr);
     }
 }

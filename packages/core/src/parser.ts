@@ -574,9 +574,9 @@ export class Parser {
   }
 
   private statement(): AST.Statement {
-      const subject = this.concept();
+      const subject = this.parseExpression();
       const relation = this.relation();
-      const object = this.concept();
+      const object = this.parseExpression();
       
       let attributes: Record<string, string | number | boolean> | undefined;
       
@@ -620,12 +620,235 @@ export class Parser {
       };
   }
 
+  // ===================================================================
+  // Expression Parsing (v2.1.0)
+  // Handles Math, Sets, Functions, Literals, Concepts
+  // Precedence: Set > Add > Mul > Pow > Call > Atomic
+  // ===================================================================
+
+  private parseExpression(): AST.Expression {
+      return this.parseSetExpression();
+  }
+
+  private parseSetExpression(): AST.Expression {
+      let left = this.parseAdditive();
+
+      while (this.check(TokenType.UNION) || this.check(TokenType.INTERSECT)) {
+          const operatorToken = this.advance();
+          const operator = operatorToken.type === TokenType.UNION ? 'UNION' : 'INTERSECT';
+          const right = this.parseAdditive();
+          left = {
+              type: 'SetExpression',
+              operator,
+              left,
+              right
+          } as AST.SetExpression;
+      }
+
+      return left;
+  }
+
+  private parseAdditive(): AST.Expression {
+      let left = this.parseMultiplicative();
+
+      while (this.check(TokenType.PLUS) || this.check(TokenType.MINUS)) {
+          const operatorToken = this.advance();
+          const operator = operatorToken.type === TokenType.PLUS ? 'PLUS' : 'MINUS';
+          const right = this.parseMultiplicative();
+          left = {
+              type: 'MathExpression',
+              operator,
+              left,
+              right
+          } as AST.MathExpression;
+      }
+
+      return left;
+  }
+
+  private parseMultiplicative(): AST.Expression {
+      let left = this.parseExponential();
+
+      while (this.check(TokenType.MULTIPLY) || this.check(TokenType.DIVIDE) || this.check(TokenType.MODULO)) {
+          const operatorToken = this.advance();
+          let operator: AST.MathOperator;
+          if (operatorToken.type === TokenType.MULTIPLY) operator = 'MULTIPLY';
+          else if (operatorToken.type === TokenType.DIVIDE) operator = 'DIVIDE';
+          else operator = 'MODULO';
+
+          const right = this.parseExponential();
+          left = {
+              type: 'MathExpression',
+              operator,
+              left,
+              right
+          } as AST.MathExpression;
+      }
+
+      return left;
+  }
+
+  private parseExponential(): AST.Expression {
+      let left = this.parseUnary();
+
+      if (this.check(TokenType.POWER)) {
+          this.advance();
+          const right = this.parseExponential(); // Right-associative
+          left = {
+              type: 'MathExpression',
+              operator: 'POWER',
+              left,
+              right
+          } as AST.MathExpression;
+      }
+
+      return left;
+  }
+
+  private parseUnary(): AST.Expression {
+      if (this.check(TokenType.MINUS)) {
+          this.advance();
+          const right = this.parseUnary();
+          return {
+              type: 'UnaryExpression',
+              operator: 'MINUS',
+              argument: right
+          } as AST.UnaryExpression;
+      }
+
+      if (this.check(TokenType.NOT)) {
+          this.advance();
+          const right = this.parseUnary();
+          return {
+              type: 'UnaryExpression',
+              operator: 'NOT',
+              argument: right
+          } as AST.UnaryExpression;
+      }
+
+      return this.parseCall();
+  }
+
+  private parseCall(): AST.Expression {
+      // Check for function call: sin(x), sum(list), etc.
+      // But avoid confusing with concepts <...> or identifiers that are just variables?
+      // Actually, if we see Identifier (, it's likely a function call. 
+      // Concepts start with <.
+      
+      
+      const next = this.peekNext();
+      
+      if (this.check(TokenType.IDENTIFIER) && next.type === TokenType.SYMBOL && next.value === '(') {
+          const functionName = this.advance().value;
+          this.advance(); // consume '('
+          const args: AST.Expression[] = [];
+          if (!this.check(TokenType.SYMBOL) || this.peek().value !== ')') {
+              do {
+                  args.push(this.parseExpression());
+              } while (this.check(TokenType.SYMBOL) && this.peek().value === ',' && this.advance());
+          }
+          this.consume(TokenType.SYMBOL, "Expect ')' after function arguments.");
+          return {
+              type: 'FunctionApplication',
+              functionName,
+              arguments: args
+          } as AST.FunctionApplication;
+      }
+
+      return this.parseAtomicExpression();
+  }
+
+  private parseAtomicExpression(): AST.Expression {
+      if (this.check(TokenType.IDENTIFIER)) {
+          return { type: 'Identifier', name: this.advance().value };
+      }
+      if (this.check(TokenType.CONCEPT)) {
+          return this.concept();
+      }
+      
+      if (this.check(TokenType.NUMBER)) {
+          const val = parseFloat(this.advance().value);
+          return { type: 'Literal', value: val };
+      }
+
+      if (this.check(TokenType.STRING)) {
+          const raw = this.advance().value;
+          return { type: 'Literal', value: raw.substring(1, raw.length - 1) };
+      }
+      
+      if (this.check(TokenType.TRUE)) {
+          this.advance();
+          return { type: 'Literal', value: true };
+      }
+      
+      if (this.check(TokenType.FALSE)) {
+          this.advance();
+          return { type: 'Literal', value: false };
+      }
+
+      // Math Constants
+      if (this.check(TokenType.PI)) {
+          this.advance();
+          return { type: 'Literal', value: Math.PI }; // Store numeric approximation? Or symbolic?
+          // Using numeric for now, as Literal value is string|number|boolean
+      }
+      if (this.check(TokenType.EULER)) {
+          this.advance();
+          return { type: 'Literal', value: Math.E };
+      }
+      if (this.check(TokenType.INFINITY)) {
+          this.advance();
+          return { type: 'Literal', value: Infinity };
+      }
+
+      // Parenthesized expression
+      if (this.check(TokenType.SYMBOL) && this.peek().value === '(') {
+          this.advance();
+          const expr = this.parseExpression();
+          this.consume(TokenType.SYMBOL, "Expect ')' after expression.");
+          return expr;
+      }
+      
+      // Lambda expression
+      if (this.check(TokenType.LAMBDA)) {
+          this.advance(); // consume lambda
+          const params: string[] = [];
+          // lambda x, y: ...
+          do {
+             if (this.check(TokenType.IDENTIFIER)) {
+                 params.push(this.advance().value);
+             } else {
+                 throw this.error(this.peek(), "Expect parameter name in lambda.");
+             }
+          } while (this.check(TokenType.SYMBOL) && this.peek().value === ',' && this.advance());
+          
+          if (this.check(TokenType.SYMBOL) && this.peek().value === ':') {
+             this.advance(); // consume ':'
+          } else {
+             throw this.error(this.peek(), "Expect ':' after lambda parameters.");
+          }
+          
+          const body = this.parseExpression();
+          return {
+              type: 'LambdaExpression',
+              parameters: params,
+              body
+          } as AST.LambdaExpression;
+      }
+
+      throw this.error(this.peek(), "Expect expression (Concept, Literal, Math, etc.).");
+  }
+
   private concept(): AST.Concept {
       const token = this.consume(TokenType.CONCEPT, "Expect Concept.");
       return { type: 'Concept', name: token.value };
   }
 
   private relation(): AST.Relation {
+      if (this.check(TokenType.ASSIGN)) {
+          this.advance();
+          return { type: 'Relation', name: '=' };
+      }
       const token = this.consume(TokenType.RELATION, "Expect Relation.");
       
       // Parse relation value: [relation_name] or [relation_name@tense:value]
@@ -699,6 +922,11 @@ export class Parser {
 
   private peek(): Token {
     return this.tokens[this.current];
+  }
+
+  private peekNext(): Token {
+    if (this.current + 1 >= this.tokens.length) return this.tokens[this.tokens.length - 1];
+    return this.tokens[this.current + 1];
   }
 
   private previous(): Token {

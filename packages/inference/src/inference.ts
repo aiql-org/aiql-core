@@ -627,9 +627,9 @@ export class InferenceEngine {
    */
   private unifyStatements(pattern: AST.Statement, target: AST.Statement, substitution: Substitution): boolean {
     // Unify subject, relation, object
-    if (!this.unifyTerm(pattern.subject.name, target.subject.name, substitution)) return false;
-    if (!this.unifyTerm(pattern.relation.name, target.relation.name, substitution)) return false;
-    if (!this.unifyTerm(pattern.object.name, target.object.name, substitution)) return false;
+    if (!this.unifyTerm(AST.extractExpressionName(pattern.subject) || '', AST.extractExpressionName(target.subject) || '', substitution)) return false;
+    if (pattern.relation.name !== target.relation.name) return false;
+    if (!this.unifyTerm(AST.extractExpressionName(pattern.object) || '', AST.extractExpressionName(target.object) || '', substitution)) return false;
 
     return true;
   }
@@ -702,7 +702,7 @@ export class InferenceEngine {
         ...stmt,
         subject: { 
           type: 'Concept' as const,
-          name: substitution.get(stmt.subject.name) || stmt.subject.name 
+          name: substitution.get(AST.extractExpressionName(stmt.subject) || '') || AST.extractExpressionName(stmt.subject) || '' 
         },
         relation: { 
           type: 'Relation' as const,
@@ -711,7 +711,7 @@ export class InferenceEngine {
         },
         object: { 
           type: 'Concept' as const,
-          name: substitution.get(stmt.object.name) || stmt.object.name 
+          name: substitution.get(AST.extractExpressionName(stmt.object) || '') || AST.extractExpressionName(stmt.object) || '' 
         }
       }))
     };
@@ -878,9 +878,9 @@ export class InferenceEngine {
     for (const stmt1 of intent1.statements) {
       for (const stmt2 of intent2.statements) {
         // Same subject and relation but different objects suggest contradiction
-        if (stmt1.subject.name === stmt2.subject.name &&
+        if (AST.extractExpressionName(stmt1.subject) === AST.extractExpressionName(stmt2.subject) &&
             stmt1.relation.name === stmt2.relation.name &&
-            stmt1.object.name !== stmt2.object.name) {
+            AST.extractExpressionName(stmt1.object) !== AST.extractExpressionName(stmt2.object)) {
           return true;
         }
         
@@ -1061,8 +1061,8 @@ export class InferenceEngine {
       return `<${stripped}>`;
     };
     
-    const normalizedSubject = normalizeConceptName(subject.name);
-    const normalizedObject = normalizeConceptName(object.name);
+    const normalizedSubject = normalizeConceptName(AST.extractExpressionName(subject) || '');
+    const normalizedObject = normalizeConceptName(AST.extractExpressionName(object) || '');
     
     // <Self> [has_knowledge_about] <?Topic>
     if (normalizedSubject === '<Self>' && relation.name === 'has_knowledge_about') {
@@ -1117,7 +1117,7 @@ export class InferenceEngine {
     for (const node of this.knowledgeBase) {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
-          if (stmt.subject.name === conceptName || stmt.object.name === conceptName) {
+          if (AST.extractExpressionName(stmt.subject) === conceptName || AST.extractExpressionName(stmt.object) === conceptName) {
             results.push(stmt);
           }
         }
@@ -1140,12 +1140,16 @@ export class InferenceEngine {
     for (const node of this.knowledgeBase) {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
-          allConcepts.add(stmt.subject.name);
-          allConcepts.add(stmt.object.name);
+          const subjectName = AST.extractExpressionName(stmt.subject);
+          const objectName = AST.extractExpressionName(stmt.object);
+          if (subjectName) allConcepts.add(subjectName);
+          if (objectName) allConcepts.add(objectName);
           
           // Count how many statements define each concept
-          const count = definedConcepts.get(stmt.subject.name) || 0;
-          definedConcepts.set(stmt.subject.name, count + 1);
+          if (subjectName) {
+            const count = definedConcepts.get(subjectName) || 0;
+            definedConcepts.set(subjectName, count + 1);
+          }
         }
       }
     }
@@ -1270,9 +1274,9 @@ export class InferenceEngine {
         const hasQuantumMode = node.contextParams?.mode === 'quantum_superposition';
         
         for (const stmt of node.statements) {
-          const concept = stmt.subject.name;
+          const concept = AST.extractExpressionName(stmt.subject) || '';
           const relation = stmt.relation.name;
-          const value = stmt.object.name;
+          const value = AST.extractExpressionName(stmt.object) || '';
           
           if (!conceptRelationMap.has(concept)) {
             conceptRelationMap.set(concept, new Map());

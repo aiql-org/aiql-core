@@ -265,10 +265,10 @@ export class SemanticExplorer {
         
         for (const stmt of node.statements) {
           // Subject stats
-          this.updateConceptStats(stats, stmt.subject.name, confidence, 'subject');
+          this.updateConceptStats(stats, AST.extractExpressionName(stmt.subject) || "", confidence, 'subject');
           
           // Object stats
-          this.updateConceptStats(stats, stmt.object.name, confidence, 'object');
+          this.updateConceptStats(stats, AST.extractExpressionName(stmt.object) || "", confidence, 'object');
         }
       }
     }
@@ -324,11 +324,11 @@ export class SemanticExplorer {
     for (const node of knowledgeBase) {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
-          if (stmt.subject.name === bracketedConcept || stmt.subject.name === concept) {
-            const objName = stmt.object.name.replace(/^<|>$/g, '');
+          if (AST.extractExpressionName(stmt.subject) || "" === bracketedConcept || AST.extractExpressionName(stmt.subject) || "" === concept) {
+            const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
             related.add(objName);
-          } else if (stmt.object.name === bracketedConcept || stmt.object.name === concept) {
-            const subjName = stmt.subject.name.replace(/^<|>$/g, '');
+          } else if (AST.extractExpressionName(stmt.object) || "" === bracketedConcept || AST.extractExpressionName(stmt.object) || "" === concept) {
+            const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
             related.add(subjName);
           }
         }
@@ -348,7 +348,7 @@ export class SemanticExplorer {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
           // Normalize: strip angle brackets
-          const subjName = stmt.subject.name.replace(/^<|>$/g, '');
+          const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
           defined.add(subjName);
         }
       }
@@ -367,8 +367,8 @@ export class SemanticExplorer {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
           // Normalize: strip angle brackets
-          const subjName = stmt.subject.name.replace(/^<|>$/g, '');
-          const objName = stmt.object.name.replace(/^<|>$/g, '');
+          const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
+          const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
           mentioned.add(subjName);
           mentioned.add(objName);
         }

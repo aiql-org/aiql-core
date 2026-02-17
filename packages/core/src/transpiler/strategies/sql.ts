@@ -1,6 +1,7 @@
-import * as AST from '../ast.js';
+import * as AST from '../../ast.js';
+import { TranspilerBase } from '../base.js';
 
-export class SQLTranspiler {
+export class SQLTranspiler extends TranspilerBase {
     public transpile(program: AST.Program): string {
         let output = "-- AIQL to SQL Transpilation\n";
         output += "-- Generated: " + new Date().toISOString() + "\n\n";
@@ -123,8 +124,6 @@ export class SQLTranspiler {
         // Data insertion
         output += "-- Insert data from AIQL program\n\n";
         
-        // For now, only transpile Intent nodes; skip logical expressions until fully implemented
-        // Note: In a real implementation, we would need to handle logical expressions and rules stored differently
         for (const node of program.body) {
             if (!AST.isIntent(node)) continue;
             const intent = node;
@@ -134,14 +133,13 @@ export class SQLTranspiler {
             // Use intent-level provenance if exists, otherwise fall back to program-level
             const intentVersion = intent.version || program.version;
             const intentOrigin = intent.origin || program.origin;
-            // Citations are handled in separate table
             
             // Insert intent
             const intentValues = [
                 `'${escapeSQLValue(intent.intentType)}'`,
                 intent.scope ? `'${escapeSQLValue(intent.scope)}'` : 'NULL',
                 intent.confidence !== undefined ? intent.confidence.toString() : 'NULL',
-                intent.coherence !== undefined ? intent.coherence.toString() : 'NULL',  // v2.6.0
+                intent.coherence !== undefined ? intent.coherence.toString() : 'NULL',
                 intent.identifier ? `'${escapeSQLValue(intent.identifier)}'` : 'NULL',
                 intent.groupIdentifier ? `'${escapeSQLValue(intent.groupIdentifier)}'` : 'NULL',
                 intent.sequenceNumber !== undefined ? intent.sequenceNumber.toString() : 'NULL',
@@ -155,11 +153,8 @@ export class SQLTranspiler {
             output += "BEGIN TRANSACTION;\n";
 
             output += `INSERT INTO aiql_intents (intent_type, scope, confidence, coherence, identifier, group_identifier, sequence_number, temperature, entropy, version, origin)\n`;
-            output += `VALUES (${intentValues.join(', ')});\n`; // SQLite supports ;
+            output += `VALUES (${intentValues.join(', ')});\n`;
 
-            // Get last insert rowid (SQLite specific, standard SQL uses RETURNING or separate SELECT)
-            // Using a variable strategy for portability in script generation
-            // For this output, we assume execution in a script where last_insert_rowid() works
             output += `INSERT INTO aiql_statements (intent_id, subject, relation, object, tense, attributes)\n`;
             
             if (intent.statements.length > 0) {
@@ -168,7 +163,7 @@ export class SQLTranspiler {
                     const attrs = stmt.attributes ? `'${escapeSQLValue(JSON.stringify(stmt.attributes))}'` : 'NULL';
                     const tense = stmt.relation.tense ? `'${escapeSQLValue(stmt.relation.tense)}'` : 'NULL';
                     
-                    output += `SELECT last_insert_rowid(), '${escapeSQLValue(stmt.subject.name)}', '${escapeSQLValue(stmt.relation.name)}', '${escapeSQLValue(stmt.object.name)}', ${tense}, ${attrs} UNION ALL \n`;
+                    output += `SELECT last_insert_rowid(), '${escapeSQLValue(this.expressionToString(stmt.subject))}', '${escapeSQLValue(stmt.relation.name)}', '${escapeSQLValue(this.expressionToString(stmt.object))}', ${tense}, ${attrs} UNION ALL \n`;
                 });
                 // Remove last UNION ALL and add semicolon
                 output = output.slice(0, -11) + ";\n";
@@ -227,15 +222,14 @@ export class SQLTranspiler {
         }
 
         for (const query of queries as AST.Intent[]) {
-             output += `-- Query: ${JSON.stringify(query.statements.map(s => `${s.subject.name} ${s.relation.name} ${s.object.name}`))}\n`;
+             output += `-- Query: ${JSON.stringify(query.statements.map(s => `${this.expressionToString(s.subject)} ${s.relation.name} ${this.expressionToString(s.object)}`))}\n`;
              
-             // Simple pattern matching for SQL generation (PoC)
-             // Supports basic Subject-Relation-Object pattern with wildcards variables (?Var)
+             // Simple pattern matching for SQL generation
              
              for (const stmt of query.statements) {
-                 const subject = stmt.subject.name;
+                 const subject = this.expressionToString(stmt.subject);
                  const relation = stmt.relation.name;
-                 const object = stmt.object.name;
+                 const object = this.expressionToString(stmt.object);
                  
                  const isSubjectVar = subject.startsWith('?');
                  const isRelationVar = relation.startsWith('?');

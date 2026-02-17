@@ -27,7 +27,7 @@ not !Assert {
 }
 
 // Existential proof: There exists a prime number
-exists p: !Assert {
+exists primes: !Assert {
   <Number> [is] <Prime>
 } @1.0
 
@@ -35,8 +35,8 @@ exists p: !Assert {
 // theorem theorem_1 : (P_holds_True → Q_holds_True) := by sorry
 // lemma inference_rule_1 : (¬Q_holds_True → ¬P_holds_True) := by intro; sorry
 
-// Set theory in Lean
-forall s: forall e: !Assert {
+// Set theory in Lean - simplified to single quantifier
+forall elements: !Assert {
   <Element> [belongs_to] <Set>
 } implies !Assert {
   <Set> [contains] <Element>

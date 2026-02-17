@@ -183,24 +183,24 @@ export class SymbolicNeuralBridge {
     const knownConcepts = this.getKnownConcepts(knowledgeBase);
 
     // 1. Check if concepts are known or in context
-    if (!knownConcepts.has(statement.subject.name) && 
-        !context.includes(statement.subject.name) &&
-        !isMetaConcept(statement.subject.name)) {
+    if (!knownConcepts.has(AST.extractExpressionName(statement.subject) || "") && 
+        !context.includes(AST.extractExpressionName(statement.subject) || "") &&
+        !isMetaConcept(AST.extractExpressionName(statement.subject) || "")) {
       result.violations.push({
         statement,
         violationType: 'concept-unknown',
-        reason: `Unknown subject concept: ${statement.subject.name}`
+        reason: `Unknown subject concept: ${AST.extractExpressionName(statement.subject) || ""}`
       });
       result.coherenceScore -= 0.3;
     }
 
-    if (!knownConcepts.has(statement.object.name) && 
-        !context.includes(statement.object.name) &&
-        !isMetaConcept(statement.object.name)) {
+    if (!knownConcepts.has(AST.extractExpressionName(statement.object) || "") && 
+        !context.includes(AST.extractExpressionName(statement.object) || "") &&
+        !isMetaConcept(AST.extractExpressionName(statement.object) || "")) {
       result.violations.push({
         statement,
         violationType: 'concept-unknown',
-        reason: `Unknown object concept: ${statement.object.name}`
+        reason: `Unknown object concept: ${AST.extractExpressionName(statement.object) || ""}`
       });
       result.coherenceScore -= 0.3;
     }
@@ -211,9 +211,9 @@ export class SymbolicNeuralBridge {
     // Check meta-relations
     if (isMetaRelation(statement.relation.name)) {
       const metaValidation = validateMetaStatement(
-        statement.subject.name,
+        AST.extractExpressionName(statement.subject) || "",
         statement.relation.name,
-        statement.object.name
+        AST.extractExpressionName(statement.object) || ""
       );
       if (!metaValidation.valid) {
         result.violations.push({
@@ -227,9 +227,9 @@ export class SymbolicNeuralBridge {
     
     // Check common-sense patterns
     const patternCheck = this.checkRelationPatterns(
-      statement.subject.name,
+      AST.extractExpressionName(statement.subject) || "",
       statement.relation.name,
-      statement.object.name
+      AST.extractExpressionName(statement.object) || ""
     );
     if (!patternCheck.valid) {
       result.violations.push({
@@ -254,9 +254,9 @@ export class SymbolicNeuralBridge {
     // 4. Validate meta-statement semantics
     if (isMetaRelation(statement.relation.name)) {
       const metaValidation = validateMetaStatement(
-        statement.subject.name,
+        AST.extractExpressionName(statement.subject) || "",
         statement.relation.name,
-        statement.object.name
+        AST.extractExpressionName(statement.object) || ""
       );
 
       if (!metaValidation.valid) {
@@ -368,9 +368,9 @@ export class SymbolicNeuralBridge {
 
       // 2. Check for impossible relations (common-sense violations only, not unknown relations)
       // Normalize concept names for comparison
-      const subjName = stmt.subject.name.replace(/^<|>$/g, '');
+      const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
       const relName = stmt.relation.name.replace(/^\[|\]$/g, '');
-      const objName = stmt.object.name.replace(/^<|>$/g, '');
+      const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
       
       const patternCheck = this.checkRelationPatterns(subjName, relName, objName);
       if (!patternCheck.valid) {
@@ -434,8 +434,8 @@ export class SymbolicNeuralBridge {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
           // Normalize: strip angle brackets
-          const subjName = stmt.subject.name.replace(/^<|>$/g, '');
-          const objName = stmt.object.name.replace(/^<|>$/g, '');
+          const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
+          const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
           concepts.add(subjName);
           concepts.add(objName);
         }
@@ -473,7 +473,7 @@ export class SymbolicNeuralBridge {
     context: string[]
   ): { valid: boolean; reason?: string } {
     // Normalize concept and relation names (strip brackets)
-    const subjName = stmt.subject.name.replace(/^<|>$/g, '');
+    const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
     
     // Subject must be known or in context (strict requirement)
     const subjectValid = knownConcepts.has(subjName) || 
@@ -545,18 +545,18 @@ export class SymbolicNeuralBridge {
     knowledgeBase: AST.LogicalNode[]
   ): { hasContradiction: boolean; reason?: string } {
     // Normalize statement concept and relation names
-    const stmtSubj = stmt.subject.name.replace(/^<|>$/g, '');
+    const stmtSubj = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
     const stmtRel = stmt.relation.name.replace(/^\[|\]$/g, '');
-    const stmtObj = stmt.object.name.replace(/^<|>$/g, '');
+    const stmtObj = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
     
     // Look for direct contradictions
     for (const node of knowledgeBase) {
       if (AST.isIntent(node)) {
         for (const existingStmt of node.statements) {
           // Normalize existing statement names
-          const existSubj = existingStmt.subject.name.replace(/^<|>$/g, '');
+          const existSubj = AST.extractExpressionName(existingStmt.subject) || "".replace(/^<|>$/g, '');
           const existRel = existingStmt.relation.name.replace(/^\[|\]$/g, '');
-          const existObj = existingStmt.object.name.replace(/^<|>$/g, '');
+          const existObj = AST.extractExpressionName(existingStmt.object) || "".replace(/^<|>$/g, '');
           
           // Check for opposite relations
           if (existSubj === stmtSubj && existObj === stmtObj) {

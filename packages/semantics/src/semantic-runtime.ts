@@ -235,8 +235,8 @@ export class SemanticRuntime {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
           // Normalize: strip angle brackets
-          const subjName = stmt.subject.name.replace(/^<|>$/g, '');
-          const objName = stmt.object.name.replace(/^<|>$/g, '');
+          const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
+          const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
           domains.add(subjName);
           domains.add(objName);
         }
@@ -259,8 +259,8 @@ export class SemanticRuntime {
       if (AST.isIntent(node)) {
         for (const stmt of node.statements) {
           // Normalize: strip angle brackets
-          const subjName = stmt.subject.name.replace(/^<|>$/g, '');
-          const objName = stmt.object.name.replace(/^<|>$/g, '');
+          const subjName = AST.extractExpressionName(stmt.subject) || "".replace(/^<|>$/g, '');
+          const objName = AST.extractExpressionName(stmt.object) || "".replace(/^<|>$/g, '');
           
           const subjCount = conceptCounts.get(subjName) || 0;
           conceptCounts.set(subjName, subjCount + 1);
@@ -324,7 +324,7 @@ export class SemanticRuntime {
     const hasSelfRef = kb.some((node: AST.LogicalNode) => {
       if (AST.isIntent(node)) {
         return node.statements.some(stmt =>
-          stmt.subject.name === 'Self' || stmt.object.name === 'Self'
+          (AST.extractExpressionName(stmt.subject) || "") === 'Self' || (AST.extractExpressionName(stmt.object) || "") === 'Self'
         );
       }
       return false;
