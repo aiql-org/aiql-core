@@ -1,5 +1,13 @@
 # @aiql-org/semantics
 
+## 2.6.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.6.5
+  - @aiql-org/inference@2.6.5
+
 ## 2.6.4
 
 ### Patch Changes

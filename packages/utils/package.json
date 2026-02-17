@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/utils",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "AIQL Utilities - Shared helpers, file readers, and version sync tools",
   "type": "module",
   "main": "./dist/index.js",
