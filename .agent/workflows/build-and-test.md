@@ -8,7 +8,7 @@ This workflow installs dependencies, builds the entire AIQL monorepo, and execut
 // turbo
 2. npm install
 
-3. Build all packages in dependency order (core -> security -> inference -> soul -> semantics -> utils -> cli -> api)
+3. Build all packages in dependency order (core -> security -> inference -> soul -> semantics -> utils -> cli -> api -> examples)
 // turbo
 4. npm run build
 

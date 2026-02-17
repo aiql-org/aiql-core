@@ -17,7 +17,7 @@ Every new feature or change MUST update the following in a single commit:
    - Update `README.md` if new packages or features are added
 
 3. **Examples**
-   - `examples/` - Add `.aiql` example files demonstrating the new feature
+   - `packages/examples/src/` - Add `.aiql` example files demonstrating the new feature
    - Examples must use ONLY implemented features
    - Add corresponding test coverage in the relevant package's `test.ts`
 
@@ -41,7 +41,7 @@ Every new feature or change MUST update the following in a single commit:
 - [ ] Version numbers consistent: `npm run sync-versions`
 - [ ] All packages build: `npm run build` (0 errors across all 8 packages)
 - [ ] All tests pass: `npm test` (93 tests: 37 core + 23 inference + 33 security)
-- [ ] All `.aiql` examples in `examples/` parse and transpile successfully
+- [ ] All `.aiql` examples in `packages/examples/src/` parse and transpile successfully
 - [ ] Docker images build: `npm run docker:all`
 - [ ] README.md is up to date with package descriptions
 - [ ] Documentation is synchronized and accurate
@@ -114,7 +114,7 @@ aiql-core/                       # Root monorepo (npm workspaces)
 │       └── src/
 │           └── index.ts        # File I/O, target extensions, version constant
 │
-├── examples/                   # 65+ AIQL example files
+├── packages/examples/src/        # 65+ AIQL example files
 │   ├── getting-started/        # Core features (49 examples)
 │   ├── meta-cognition/         # Self-awareness & reasoning (5 examples)
 │   ├── robotics/               # Robot planning (3 examples)
@@ -326,7 +326,7 @@ The AIQL SDK is organized as an **npm workspaces monorepo** with 8 packages:
 - `packages/core/src/ast.ts` - Removed 4 special nodes (~150 lines)
 - `packages/core/src/parser.ts` - Removed special parsing logic (~197 lines)
 - `packages/inference/src/meta-ontology.ts` - Added robotics domain (+80 lines)
-- `examples/robotics/` - Added organic robotics examples
+- `packages/examples/src/robotics/` - Added organic robotics examples
 
 ---
 
@@ -422,7 +422,7 @@ The AIQL SDK is organized as an **npm workspaces monorepo** with 8 packages:
 - `packages/security/src/trust-registry.ts` - New module (295 lines)
 - `packages/inference/src/inference.ts` - Extended with semantic detection (+213 lines)
 - `packages/inference/src/meta-ontology.ts` - Added epistemological concepts (+17 entries)
-- `examples/semantic-contradiction/` - Added 5 semantic contradiction examples
+- `packages/examples/src/semantic-contradiction/` - Added 5 semantic contradiction examples
 
 **Use Cases:**
 - **Knowledge Base Validation**: Detect inconsistencies in large knowledge graphs
@@ -525,7 +525,7 @@ The AIQL SDK is organized as an **npm workspaces monorepo** with 8 packages:
 - `packages/core/src/transpiler.ts` - All formats support coherence (+15 lines)
 - `packages/semantics/src/semantic-runtime.ts` - Consciousness tracking (+90 lines)
 - `packages/inference/src/inference.ts` - Consciousness queries (+160 lines)
-- `examples/quantum-consciousness/` - Added 3 quantum consciousness examples
+- `packages/examples/src/quantum-consciousness/` - Added 3 quantum consciousness examples
 
 ---
 
@@ -640,7 +640,7 @@ $id:pattern_web_framework
 **Implementation Status:** RFC/Design phase - comprehensive feature discovery completed February 2026
 
 **Key Documents:**
-- See `docs/` and `examples/` for detailed specifications and usage examples
+- See `docs/` and `packages/examples/src/` for detailed specifications and usage examples
 
 ## Development Practices
 
@@ -661,7 +661,7 @@ $id:pattern_web_framework
 2. Ensure 95%+ coverage of new code
 3. All tests must pass (100% success rate)
 4. Run `npm test` before committing
-5. Update relevant examples in `examples/`
+5. Update relevant examples in `packages/examples/src/`
 6. Update documentation
 
 ### Code Style
@@ -722,7 +722,7 @@ $id:pattern_web_framework
 - Docker tags in `docker-compose.yml` must match
 
 **3. Examples**
-- All `.aiql` files in `examples/` must parse and transpile successfully
+- All `.aiql` files in `packages/examples/src/` must parse and transpile successfully
 - Add new examples when features are added
 - Organize by category (getting-started, meta-cognition, robotics, etc.)
 

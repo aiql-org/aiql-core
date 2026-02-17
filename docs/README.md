@@ -7,7 +7,7 @@ Welcome to the AIQL documentation hub.
 - **[System Design & Specification](../AIQL_Design.md)**  
   The implementation guide, system prompt, and feature specification. This is the authoritative source for AIQL architecture.
 
-- **[Examples](../examples/README.md)**  
+- **[Examples](../packages/examples/src/README.md)**  
   A library of 65+ AIQL files demonstrating features from basic syntax to quantum consciousness.
 
 ## 📦 Package Documentation

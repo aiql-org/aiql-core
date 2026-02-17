@@ -33,7 +33,7 @@ services:
     image: aiql/cli:2.6.0
     container_name: aiql-cli
     volumes:
-      - ./examples:/data:ro
+      - ./packages/examples/src:/data:ro
       - ./output:/output:rw
     command: ["--help"]
     profiles:
@@ -52,7 +52,7 @@ services:
     image: aiql/playground:2.6.0
     container_name: aiql-playground
     volumes:
-      - ./examples:/playground/examples:ro
+      - ./packages/examples/src:/playground/examples:ro
       - ./output:/workspace:rw
     stdin_open: true
     tty: true

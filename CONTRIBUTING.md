@@ -33,7 +33,7 @@ We follow a generic **Test Driven Development (TDD)** approach.
 - `packages/core`: The compiler (Tokenizer, Parser, AST, Transpiler). start here for syntax changes.
 - `packages/inference`: Logic and reasoning engine.
 - `packages/semantics`: Runtime and quantum models.
-- `examples/`: Add new `.aiql` files here to demonstrate features.
+- `packages/examples/src/`: Add new `.aiql` files here to demonstrate features.
 
 ## 📝 Coding Standards
 
@@ -46,7 +46,7 @@ We follow a generic **Test Driven Development (TDD)** approach.
 1. Create a feature branch (`git checkout -b feat/my-feature`).
 2. Implement your changes.
 3. Add tests in `src/test.ts` of the relevant package.
-4. Add an example in `examples/`.
+4. Add an example in `packages/examples/src/`.
 5. Run `npm test` and `npm run build`.
 6. Submit a Pull Request.
 

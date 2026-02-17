@@ -67,30 +67,35 @@ npm install -g @aiql-org/cli
 
 ```bash
 # Transpile to Python
-aiql transpile input.aiql --target python
+aiql transpile packages/examples/src/getting-started/query-python-for-data-science.aiql --target python
 
 # Generate SQL schema
-aiql transpile input.aiql --target sql --output schema.sql
+aiql transpile packages/examples/src/getting-started/query-python-for-data-science.aiql --target sql --output schema.sql
 
 # Validate syntax
-aiql validate input.aiql
+aiql validate packages/examples/src/getting-started/query-python-for-data-science.aiql
 ```
 
 ### 3. Programmatic Usage
 
 ```typescript
 import { Tokenizer, Parser, Transpiler } from '@aiql-org/core';
+import { readFileSync } from 'fs';
 
-const code = `!Assert { <Sky> [is] <Blue> }`;
+// Read example file
+const code = readFileSync('packages/examples/src/getting-started/query-python-for-data-science.aiql', 'utf-8');
 
 // 1. Tokenize
-const tokens = new Tokenizer(code).tokenize();
+const tokenizer = new Tokenizer(code);
+const tokens = tokenizer.tokenize();
 
 // 2. Parse into AST
-const ast = new Parser(tokens).parse();
+const parser = new Parser(tokens);
+const ast = parser.parse();
 
 // 3. Transpile to Target
-const pythonCode = new Transpiler().transpile(ast, 'python');
+const transpiler = new Transpiler();
+const pythonCode = transpiler.transpile(ast, 'python');
 
 console.log(pythonCode);
 ```
@@ -123,7 +128,7 @@ docker run -v $(pwd):/data aiql/cli transpile /data/example.aiql -t json
 ## 📚 Documentation
 
 - [**Language Design**](AIQL_Design.md) — Comprehensive system prompt and spec.
-- [**Examples**](examples/README.md) — 65+ examples covering Robotics, Logic, and more.
+- [**Examples**](packages/examples/src/README.md) — 65+ examples covering Robotics, Logic, and more.
 - [**Contributing**](CONTRIBUTING.md) — Guide for contributors.
 
 ---
