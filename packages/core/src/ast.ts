@@ -134,7 +134,7 @@ export interface RelationshipNode extends Node {
   statements?: Statement[];      // Optional explicit relationship expression
   confidence?: number;           // Confidence in the relationship (0.0-1.0)
   bidirectional?: boolean;       // Whether relationship is symmetric
-  metadata?: Record<string, any>; // Additional metadata
+  metadata?: Record<string, unknown>; // Additional metadata
 }
 
 // ===================================================================
@@ -152,7 +152,7 @@ export interface ExampleNode extends Node {
   contextType?: string;          // Context category (linguistic, cultural, domain, etc.)
   statements: Statement[];       // Example instances
   confidence?: number;           // Confidence in examples (0.0-1.0)
-  metadata?: Record<string, any>; // Additional metadata (domain, usage, etc.)
+  metadata?: Record<string, unknown>; // Additional metadata (domain, usage, etc.)
 }
 
 // Inline Example Instance (for #example: marker within statements)

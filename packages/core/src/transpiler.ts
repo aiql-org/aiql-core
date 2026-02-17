@@ -42,12 +42,13 @@ export class Transpiler {
                 default:
                     return this.toPython(program);
             }
-        } catch (e: any) {
-            return `Error: ${e.message}`;
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : String(e);
+            return `Error: ${message}`;
         }
     }
 
-    private toInterchangeFormat(program: AST.Program): any {
+    private toInterchangeFormat(program: AST.Program): Record<string, unknown> {
         // Simplify AST for clean JSON/YAML with full v2.0.0+ logic support
         const body = program.body.map(node => {
             if (AST.isIntent(node)) {
@@ -65,14 +66,14 @@ export class Transpiler {
         }).filter(n => n !== null);
 
         const intents = program.body.filter(AST.isIntent).map(intent => {
-            const intentObj: any = {
+            const intentObj: Record<string, unknown> = {
                 intentType: intent.intentType,
                 scope: intent.scope,
                 contextParams: intent.contextParams,
                 confidence: intent.confidence,
                 coherence: intent.coherence,  // v2.6.0: Quantum coherence
                 statements: intent.statements.map((node: AST.Statement) => {
-                    const stmtObj: any = {
+                    const stmtObj: Record<string, unknown> = {
                         subject: node.subject.name,
                         predicate: node.relation.name,
                         object: node.object.name,
@@ -99,27 +100,28 @@ export class Transpiler {
             
             // Add security metadata if present
             if (intent.security) {
+                const security = intent.security as AST.SecurityMetadata;
                 intentObj.security = {
-                    signed: intent.security.signed,
-                    encrypted: intent.security.encrypted,
-                    signerAgentId: intent.security.signerAgentId,
-                    recipientAgentId: intent.security.recipientAgentId,
-                    timestamp: intent.security.timestamp,
+                    signed: security.signed,
+                    encrypted: security.encrypted,
+                    signerAgentId: security.signerAgentId,
+                    recipientAgentId: security.recipientAgentId,
+                    timestamp: security.timestamp,
                 };
                 
                 // Only include signature/encrypted data if they exist
-                if (intent.security.signature) {
-                    intentObj.security.signature = intent.security.signature;
+                if (security.signature) {
+                    (intentObj.security as Record<string, unknown>).signature = security.signature;
                 }
-                if (intent.security.encryptedData) {
-                    intentObj.security.encryptedData = intent.security.encryptedData;
+                if (security.encryptedData) {
+                    (intentObj.security as Record<string, unknown>).encryptedData = security.encryptedData;
                 }
             }
             
             return intentObj;
         });
         
-        const result: any = { 
+        const result: Record<string, unknown> = { 
             body,  // Complete v2.0.0 body with all node types
             intents  // Legacy field for backwards compatibility
         };
@@ -138,8 +140,8 @@ export class Transpiler {
     }
 
     // Helper method to convert Intent to object
-    private intentToObject(intent: AST.Intent): any {
-        const intentObj: any = {
+    private intentToObject(intent: AST.Intent): Record<string, unknown> {
+        const intentObj: Record<string, unknown> = {
             nodeType: 'Intent',
             intentType: intent.intentType,
             scope: intent.scope,
@@ -147,7 +149,7 @@ export class Transpiler {
             confidence: intent.confidence,
             coherence: intent.coherence,  // v2.6.0
             statements: intent.statements.map((node: AST.Statement) => {
-                const stmtObj: any = {
+                const stmtObj: Record<string, unknown> = {
                     subject: node.subject.name,
                     predicate: node.relation.name,
                     object: node.object.name,
@@ -174,20 +176,21 @@ export class Transpiler {
         
         // Add security metadata if present
         if (intent.security) {
+            const security = intent.security as AST.SecurityMetadata;
             intentObj.security = {
-                signed: intent.security.signed,
-                encrypted: intent.security.encrypted,
-                signerAgentId: intent.security.signerAgentId,
-                recipientAgentId: intent.security.recipientAgentId,
-                timestamp: intent.security.timestamp,
+                signed: security.signed,
+                encrypted: security.encrypted,
+                signerAgentId: security.signerAgentId,
+                recipientAgentId: security.recipientAgentId,
+                timestamp: security.timestamp,
             };
             
             // Only include signature/encrypted data if they exist
-            if (intent.security.signature) {
-                intentObj.security.signature = intent.security.signature;
+            if (security.signature) {
+                (intentObj.security as Record<string, unknown>).signature = security.signature;
             }
-            if (intent.security.encryptedData) {
-                intentObj.security.encryptedData = intent.security.encryptedData;
+            if (security.encryptedData) {
+                (intentObj.security as Record<string, unknown>).encryptedData = security.encryptedData;
             }
         }
         
@@ -195,8 +198,8 @@ export class Transpiler {
     }
 
     // Helper method to convert LogicalExpression to object (recursive)
-    private logicalExpressionToObject(expr: AST.LogicalExpression): any {
-        const obj: any = {
+    private logicalExpressionToObject(expr: AST.LogicalExpression): Record<string, unknown> {
+        const obj: Record<string, unknown> = {
             nodeType: 'LogicalExpression',
             operator: expr.operator
         };
@@ -227,8 +230,8 @@ export class Transpiler {
     }
 
     // Helper method to convert QuantifiedExpression to object
-    private quantifiedExpressionToObject(expr: AST.QuantifiedExpression): any {
-        const obj: any = {
+    private quantifiedExpressionToObject(expr: AST.QuantifiedExpression): Record<string, unknown> {
+        const obj: Record<string, unknown> = {
             nodeType: 'QuantifiedExpression',
             quantifier: expr.quantifier,
             variable: expr.variable
@@ -251,7 +254,7 @@ export class Transpiler {
     }
 
     // Helper method to convert RuleDefinition to object
-    private ruleDefinitionToObject(rule: AST.RuleDefinition): any {
+    private ruleDefinitionToObject(rule: AST.RuleDefinition): Record<string, unknown> {
         return {
             nodeType: 'RuleDefinition',
             ruleId: rule.ruleId,
@@ -278,8 +281,8 @@ export class Transpiler {
     /**
      * Convert RelationshipNode to simple object for JSON/YAML (v2.1.0)
      */
-    private relationshipToObject(rel: AST.RelationshipNode): any {
-        const obj: any = {
+    private relationshipToObject(rel: AST.RelationshipNode): Record<string, unknown> {
+        const obj: Record<string, unknown> = {
             nodeType: 'Relationship',
             relationshipType: rel.relationshipType,
             source: rel.source,

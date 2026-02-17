@@ -17,9 +17,10 @@ async function test(name: string, fn: () => Promise<void>): Promise<void> {
     await fn();
     console.log(`✅ ${name}`);
     passed++;
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
     console.log(`❌ ${name}`);
-    console.log(`   Error: ${e.message}`);
+    console.log(`   Error: ${error.message}`);
     failed++;
   }
 }
