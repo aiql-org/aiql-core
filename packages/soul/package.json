@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/soul",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "description": "AIQL Soul - Affective AI engine for emotional computation (Reward/Pain/Stress/Novelty)",
   "type": "module",
   "main": "./dist/index.js",
@@ -44,7 +44,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@aiql-org/core": "^2.6.3"
+    "@aiql-org/core": "^2.6.4"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

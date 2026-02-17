@@ -1,5 +1,13 @@
 # @aiql-org/api
 
+## 2.6.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.6.4
+  - @aiql-org/soul@2.6.4
+
 ## 2.6.3
 
 ### Patch Changes

@@ -1,5 +1,7 @@
 # @aiql-org/utils
 
+## 2.6.4
+
 ## 2.6.3
 
 ### Patch Changes

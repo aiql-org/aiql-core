@@ -1,5 +1,12 @@
 # @aiql-org/cli
 
+## 2.6.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.6.4
+
 ## 2.6.3
 
 ### Patch Changes
