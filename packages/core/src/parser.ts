@@ -709,6 +709,15 @@ export class Parser {
       if (this.check(TokenType.MINUS)) {
           this.advance();
           const right = this.parseUnary();
+          
+          // Optimization: fold negative literals (v2.6.5)
+          if (right.type === 'Literal' && typeof right.value === 'number') {
+              return {
+                  type: 'Literal',
+                  value: -right.value
+              };
+          }
+
           return {
               type: 'UnaryExpression',
               operator: 'MINUS',

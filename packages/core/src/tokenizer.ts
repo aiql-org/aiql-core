@@ -556,6 +556,22 @@ export class Tokenizer {
       while (/[0-9.]/.test(this.peek())) {
           value += this.advance();
       }
+      
+      // Check for scientific notation (v2.6.5 fix)
+      if (this.peek().toLowerCase() === 'e') {
+          // Verify it's actually separate from next token (check if 'e' is followed by digit/sign)
+          const next = this.peek(1);
+          if (/[0-9+-]/.test(next)) {
+             value += this.advance(); // consume 'e'
+             if (this.peek() === '+' || this.peek() === '-') {
+                value += this.advance(); // consume sign
+             }
+             while (/[0-9]/.test(this.peek())) {
+                value += this.advance();
+             }
+          }
+      }
+
       return { type: TokenType.NUMBER, value, line: startLine, column: startCol };
   }
 

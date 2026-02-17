@@ -7,6 +7,7 @@ import { Tokenizer } from './tokenizer.js';
 import { Parser } from './parser.js';
 import { Transpiler } from './transpiler.js';
 import * as AST from './ast.js';
+import nodeAssert from 'node:assert';
 
 let passed = 0;
 let failed = 0;
@@ -301,6 +302,126 @@ test('Error handling: invalid syntax throws', () => {
   } catch {
     assert(true, 'Error thrown for invalid syntax');
   }
+});
+
+// =============================================================================
+// Comprehensive Math Tests
+// =============================================================================
+console.log('\n--- Comprehensive Math Parsing ---');
+
+test('Math: unary minus on literals and variables', () => {
+    const code = `
+      !Test {
+        <A> = -5
+        <B> = -<C>
+        <D> = -(1 + 2)
+      }
+    `;
+    const tokens = new Tokenizer(code).tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    const intent = ast.body[0] as AST.Intent;
+
+    // <A> = -5
+    const stmtA = intent.statements[0];
+    const valA = stmtA.object; 
+    
+    // Check if it's -5 directly
+    if (AST.isLiteral(valA)) {
+        nodeAssert.strictEqual(valA.value, -5);
+    } else {
+         // Should be Literal -5 if tokenizer handles signed numbers
+         nodeAssert.fail('Expected -5 to be parsed as Literal(-5)');
+    }
+
+    // <B> = -<C>
+    const stmtB = intent.statements[1];
+    nodeAssert.ok(stmtB.object, 'Should parse -<C>');
+    // Verify structure if possible, but at least ensure no parse error
+});
+
+test('Math: scientific notation', () => {
+    const code = `
+      !Test {
+        <X> = 1.5e-10
+        <Y> = 2E+5
+      }
+    `;
+    const tokens = new Tokenizer(code).tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    const intent = ast.body[0] as AST.Intent;
+
+    const valX = intent.statements[0].object as AST.Literal;
+    nodeAssert.strictEqual(valX.value, 1.5e-10);
+    
+    const valY = intent.statements[1].object as AST.Literal;
+    nodeAssert.strictEqual(valY.value, 200000);
+});
+
+test('Math: variables in math expressions', () => {
+    const code = `
+      !Test {
+        <Result> = <Input> * 2 + <Bias>
+      }
+    `;
+    const tokens = new Tokenizer(code).tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    const stmt = (ast.body[0] as AST.Intent).statements[0];
+    const expr = stmt.object as AST.MathExpression;
+
+    // (<Input> * 2) + <Bias>
+    nodeAssert.strictEqual(expr.operator, 'PLUS');
+    nodeAssert.ok(AST.isConcept(expr.right));
+    nodeAssert.strictEqual((expr.right as AST.Concept).name, '<Bias>');
+
+    const left = expr.left as AST.MathExpression;
+    nodeAssert.strictEqual(left.operator, 'MULTIPLY');
+    nodeAssert.ok(AST.isConcept(left.left));
+    nodeAssert.strictEqual((left.left as AST.Concept).name, '<Input>');
+});
+
+test('Math: multi-argument functions', () => {
+    const code = `
+      !Test {
+        <Val> = max(<A>, <B>, 10)
+      }
+    `;
+    const tokens = new Tokenizer(code).tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    const stmt = (ast.body[0] as AST.Intent).statements[0];
+    const expr = stmt.object as AST.FunctionApplication;
+
+    nodeAssert.strictEqual(expr.functionName, 'max');
+    nodeAssert.strictEqual(expr.arguments.length, 3);
+    nodeAssert.strictEqual((expr.arguments[0] as AST.Concept).name, '<A>');
+    nodeAssert.strictEqual((expr.arguments[1] as AST.Concept).name, '<B>');
+    nodeAssert.strictEqual((expr.arguments[2] as AST.Literal).value, 10);
+});
+
+test('Math: left associativity for subtraction', () => {
+    const code = `
+      !Test {
+        <Res> = 10 - 5 - 2
+      }
+    `;
+    // Should be (10 - 5) - 2 = 3. 
+    const tokens = new Tokenizer(code).tokenize();
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    const stmt = (ast.body[0] as AST.Intent).statements[0];
+    const expr = stmt.object as AST.MathExpression;
+
+    // Expr = (10 - 5) - 2 -> Op: MINUS, Right: 2, Left: (10-5)
+    nodeAssert.strictEqual(expr.operator, 'MINUS');
+    nodeAssert.strictEqual((expr.right as AST.Literal).value, 2);
+    
+    const left = expr.left as AST.MathExpression;
+    nodeAssert.strictEqual(left.operator, 'MINUS');
+    nodeAssert.strictEqual((left.left as AST.Literal).value, 10);
+    nodeAssert.strictEqual((left.right as AST.Literal).value, 5);
 });
 
 // =============================================================================
