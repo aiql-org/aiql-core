@@ -17,6 +17,7 @@ WORKDIR /build
 # Copy root workspace files
 COPY package.json package-lock.json* ./
 COPY tsconfig.base.json ./
+COPY eslint.config.mjs ./
 
 # Copy all package directories (source + configs)
 COPY packages/ ./packages/

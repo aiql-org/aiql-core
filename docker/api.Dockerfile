@@ -16,6 +16,7 @@ WORKDIR /build
 
 COPY package.json package-lock.json* ./
 COPY tsconfig.base.json ./
+COPY eslint.config.mjs ./
 COPY packages/ ./packages/
 
 RUN npm ci
