@@ -14,10 +14,9 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✅ ${name}`);
     passed++;
-  } catch (e: any) {
-    console.log(`❌ ${name}`);
-    console.log(`   Error: ${e.message}`);
+  } catch (e: unknown) {
     failed++;
+    console.error(`  ❌ ${name}: ${(e as Error).message}`);
   }
 }
 

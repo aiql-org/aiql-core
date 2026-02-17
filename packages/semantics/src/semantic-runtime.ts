@@ -59,6 +59,17 @@ export interface EvolutionStats {
   curiosityLevel: number;
 }
 
+/**
+ * SoulState: Affective state from aiql-soul
+ */
+export interface SoulState {
+  reward: number;
+  pain: number;
+  stress: number;
+  novelty: number;
+  [key: string]: unknown;
+}
+
 // =============================================================================
 // Semantic Runtime
 // =============================================================================
@@ -76,7 +87,7 @@ export interface EvolutionStats {
  */
 export class SemanticRuntime {
   private inferenceEngine: InferenceEngine;
-  private soulState: any;  // Affective state from aiql-soul
+  private soulState: SoulState;  // Affective state from aiql-soul
   private selfModel: SelfModel;
   private evolutionHistory: EvolutionStats[];
   
@@ -91,7 +102,7 @@ export class SemanticRuntime {
    * @param kb - InferenceEngine with initial knowledge
    * @param initialSoulState - Affective state (reward, pain, stress, novelty)
    */
-  constructor(kb: InferenceEngine, initialSoulState?: any) {
+  constructor(kb: InferenceEngine, initialSoulState?: SoulState) {
     this.inferenceEngine = kb;
     this.soulState = initialSoulState || {
       reward: 0,
@@ -218,7 +229,7 @@ export class SemanticRuntime {
    */
   private getKnowledgeDomains(): string[] {
     const domains = new Set<string>();
-    const kb = (this.inferenceEngine as any).knowledgeBase;
+    const kb = (this.inferenceEngine as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
 
     for (const node of kb) {
       if (AST.isIntent(node)) {
@@ -241,7 +252,7 @@ export class SemanticRuntime {
    */
   private identifyKnowledgeGaps(): Array<{ domain: string; confidence: number }> {
     const conceptCounts = new Map<string, number>();
-    const kb = (this.inferenceEngine as any).knowledgeBase;
+    const kb = (this.inferenceEngine as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
 
     // Count how many statements define each concept
     for (const node of kb) {
@@ -284,8 +295,8 @@ export class SemanticRuntime {
    */
   private inferCapabilities(): string[] {
     const capabilities: string[] = [];
-    const kb = (this.inferenceEngine as any).knowledgeBase;
-    const rules = (this.inferenceEngine as any).rules;
+    const kb = (this.inferenceEngine as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
+    const rules = (this.inferenceEngine as unknown as { rules: AST.RuleDefinition[] }).rules;
 
     // Check for logical reasoning (presence of rules)
     if (rules.length > 0) {
@@ -331,7 +342,7 @@ export class SemanticRuntime {
    * Based on average confidence of statements in KB
    */
   private computeEpistemicConfidence(): number {
-    const kb = (this.inferenceEngine as any).knowledgeBase;
+    const kb = (this.inferenceEngine as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
     let totalConfidence = 0;
     let count = 0;
 
@@ -476,7 +487,7 @@ export class SemanticRuntime {
   /**
    * Get current soul state
    */
-  public getSoulState(): any {
+  public getSoulState(): SoulState {
     return { ...this.soulState };
   }
 

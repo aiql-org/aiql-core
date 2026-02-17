@@ -3,7 +3,7 @@
  * Tests: forward chaining, backward chaining, unification, consistency, proofs
  */
 
-import { InferenceEngine, Substitution } from './inference.js';
+import { InferenceEngine } from './inference.js';
 import { Tokenizer } from '@aiql-org/core';
 import { Parser } from '@aiql-org/core';
 import * as AST from '@aiql-org/core';
@@ -23,9 +23,10 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✅ ${name}`);
     passed++;
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.log(`❌ ${name}`);
-    console.log(`   Error: ${e.message}`);
+    const message = e instanceof Error ? e.message : String(e);
+    console.log(`   Error: ${message}`);
     failed++;
   }
 }

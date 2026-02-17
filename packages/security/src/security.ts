@@ -94,7 +94,7 @@ export function encryptCommand(
   
   // Serialize command for encryption
   // Include security metadata if present (e.g., for sign+encrypt)
-  const commandToEncrypt: any = {
+  const commandToEncrypt: Record<string, unknown> = {
     intentType: command.intentType,
     scope: command.scope,
     statements: command.statements,
@@ -203,7 +203,7 @@ export function unsecureCommand(
   if (command.security?.signed && command.security?.signature) {
     try {
       verified = verifyCommand(command as AST.SecureIntent);
-    } catch (e) {
+    } catch {
       verified = false;
     }
   }

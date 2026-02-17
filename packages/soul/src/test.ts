@@ -1,8 +1,4 @@
-/**
- * @aiql-org/soul — Test Suite
- */
-
-import { ArtificialSoul, Stimulation, StimulationType } from './soul.js';
+import { ArtificialSoul, Stimulation } from './soul.js';
 
 let passed = 0;
 let failed = 0;
@@ -12,10 +8,9 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✅ ${name}`);
     passed++;
-  } catch (e: any) {
-    console.log(`❌ ${name}`);
-    console.log(`   Error: ${e.message}`);
+  } catch (e: unknown) {
     failed++;
+    console.error(`  ❌ ${name}: ${(e as Error).message}`);
   }
 }
 

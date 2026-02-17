@@ -27,7 +27,6 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
     "test": "tsc && node dist/test.js",
     "lint:package": "publint",
     "check:types": "attw --pack ."

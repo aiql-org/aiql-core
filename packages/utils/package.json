@@ -21,8 +21,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
-    "test": "tsc && node dist/test.js",
-    "prepublishOnly": "npm run clean && npm run build"
+    "test": "tsc && node dist/test.js"
   },
   "keywords": [
     "aiql",

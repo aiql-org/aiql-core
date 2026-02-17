@@ -76,7 +76,7 @@ export interface SemanticContradiction {
   conflictType: 'taxonomy' | 'property' | 'cardinality' | 'type' | 'disjoint_values';
   reason: string;
   severity: 'critical' | 'major' | 'minor' | 'informational';
-  details: Record<string, any>;
+  details: Record<string, unknown>;
 }
 
 /**
@@ -794,8 +794,8 @@ export class InferenceEngine {
     for (const conflict of conflicts) {
       if (conflict.hasConflict && conflict.conflictType && conflict.severity && conflict.details) {
         contradictions.push({
-          statement1: conflict.details.statement1,
-          statement2: conflict.details.statement2,
+          statement1: conflict.details.statement1 as AST.Statement,
+          statement2: conflict.details.statement2 as AST.Statement,
           conflictType: conflict.conflictType,
           reason: conflict.reason || 'Semantic conflict detected',
           severity: conflict.severity,
@@ -1071,7 +1071,7 @@ export class InferenceEngine {
     
     // <Self> [lacks_knowledge_about] <?Domain>
     if (normalizedSubject === '<Self>' && relation.name === 'lacks_knowledge_about') {
-      const gaps = this.findKnowledgeGaps(normalizedObject);
+      const gaps = this.findKnowledgeGaps();
       return gaps.map(gap => ({
         type: 'Statement' as const,
         subject: { type: 'Concept' as const, name: '<Self>' },
@@ -1130,10 +1130,9 @@ export class InferenceEngine {
    * Find knowledge gaps - concepts referenced but not well-defined
    * A concept is a "gap" if it appears in fewer than 2 statements.
    * 
-   * @param domain - Optional domain filter (not currently used)
    * @returns Array of gaps with concept name and confidence score
    */
-  private findKnowledgeGaps(_domain?: string): Array<{concept: string, confidence: number}> {
+  private findKnowledgeGaps(): Array<{concept: string, confidence: number}> {
     const allConcepts = new Set<string>();
     const definedConcepts = new Map<string, number>();
     

@@ -45,6 +45,12 @@ export interface AgentIdentity {
   created: number;
 }
 
+export interface LatticeParams {
+  n: number;
+  q: number;
+  k: number;
+}
+
 // ============================================================================
 // Quantum-Resistant Key Generation
 // ============================================================================
@@ -154,7 +160,10 @@ export function sign(message: string | Uint8Array, keyPair: KeyPair): Signature 
   const messageHash = hash(messageBytes);
   
   // Generate signature using lattice-based signing
-  const signature = latticeSign(messageHash, keyPair.privateKey, DILITHIUM_PARAMS);
+  const signature = latticeSign(
+    messageHash,
+    keyPair.privateKey
+  );
   
   return {
     signature,
@@ -180,8 +189,7 @@ export function verify(
   return latticeVerify(
     messageHash,
     signature.signature,
-    signature.publicKey,
-    DILITHIUM_PARAMS
+    signature.publicKey
   );
 }
 
@@ -200,13 +208,12 @@ export function encrypt(
     ? Buffer.from(message, 'utf-8') 
     : message;
   
-  // Generate ephemeral key pair for this encryption
-  const ephemeralKeyPair = generateEncryptionKeyPair('ephemeral');
+  // Generate ephemeral key pair for this encryption - ephemeral key pair is context-driven
+  // Note: generateEncryptionKeyPair returns a KeyPair, we specifically need the KEM properties
   
   // Perform Key Encapsulation Mechanism (KEM)
   const { sharedSecret, encapsulatedKey } = kyberEncapsulate(
-    recipientPublicKey,
-    KYBER_PARAMS
+    recipientPublicKey
   );
   
   // Use shared secret to encrypt the message with AES-256-GCM
@@ -262,7 +269,7 @@ export function decrypt(
       decipher.update(encrypted.ciphertext),
       decipher.final()
     ]);
-  } catch (error) {
+  } catch {
     throw new Error('Decryption failed: Unable to authenticate data');
   }
   
@@ -285,7 +292,7 @@ function expandSeed(seed: Uint8Array, context: string, algorithm: string): Uint8
 /**
  * Generate lattice-based private key from seed
  */
-function generateLatticePrivateKey(seed: Uint8Array, params: any): Uint8Array {
+function generateLatticePrivateKey(seed: Uint8Array, params: LatticeParams): Uint8Array {
   // Simplified: In production, this would sample from centered binomial distribution
   const keySize = params.n * params.k * 4; // 4 bytes per coefficient
   const key = Buffer.alloc(keySize);
@@ -307,7 +314,7 @@ function generateLatticePrivateKey(seed: Uint8Array, params: any): Uint8Array {
 /**
  * Generate lattice-based public key from private key
  */
-function generateLatticePublicKey(privateKey: Uint8Array, params: any): Uint8Array {
+function generateLatticePublicKey(privateKey: Uint8Array, params: LatticeParams): Uint8Array {
   // Simplified: publicKey includes verification material
   // Real lattice crypto: publicKey = A * privateKey + error
   const publicKeySize = params.n * params.k * 4;
@@ -331,8 +338,7 @@ function generateLatticePublicKey(privateKey: Uint8Array, params: any): Uint8Arr
  */
 function latticeSign(
   messageHash: Uint8Array,
-  privateKey: Uint8Array,
-  params: any
+  privateKey: Uint8Array
 ): Uint8Array {
   // Simplified signature scheme
   // signature = [nonce || proof]
@@ -359,8 +365,7 @@ function latticeSign(
 function latticeVerify(
   messageHash: Uint8Array,
   signature: Uint8Array,
-  publicKey: Uint8Array,
-  params: any
+  publicKey: Uint8Array
 ): boolean {
   // IMPORTANT: This is a simplified demo implementation
   // In production, use actual CRYSTALS-Dilithium from a trusted crypto library
@@ -406,7 +411,7 @@ function latticeVerify(
     
     return matches;
     
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -415,8 +420,7 @@ function latticeVerify(
  * Kyber Key Encapsulation
  */
 function kyberEncapsulate(
-  publicKey: Uint8Array,
-  params: any
+  publicKey: Uint8Array
 ): { sharedSecret: Uint8Array; encapsulatedKey: Uint8Array } {
   // Simplified KEM
   // Generate randomness that will be encrypted
@@ -450,7 +454,7 @@ function kyberEncapsulate(
 function kyberDecapsulate(
   encapsulatedKey: Uint8Array,
   privateKey: Uint8Array,
-  params: any
+  params: LatticeParams
 ): Uint8Array {
   // Simplified decapsulation
   // Extract the encrypted randomness from the encapsulated key

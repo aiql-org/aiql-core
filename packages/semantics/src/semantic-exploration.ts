@@ -19,6 +19,16 @@ import * as AST from '@aiql-org/core';
 // =============================================================================
 
 /**
+ * Statistics for a concept
+ */
+export interface ConceptStats {
+  statementCount: number;
+  averageConfidence: number;
+  inDegree: number;
+  outDegree: number;
+}
+
+/**
  * Semantic gap in knowledge graph
  */
 export interface SemanticGap {
@@ -26,12 +36,7 @@ export interface SemanticGap {
   gapType: 'connectivity' | 'confidence' | 'definition' | 'coherence';
   severity: number;                // 0-1, higher = more severe
   context: string[];               // Related concepts
-  metrics: {
-    statementCount: number;        // How many statements mention it
-    averageConfidence: number;     // Average confidence of statements
-    inDegree: number;              // How many statements point to it
-    outDegree: number;             // How many statements it points from
-  };
+  metrics: ConceptStats;
 }
 
 /**
@@ -93,7 +98,7 @@ export class SemanticExplorer {
    */
   public detectSemanticGaps(kb: InferenceEngine): SemanticGap[] {
     const gaps: SemanticGap[] = [];
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
 
     // Build concept statistics
     const conceptStats = this.buildConceptStatistics(knowledgeBase);
@@ -156,21 +161,21 @@ export class SemanticExplorer {
    */
   public generateSemanticQueries(gap: SemanticGap, kb: InferenceEngine): SemanticQuery[] {
     const queries: SemanticQuery[] = [];
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
 
     // Generate different types of queries based on gap type
     switch (gap.gapType) {
       case 'connectivity':
-        queries.push(...this.generateConnectivityQueries(gap, knowledgeBase));
+        queries.push(...this.generateConnectivityQueries(gap));
         break;
       case 'confidence':
-        queries.push(...this.generateConfidenceQueries(gap, knowledgeBase));
+        queries.push(...this.generateConfidenceQueries(gap));
         break;
       case 'definition':
-        queries.push(...this.generateDefinitionQueries(gap, knowledgeBase));
+        queries.push(...this.generateDefinitionQueries(gap));
         break;
       case 'coherence':
-        queries.push(...this.generateCoherenceQueries(gap, knowledgeBase));
+        queries.push(...this.generateCoherenceQueries(gap));
         break;
     }
 
@@ -192,7 +197,7 @@ export class SemanticExplorer {
    * @returns Semantic weight with breakdown
    */
   public calculateSemanticWeight(concept: string, kb: InferenceEngine): SemanticWeight {
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
     
     // Normalize: strip angle brackets if present
     const normalizedConcept = concept.replace(/^<|>$/g, '');
@@ -250,8 +255,8 @@ export class SemanticExplorer {
   /**
    * Build statistics for all concepts in KB
    */
-  private buildConceptStatistics(knowledgeBase: AST.LogicalNode[]): Map<string, SemanticGap['metrics']> {
-    const stats = new Map<string, SemanticGap['metrics']>();
+  private buildConceptStatistics(knowledgeBase: AST.LogicalNode[]): Map<string, ConceptStats> {
+    const stats = new Map<string, ConceptStats>();
 
     for (const node of knowledgeBase) {
       if (AST.isIntent(node)) {
@@ -275,7 +280,7 @@ export class SemanticExplorer {
    * Update statistics for a concept
    */
   private updateConceptStats(
-    stats: Map<string, SemanticGap['metrics']>,
+    stats: Map<string, ConceptStats>,
     concept: string,
     confidence: number,
     role: 'subject' | 'object'
@@ -376,7 +381,7 @@ export class SemanticExplorer {
   /**
    * Generate connectivity-focused queries
    */
-  private generateConnectivityQueries(gap: SemanticGap, _kb: AST.LogicalNode[]): SemanticQuery[] {
+  private generateConnectivityQueries(gap: SemanticGap): SemanticQuery[] {
     return [
       {
         aiqlCode: `!Query { <${gap.concept}> [?relation] <?Object> }`,
@@ -391,7 +396,7 @@ export class SemanticExplorer {
   /**
    * Generate confidence-focused queries
    */
-  private generateConfidenceQueries(gap: SemanticGap, _kb: AST.LogicalNode[]): SemanticQuery[] {
+  private generateConfidenceQueries(gap: SemanticGap): SemanticQuery[] {
     return [
       {
         aiqlCode: `!Query { <${gap.concept}> [has_property] <?Property> }`,
@@ -406,7 +411,7 @@ export class SemanticExplorer {
   /**
    * Generate definition-focused queries
    */
-  private generateDefinitionQueries(gap: SemanticGap, _kb: AST.LogicalNode[]): SemanticQuery[] {
+  private generateDefinitionQueries(gap: SemanticGap): SemanticQuery[] {
     return [
       {
         aiqlCode: `!Query { <${gap.concept}> [is_a] <?Type> }`,
@@ -428,7 +433,7 @@ export class SemanticExplorer {
   /**
    * Generate coherence-focused queries
    */
-  private generateCoherenceQueries(gap: SemanticGap, _kb: AST.LogicalNode[]): SemanticQuery[] {
+  private generateCoherenceQueries(gap: SemanticGap): SemanticQuery[] {
     return [
       {
         aiqlCode: `!Query { <${gap.concept}> [validates_with] <?Context> }`,

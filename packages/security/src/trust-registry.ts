@@ -298,8 +298,8 @@ export class TrustRegistry {
   /**
    * Export trust registry to JSON
    */
-  public toJSON(): Record<string, any> {
-    const entries: any[] = [];
+  public toJSON(): Record<string, unknown> {
+    const entries: Array<Record<string, unknown>> = [];
     for (const ts of this.registry.values()) {
       entries.push({
         origin: ts.origin,
@@ -319,16 +319,16 @@ export class TrustRegistry {
   /**
    * Import trust registry from JSON
    */
-  public static fromJSON(data: any): TrustRegistry {
-    const registry = new TrustRegistry(data.defaultTrustScore || 0.50);
+  public static fromJSON(data: Record<string, unknown>): TrustRegistry {
+    const registry = new TrustRegistry((data.defaultTrustScore as number) || 0.50);
     
     if (data.sources && Array.isArray(data.sources)) {
-      for (const entry of data.sources) {
+      for (const entry of data.sources as Array<Record<string, unknown>>) {
         registry.setTrustScore(
-          entry.origin,
-          entry.score,
-          entry.domain,
-          entry.rationale
+          entry.origin as string,
+          entry.score as number,
+          entry.domain as string | undefined,
+          entry.rationale as string | undefined
         );
       }
     }

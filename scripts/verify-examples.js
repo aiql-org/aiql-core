@@ -26,7 +26,7 @@ function walk(dir) {
         execSync(`node "${cliPath}" transpile "${filePath}" --target json`, { stdio: 'ignore' });
         passedFiles++;
         process.stdout.write('.');
-      } catch (error) {
+      } catch {
         failedFiles++;
         console.error(`\n❌ Failed: ${filePath}`);
       }

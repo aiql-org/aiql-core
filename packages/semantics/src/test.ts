@@ -3,10 +3,12 @@
  */
 
 import { SemanticExplorer, SemanticGap } from './semantic-exploration.js';
+import * as AST from '@aiql-org/core';
+import { InferenceEngine } from '@aiql-org/inference';
 // Mock InferenceEngine interface to avoid full dependency
 interface MockInferenceEngine {
     // Basic shape needed by SemanticExplorer
-    knowledgeBase: any[];
+    knowledgeBase: AST.LogicalNode[];
 }
 
 let passed = 0;
@@ -17,9 +19,10 @@ function test(name: string, fn: () => void): void {
     fn();
     console.log(`✅ ${name}`);
     passed++;
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
     console.log(`❌ ${name}`);
-    console.log(`   Error: ${e.message}`);
+    console.log(`   Error: ${message}`);
     failed++;
   }
 }
@@ -32,10 +35,10 @@ console.log('\n=== @aiql-org/semantics Tests ===\n');
 
 test('SemanticExplorer: detects empty knowledge base', () => {
     const explorer = new SemanticExplorer();
-    const mockKB: MockInferenceEngine = { knowledgeBase: [] };
+const mockKB: MockInferenceEngine = { knowledgeBase: [] };
     
     // With empty KB, it might not find gaps or find specific "empty" gaps
-    const gaps = explorer.detectSemanticGaps(mockKB as any);
+    const gaps = explorer.detectSemanticGaps((mockKB as unknown) as InferenceEngine);
     assert(Array.isArray(gaps), 'Should return an array of gaps');
 });
 
@@ -56,7 +59,7 @@ test('SemanticExplorer: generates queries for gaps', () => {
     
     // Mock InfereceEngine with minimal structure
     const mockKB: MockInferenceEngine = { knowledgeBase: [] };
-    const queries = explorer.generateSemanticQueries(gap, mockKB as any);
+    const queries = explorer.generateSemanticQueries(gap, (mockKB as unknown) as InferenceEngine);
     assert(queries.length > 0, 'Should generate queries');
     assert(queries[0].aiqlCode.includes('!Query'), 'Should generate AIQL Query intent');
     assert(queries[0].aiqlCode.includes('<Python>'), 'Should mention the concept');

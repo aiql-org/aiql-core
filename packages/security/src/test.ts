@@ -29,42 +29,43 @@ function it(name: string, fn: () => void) {
     fn();
     console.log(`  ✅ ${name}`);
     passed++;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.log(`  ❌ ${name}`);
-    console.log(`     ${error.message || error}`);
+    console.log(`     ${message}`);
     failed++;
   }
 }
 
-function expect(actual: any) {
+function expect(actual: unknown) {
   const matchers = {
-    toBe(expected: any) {
+    toBe(expected: unknown) {
       if (actual !== expected) throw new Error(`Expected ${expected}, got ${actual}`);
     },
     toBeDefined() {
       if (actual === undefined) throw new Error('Expected value to be defined');
     },
-    toBeInstanceOf(constructor: any) {
+    toBeInstanceOf(constructor: abstract new (...args: unknown[]) => unknown) {
       if (!(actual instanceof constructor)) throw new Error(`Expected instance of ${constructor.name}`);
     },
-    toBeGreaterThan(value: any) {
-      if (!(actual > value)) throw new Error(`Expected ${actual} to be greater than ${value}`);
+    toBeGreaterThan(value: number | bigint) {
+      if (!((actual as number) > value)) throw new Error(`Expected ${actual} to be greater than ${value}`);
     },
-    toEqual(expected: any) {
+    toEqual(expected: unknown) {
       if (JSON.stringify(actual) !== JSON.stringify(expected))
         throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
     },
-    toContain(value: any) {
-      if (!actual.includes(value)) throw new Error(`Expected array to contain ${value}`);
+    toContain(value: unknown) {
+      if (!(actual as unknown[]).includes(value)) throw new Error(`Expected array to contain ${value}`);
     },
     toThrow() {
       let didThrow = false;
-      try { actual(); } catch (e) { didThrow = true; }
+      try { (actual as () => void)(); } catch { didThrow = true; }
       if (!didThrow) throw new Error('Expected function to throw');
     }
   };
   const notMatchers = {
-    toEqual(expected: any) {
+    toEqual(expected: unknown) {
       if (JSON.stringify(actual) === JSON.stringify(expected))
         throw new Error(`Expected not to equal ${JSON.stringify(expected)}`);
     }

@@ -117,7 +117,7 @@ export class SymbolicNeuralBridge {
       const statements = this.extractStatements(program);
 
       // 3. Validate each statement
-      const knowledgeBase = (kb as any).knowledgeBase;
+      const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
       const knownConcepts = this.getKnownConcepts(knowledgeBase);
 
       for (const stmt of statements) {
@@ -145,8 +145,8 @@ export class SymbolicNeuralBridge {
         result.reasons.push(`Successfully grounded ${validCount}/${totalStatements} statements`);
       }
 
-    } catch (error: any) {
-      result.reasons.push(`Parse error: ${error.message}`);
+    } catch (error: unknown) {
+      result.reasons.push(`Parse error: ${(error as Error).message}`);
       result.confidence = 0;
       result.grounded = false;
     }
@@ -179,7 +179,7 @@ export class SymbolicNeuralBridge {
       violations: []
     };
 
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
     const knownConcepts = this.getKnownConcepts(knowledgeBase);
 
     // 1. Check if concepts are known or in context
@@ -296,7 +296,7 @@ export class SymbolicNeuralBridge {
     object: string,
     kb: InferenceEngine
   ): RelationValidationResult {
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
     const knownRelations = this.getKnownRelations(knowledgeBase);
 
     // 1. Check common-sense patterns first (highest priority)
@@ -352,7 +352,7 @@ export class SymbolicNeuralBridge {
       validStatements: []
     };
 
-    const knowledgeBase = (kb as any).knowledgeBase;
+    const knowledgeBase = (kb as unknown as { knowledgeBase: AST.LogicalNode[] }).knowledgeBase;
     const knownConcepts = this.getKnownConcepts(knowledgeBase);
 
     for (const stmt of statements) {

@@ -270,7 +270,7 @@ export class PythonTranspiler {
         
         // Add security context
         if (intent.security) {
-            const securityObj: any = {};
+            const securityObj: Record<string, unknown> = {};
             if (intent.security.signed !== undefined) securityObj.signed = intent.security.signed;
             if (intent.security.encrypted !== undefined) securityObj.encrypted = intent.security.encrypted;
             if (intent.security.signerAgentId) securityObj.signerAgentId = intent.security.signerAgentId;

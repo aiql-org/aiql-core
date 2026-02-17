@@ -23,7 +23,7 @@ export interface ConflictResult {
   conflictType?: ConflictType;
   reason?: string;
   severity?: ConflictSeverity;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // Property constraint definition
@@ -386,7 +386,7 @@ export class OntologyReasoner {
     }
     
     // Check each subject's statements for conflicts
-    for (const [_, stmts] of statementsBySubject) {
+    for (const [, stmts] of statementsBySubject) {
       for (let i = 0; i < stmts.length; i++) {
         for (let j = i + 1; j < stmts.length; j++) {
           const conflict = this.detectSemanticConflict(stmts[i], stmts[j]);
