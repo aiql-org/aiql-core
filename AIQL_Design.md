@@ -56,12 +56,12 @@ Every new feature or change MUST update the following in a single commit:
 **Language:** TypeScript (ES Modules)  
 **Runtime:** Node.js v20.0.0+  
 **Architecture:** npm workspaces monorepo — Tokenizer → Parser → AST → Transpiler → InferenceEngine → OntologyReasoner + TrustRegistry + QuantumSemantics  
-**Repository:** https://github.com/AI-Memory/aiql.ws
+**Repository:** https://github.com/aiql-org/aiql-core
 
 ## Project Structure
 
 ```
-aiql.ws/                        # Root monorepo (npm workspaces)
+aiql-core/                       # Root monorepo (npm workspaces)
 ├── package.json                # Workspace root: aiql-sdk@2.6.0 (private)
 ├── tsconfig.base.json          # Shared TypeScript config (ES2022, NodeNext)
 ├── docker-compose.yml          # Docker services (API, CLI, Playground)

@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@aiql-org/core?label=@aiql-org/core)](https://www.npmjs.com/package/@aiql-org/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker](https://img.shields.io/docker/v/aiql/cli?label=Docker)](https://hub.docker.com/r/aiql/cli)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/AI-Memory/aiql.ws/ci.yml?branch=main)](https://github.com/AI-Memory/aiql.ws/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aiql-org/aiql-core/ci.yml?branch=main)](https://github.com/aiql-org/aiql-core/actions)
 
 ---
 

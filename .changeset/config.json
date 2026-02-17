@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    [
+      "@aiql-org/api",
+      "@aiql-org/cli",
+      "@aiql-org/core",
+      "@aiql-org/inference",
+      "@aiql-org/security",
+      "@aiql-org/semantics",
+      "@aiql-org/soul",
+      "@aiql-org/utils"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}

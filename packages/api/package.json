@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/api",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL REST API - HTTP service for parsing and transpiling AIQL code",
   "type": "module",
   "main": "./dist/server.js",
@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/api"
   },
   "dependencies": {
-    "@aiql-org/core": "^2.6.2",
-    "@aiql-org/soul": "^2.6.2",
+    "@aiql-org/core": "^2.6.3",
+    "@aiql-org/soul": "^2.6.3",
     "cors": "^2.8.5",
     "express": "^4.18.0",
     "express-rate-limit": "^7.1.0",

@@ -6,8 +6,8 @@ Thank you for your interest in contributing to the **Artificial Intelligence Qua
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/AI-Memory/aiql.ws.git
-   cd aiql.ws
+   git clone https://github.com/aiql-org/aiql-core.git
+   cd aiql-core
    ```
 
 2. **Install dependencies:**

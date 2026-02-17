@@ -22,6 +22,8 @@
     "format": "prettier --write .",
     "lint:workspaces": "npm run lint --workspaces --if-present",
     "sync-versions": "node scripts/sync-versions.js",
+    "version-packages": "changeset version",
+    "release": "npm run build && changeset publish",
     "docker:cli": "docker build -f docker/cli.Dockerfile -t aiql/cli:latest .",
     "docker:api": "docker build -f docker/api.Dockerfile -t aiql/api:latest .",
     "docker:playground": "docker build -f docker/playground.Dockerfile -t aiql/playground:latest .",
@@ -30,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AI-Memory/aiql.ws.git"
+    "url": "https://github.com/aiql-org/aiql-core.git"
   },
   "keywords": [
     "aiql",
@@ -46,10 +48,11 @@
   "author": "AIQL Contributors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/AI-Memory/aiql.ws/issues"
+    "url": "https://github.com/aiql-org/aiql-core/issues"
   },
   "homepage": "https://aiql.org",
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",

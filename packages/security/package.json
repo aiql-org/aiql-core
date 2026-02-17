@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/security",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL Security - Quantum-proof cryptography (Dilithium/Kyber), trust registry",
   "type": "module",
   "main": "./dist/index.js",
@@ -37,14 +37,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/security"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.2"
+    "@aiql-org/core": "^2.6.3"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

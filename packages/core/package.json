@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/core",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL language parser and multi-target transpiler (JSON/YAML/Python/SQL/Coq/Lean)",
   "type": "module",
   "main": "./dist/index.js",
@@ -51,11 +51,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/AI-Memory/aiql.ws/issues"
+    "url": "https://github.com/aiql-org/aiql-core/issues"
   },
   "homepage": "https://aiql.org",
   "publishConfig": {

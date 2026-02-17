@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/utils",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL Utilities - Shared helpers, file readers, and version sync tools",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/utils"
   },
   "publishConfig": {

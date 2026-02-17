@@ -40,7 +40,7 @@ FROM node:20-alpine AS runtime
 LABEL maintainer="AIQL Contributors"
 LABEL description="AIQL CLI - Parse and transpile AIQL code to Python/JSON/YAML/SQL/Coq/Lean"
 LABEL version="2.6.0"
-LABEL org.opencontainers.image.source="https://github.com/AI-Memory/aiql.ws"
+LABEL org.opencontainers.image.source="https://github.com/aiql-org/aiql-core"
 LABEL org.opencontainers.image.description="AIQL CLI transpiler supporting 6 target formats"
 LABEL org.opencontainers.image.licenses="MIT"
 

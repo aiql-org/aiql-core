@@ -30,7 +30,7 @@ FROM node:20-alpine AS runtime
 LABEL maintainer="AIQL Contributors"
 LABEL description="AIQL Playground - Interactive environment for AIQL transpilation"
 LABEL version="2.6.0"
-LABEL org.opencontainers.image.source="https://github.com/AI-Memory/aiql.ws"
+LABEL org.opencontainers.image.source="https://github.com/aiql-org/aiql-core"
 
 WORKDIR /playground
 
@@ -74,7 +74,7 @@ RUN echo '#!/bin/sh' > /usr/local/bin/welcome && \
     echo 'echo "║    aiql transpile FILE -t python   # transpile           ║"' >> /usr/local/bin/welcome && \
     echo 'echo "║    ls examples/                    # browse examples     ║"' >> /usr/local/bin/welcome && \
     echo 'echo "║                                                          ║"' >> /usr/local/bin/welcome && \
-    echo 'echo "║  Docs: https://aiql.org | GitHub: AI-Memory/aiql.ws      ║"' >> /usr/local/bin/welcome && \
+    echo 'echo "║  Docs: https://aiql.org | GitHub: aiql-org/aiql-core      ║"' >> /usr/local/bin/welcome && \
     echo 'echo "╚══════════════════════════════════════════════════════════╝"' >> /usr/local/bin/welcome && \
     echo 'echo ""' >> /usr/local/bin/welcome && \
     echo 'exec /bin/sh' >> /usr/local/bin/welcome && \

@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/inference",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL Inference Engine - Ontology reasoning, meta-ontology, and logical inference",
   "type": "module",
   "main": "./dist/index.js",
@@ -35,15 +35,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/inference"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.2",
-    "@aiql-org/security": "^2.6.2"
+    "@aiql-org/core": "^2.6.3",
+    "@aiql-org/security": "^2.6.3"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

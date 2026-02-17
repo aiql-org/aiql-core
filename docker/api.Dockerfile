@@ -34,7 +34,7 @@ FROM node:20-alpine AS runtime
 LABEL maintainer="AIQL Contributors"
 LABEL description="AIQL REST API - HTTP transpilation service"
 LABEL version="2.6.0"
-LABEL org.opencontainers.image.source="https://github.com/AI-Memory/aiql.ws"
+LABEL org.opencontainers.image.source="https://github.com/aiql-org/aiql-core"
 LABEL org.opencontainers.image.licenses="MIT"
 
 WORKDIR /app

@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/soul",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL Soul - Affective AI engine for emotional computation (Reward/Pain/Stress/Novelty)",
   "type": "module",
   "main": "./dist/index.js",
@@ -38,14 +38,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/soul"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "@aiql-org/core": "^2.6.2"
+    "@aiql-org/core": "^2.6.3"
   },
   "peerDependenciesMeta": {
     "@aiql-org/core": {

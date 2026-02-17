@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/cli",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "AIQL CLI - Command-line tool for parsing and transpiling AIQL code",
   "type": "module",
   "main": "./dist/cli.js",
@@ -40,14 +40,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AI-Memory/aiql.ws.git",
+    "url": "git+https://github.com/aiql-org/aiql-core.git",
     "directory": "packages/cli"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@aiql-org/core": "^2.6.2",
+    "@aiql-org/core": "^2.6.3",
     "chalk": "^5.3.0",
     "commander": "^12.0.0"
   },
