@@ -1,0 +1,12 @@
+// Mathematical Constants and Formulas
+// Demonstrates constants, variables, and formula definitions.
+// Use for scientific computing, physics models, engineering.
+!PhysicsConstants {
+  <Gravity> = 9.81
+  <SpeedOfLight> = 299792458
+  <Pi> = 3.14159
+  <KineticEnergy> = 0.5 * <Mass> * <Velocity> ^ 2
+  <Momentum> = <Mass> * <Velocity>
+} @0.97
+
+// Constants and formulas for scientific computation

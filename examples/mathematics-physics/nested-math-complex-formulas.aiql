@@ -1,0 +1,11 @@
+// Nested Mathematical Expressions
+// Shows nested function calls and complex formulas.
+// Demonstrates operator precedence and parenthetical grouping.
+!ComplexFormulas {
+  <Distance> = sqrt(<A> ^ 2 + <B> ^ 2)
+  <Volume> = <Pi> * <Radius> ^ 3
+  <Exponential> = exp(<Rate> * <Time>)
+  <Polynomial> = <A> * <X> ^ 2 + <B> * <X> + <C>
+} @0.92
+
+// Nested expressions maintain correct order of operations

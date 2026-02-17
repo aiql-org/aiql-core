@@ -1,0 +1,12 @@
+// Lambda Functions
+// Anonymous functions for flexible, reusable calculations.
+// Syntax: lambda params: expression
+!MathFunctions {
+  <Square> = lambda x: x ^ 2
+  <Cube> = lambda x: x ^ 3
+  <DoubleSum> = lambda a, b: (a + b) * 2
+  <KineticEnergy> = lambda m, v: 0.5 * m * v ^ 2
+  <AreaRectangle> = lambda w, h: w * h
+} @0.97
+
+// Lambdas transpile to Python lambda expressions

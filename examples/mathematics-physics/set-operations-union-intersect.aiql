@@ -1,0 +1,10 @@
+// Set Operations
+// Demonstrates union and intersect operations on sets.
+// Use cases: Data classification, taxonomy, logical grouping.
+!SetOperations {
+  <AllNumbers> = <Integers> union <Decimals>
+  <CommonElements> = <SetA> intersect <SetB>
+  <Particles> = <Fermions> union <Bosons>
+} @0.99
+
+// Set operations transpile to Python sets and SQL set queries

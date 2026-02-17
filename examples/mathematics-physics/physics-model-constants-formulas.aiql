@@ -1,0 +1,13 @@
+// Physics Model: Constants & Formulas
+// Demonstrates mathematical expressions with constants, formulas, and operators.
+// New in v2.6.0: Full support for arithmetic (+, -, *, /, ^), functions, lambdas, sets.
+!PhysicsModel {
+  <Gravity> = 9.81
+  <Distance> = <Velocity> * <Time> + 0.5 * <Acceleration> * <Time> ^ 2
+  <WaveHeight> = <Amplitude> * sin(<AngularFrequency> * <Time> + <PhaseShift>)
+  <CalculateKE> = lambda m, v: 0.5 * m * v ^ 2
+  <Fermions> = <Quarks> union <Leptons>
+  <CommonParticles> = <Protons> intersect <Baryons>
+} @0.95
+
+// Transpiles to Python, SQL with full mathematical support
