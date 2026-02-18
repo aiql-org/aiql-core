@@ -1,5 +1,12 @@
 # @aiql-org/security
 
+## 2.6.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.6.6
+
 ## 2.6.5
 
 ### Patch Changes

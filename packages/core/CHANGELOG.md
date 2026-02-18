@@ -1,5 +1,11 @@
 # @aiql-org/core
 
+## 2.6.6
+
+### Patch Changes
+
+- Bump version to sync with web updates and ensure latest build artifacts are available.
+
 ## 2.6.5
 
 ### Patch Changes
