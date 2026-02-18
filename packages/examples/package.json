@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/examples",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "type": "module",
   "description": "Official AIQL example snippets and test cases",
   "main": "dist/index.js",

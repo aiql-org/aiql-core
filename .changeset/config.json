@@ -11,7 +11,8 @@
       "@aiql-org/security",
       "@aiql-org/semantics",
       "@aiql-org/soul",
-      "@aiql-org/utils"
+      "@aiql-org/utils",
+      "@aiql-org/examples"
     ]
   ],
   "linked": [],
