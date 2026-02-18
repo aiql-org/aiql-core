@@ -66,7 +66,7 @@ export interface Statement extends Node {
   subject: Expression; // v2.1.0: Was Concept
   relation: Relation;
   object: Expression;  // v2.1.0: Was Concept
-  attributes?: Record<string, string | number | boolean>;
+  attributes?: Record<string, Expression | string | number | boolean>;
   examples?: InlineExample[];    // v2.2.0: Inline examples with #example: marker
 }
 

@@ -64,8 +64,10 @@ export abstract class TranspilerBase {
                     const val = node.attributes.intensity;
                     if (typeof val === 'boolean') {
                         intensity = val ? 1.0 : 0.0;
-                    } else {
+                    } else if (typeof val === 'number' || typeof val === 'string') {
                         intensity = val;
+                    } else {
+                        intensity = this.expressionToString(val);
                     }
                 }
                 

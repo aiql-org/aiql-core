@@ -608,7 +608,14 @@ export class InferenceEngine {
    * Unify two Intent nodes
    */
   private unifyIntents(pattern: AST.Intent, target: AST.Intent, substitution: Substitution): boolean {
-    if (pattern.intentType !== target.intentType) return false;
+    // Allow !Query to match !Assert (v2.7.0 fix)
+    if (pattern.intentType !== target.intentType) {
+        const pType = pattern.intentType;
+        const tType = target.intentType;
+        const validMatch = (pType === '!Query' && tType === '!Assert') || 
+                           (pType === '!Assert' && tType === '!Query');
+        if (!validMatch) return false;
+    }
 
     // Unify statements
     if (pattern.statements.length !== target.statements.length) return false;
@@ -631,7 +638,57 @@ export class InferenceEngine {
     if (pattern.relation.name !== target.relation.name) return false;
     if (!this.unifyTerm(AST.extractExpressionName(pattern.object) || '', AST.extractExpressionName(target.object) || '', substitution)) return false;
 
+    // Unify attributes (v2.7.0)
+    if (pattern.attributes) {
+      if (!target.attributes) return false;
+      
+      for (const [key, patternVal] of Object.entries(pattern.attributes)) {
+        if (!(key in target.attributes)) return false;
+        const targetVal = target.attributes[key];
+        
+        if (!this.unifyAttributeValue(patternVal, targetVal, substitution)) {
+          return false;
+        }
+      }
+    }
+
     return true;
+  }
+
+  /**
+   * Unify two attribute values (v2.7.0)
+   */
+  private unifyAttributeValue(patternVal: AST.Expression | string | number | boolean, targetVal: AST.Expression | string | number | boolean, substitution: Substitution): boolean {
+    // Convert values to string representation/names for unification
+    let pName = '';
+    let tName = '';
+
+    // Extract pattern name/value
+    if (typeof patternVal === 'object' && patternVal !== null) {
+      if (AST.isConcept(patternVal) || AST.isIdentifier(patternVal)) {
+        pName = patternVal.name;
+      } else {
+        // Complex expression - try strict equality for now
+        return JSON.stringify(patternVal) === JSON.stringify(targetVal);
+      }
+    } else {
+      pName = String(patternVal);
+    }
+
+    // Extract target name/value
+    if (typeof targetVal === 'object' && targetVal !== null) {
+      if (AST.isConcept(targetVal) || AST.isIdentifier(targetVal)) {
+        tName = targetVal.name; 
+      } else if (AST.isLiteral(targetVal)) {
+          tName = String(targetVal.value);
+      } else {
+        return JSON.stringify(patternVal) === JSON.stringify(targetVal);
+      }
+    } else {
+      tName = String(targetVal);
+    }
+    
+    return this.unifyTerm(pName, tName, substitution);
   }
 
   /**
@@ -659,6 +716,7 @@ export class InferenceEngine {
    * Check if a term is a variable (heuristic: lowercase first letter, not wrapped in <>)
    */
   private isVariable(term: string): boolean {
+    if (term.startsWith('<?') && term.endsWith('>')) return true; // v2.7.0: <?Var>
     if (term.startsWith('<') && term.endsWith('>')) return false;
     if (term.startsWith('[') && term.endsWith(']')) return false;
     if (term.length > 0 && term[0] >= 'a' && term[0] <= 'z') return true;
@@ -698,7 +756,34 @@ export class InferenceEngine {
   private applySubstitutionToIntent(intent: AST.Intent, substitution: Substitution): AST.Intent {
     return {
       ...intent,
-      statements: intent.statements.map(stmt => ({
+      statements: intent.statements.map(stmt => {
+        // Substitute attributes
+        let newAttributes: Record<string, AST.Expression | string | number | boolean> | undefined = stmt.attributes;
+        if (stmt.attributes) {
+            newAttributes = {};
+            for (const [key, val] of Object.entries(stmt.attributes)) {
+                if (typeof val === 'object' && (AST.isConcept(val) || AST.isIdentifier(val))) {
+                     // Check if variable
+                     const name = (val as AST.Concept | AST.Identifier).name;
+                     if (this.isVariable(name) && substitution.has(name)) {
+                         const subVal = substitution.get(name)!;
+                         // Try to determine type of substituted value
+                         // If string looks like number?
+                         if (!isNaN(Number(subVal))) {
+                             newAttributes[key] = { type: 'Literal', value: Number(subVal) } as AST.Literal;
+                         } else {
+                             newAttributes[key] = { type: 'Literal', value: subVal } as AST.Literal;
+                         }
+                     } else {
+                         newAttributes[key] = val;
+                     }
+                } else {
+                    newAttributes[key] = val;
+                }
+            }
+        }
+
+        return {
         ...stmt,
         subject: { 
           type: 'Concept' as const,
@@ -712,8 +797,9 @@ export class InferenceEngine {
         object: { 
           type: 'Concept' as const,
           name: substitution.get(AST.extractExpressionName(stmt.object) || '') || AST.extractExpressionName(stmt.object) || '' 
-        }
-      }))
+        },
+        attributes: newAttributes
+      };})
     };
   }
 

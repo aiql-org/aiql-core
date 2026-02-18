@@ -336,11 +336,60 @@ test('Edge: Self-referential implication', () => {
 });
 
 // =============================================================================
+// Attribute Querying (v2.7.0)
+// =============================================================================
+console.log('\n--- Attribute Querying ---');
+
+test('Attribute Query: Unify variable in attribute', () => {
+  // Fact: Bell invented Telephone in 1876
+  const factCode = '!Assert { <Bell> [invented] <Telephone> { year: 1876 } }';
+  // Query: Who invented Telephone in what year?
+  const queryCode = '!Query { <?Inventor> [invented] <Telephone> { year: <?Year> } }';
+  
+  const program = parseAIQL(factCode);
+  const engine = new InferenceEngine(program);
+  
+  const query = parseAIQL(queryCode).body[0];
+  if (!AST.isIntent(query)) throw new Error("Query parsed incorrectly");
+  
+  // Find fact
+  const facts = engine.getKnowledgeBase().filter(AST.isIntent);
+  assert(facts.length === 1, "Should have 1 fact");
+  
+  // Unify
+  const substitution = engine.unify(query, facts[0]);
+  assert(substitution !== null, "Should unify with attribute variable");
+  
+  if (substitution) {
+      // ?Inventor binds to <Bell> (Concept name includes brackets)
+      const inventor = substitution.get("<?Inventor>");
+      assert(inventor === "<Bell>", `Inventor should be <Bell>, got '${inventor}'`);
+      
+      // ?Year binds to "1876" (stringified number)
+      const year = substitution.get("<?Year>");
+      assert(year === "1876", `Year should be "1876", got '${year}'`);
+  }
+});
+
+test('Attribute Query: Fail on mismatching attribute', () => {
+    const factCode = '!Assert { <A> [b] <C> { year: 1999 } }';
+    const queryCode = '!Query { <A> [b] <C> { year: 2000 } }';
+    
+    const program = parseAIQL(factCode);
+    const engine = new InferenceEngine(program);
+    const query = parseAIQL(queryCode).body[0];
+    
+    const facts = engine.getKnowledgeBase().filter(AST.isIntent);
+    const substitution = engine.unify(query as AST.Intent, facts[0]);
+    assert(substitution === null, "Should fail when attributes don't match");
+});
+
+// =============================================================================
 // Summary
 // =============================================================================
 console.log('\n=== Test Summary ===');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failed}`);
 console.log(`Total:  ${passed + failed}`);
-
+console.log(`Failed: ${failed}`); // Redundant log removed in replacement
 if (failed > 0) process.exit(1);

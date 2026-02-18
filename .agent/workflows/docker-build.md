@@ -1,21 +1,39 @@
 ---
-description: Build Docker images for API, CLI, and Playground
+description: Build and Verify Docker Images for AIQL
 ---
 
-This workflow builds the Docker containers for the AIQL ecosystem.
+This workflow builds and tests the Docker containers for the AIQL ecosystem (API, CLI, Playground).
 
-1. Build the API service image
-// turbo
-2. docker build -t aiql/api -f docker/api.Dockerfile .
+## Prerequisites
+- Docker Desktop or Engine installed and running
+- Current directory is the repository root (`aiql-core`)
 
-3. Build the CLI tool image
-// turbo
-4. docker build -t aiql/cli -f docker/cli.Dockerfile .
+## Build Steps
 
-5. Build the Playground image
+### 1. Build API Service
 // turbo
-6. docker build -t aiql/playground -f docker/playground.Dockerfile .
+docker build -t aiql/api:latest -f docker/api.Dockerfile .
 
-7. Verify images were created
+### 2. Build CLI Tool
 // turbo
-8. docker images | grep aiql
+docker build -t aiql/cli:latest -f docker/cli.Dockerfile .
+
+### 3. Build Playground Environment
+// turbo
+docker build -t aiql/playground:latest -f docker/playground.Dockerfile .
+
+## Verification
+
+### 4. Verify Images Existence
+// turbo
+docker images | grep aiql
+
+### 5. Test CLI Image (Help)
+// turbo
+docker run --rm aiql/cli:latest --help
+
+### 6. Test API Image (Health Check)
+# Note: This runs in background, you might need to stop it manually
+# docker run -d -p 3000:3000 --name aiql-api-test aiql/api:latest
+# curl http://localhost:3000/api/v1/health
+# docker stop aiql-api-test && docker rm aiql-api-test

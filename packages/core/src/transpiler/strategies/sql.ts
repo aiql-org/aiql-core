@@ -251,7 +251,7 @@ export class SQLTranspiler extends TranspilerBase {
                  }
                  
                  // Add threshold filters from attributes if present
-                 if (stmt.attributes && stmt.attributes.confidence_threshold) {
+                 if (stmt.attributes && typeof stmt.attributes.confidence_threshold === 'number') {
                      output += `  AND i.confidence >= ${stmt.attributes.confidence_threshold}\n`;
                  }
                  

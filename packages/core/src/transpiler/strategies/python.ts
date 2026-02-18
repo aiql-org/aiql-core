@@ -224,9 +224,27 @@ export class PythonTranspiler extends TranspilerBase {
         return lines.join('\n');
     }
 
+    private attributesToPython(attributes: Record<string, AST.Expression | string | number | boolean>): string {
+        const parts: string[] = [];
+        for (const [key, value] of Object.entries(attributes)) {
+            let pyValue = "";
+            if (typeof value === 'string') {
+                pyValue = `"${value}"`;
+            } else if (typeof value === 'number') {
+                pyValue = value.toString();
+            } else if (typeof value === 'boolean') {
+                pyValue = value ? "True" : "False";
+            } else {
+                pyValue = this.expressionToPython(value);
+            }
+            parts.push(`"${key}": ${pyValue}`);
+        }
+        return `{${parts.join(', ')}}`;
+    }
+
     private transpileIntent(intent: AST.Intent): string {
         const graphRep = intent.statements.map((node: AST.Statement) => {
-            const attrs = node.attributes ? `, attributes=${JSON.stringify(node.attributes)}` : "";
+            const attrs = node.attributes ? `, attributes=${this.attributesToPython(node.attributes)}` : "";
             const tense = node.relation.tense ? `, tense="${node.relation.tense}"` : "";
             return `Relation(subject=${this.expressionToPython(node.subject)}, predicate="${node.relation.name}", object=${this.expressionToPython(node.object)}${attrs}${tense})`;
         }).join(",\n    ");

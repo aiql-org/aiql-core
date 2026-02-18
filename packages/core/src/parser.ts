@@ -718,7 +718,7 @@ export class Parser {
       const relation = this.relation();
       const object = this.parseExpression();
       
-      let attributes: Record<string, string | number | boolean> | undefined;
+      let attributes: Record<string, AST.Expression | string | number | boolean> | undefined;
       
       if (this.check(TokenType.SYMBOL) && this.peek().value === '{') {
           this.advance(); // consume '{'
@@ -726,7 +726,7 @@ export class Parser {
           while (!this.check(TokenType.SYMBOL) || this.peek().value !== '}') {
               const key = this.consume(TokenType.IDENTIFIER, "Expect attribute key").value;
               this.consume(TokenType.SYMBOL, "Expect :"); 
-              let value: string | number | boolean;
+              let value: AST.Expression | string | number | boolean;
               if (this.match(TokenType.STRING)) {
                   const raw = this.previous().value;
                   value = raw.substring(1, raw.length - 1);
@@ -737,7 +737,12 @@ export class Parser {
               } else if (this.match(TokenType.FALSE)) {
                   value = false;
               } else {
-                  throw this.error(this.peek(), "Expect attribute value");
+                  // Allow arbitrary expressions (variables, math, concepts) as attribute values
+                  try {
+                      value = this.parseExpression();
+                  } catch {
+                      throw this.error(this.peek(), "Expect attribute value (string, number, boolean, or expression)");
+                  }
               }
               attributes[key] = value;
               

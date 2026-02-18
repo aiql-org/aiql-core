@@ -1,0 +1,33 @@
+// Attribute Querying Feature Example (v2.7.0)
+// Demonstrates querying with variables in attributes and complex expressions
+
+!Assert {
+  <Bell> [invented] <Telephone> { year: 1876, location: "Boston", impact: "High" }
+  <Edison> [invented] <Phonograph> { year: 1877, location: "Menlo Park", impact: "High" }
+  <Tesla> [invented] <AC_Motor> { year: 1887, location: "New York", impact: "Revolutionary" }
+}
+
+// 1. Simple Attribute Variable Query
+// Find who invented something in 1876
+!Query {
+  <?Who> [invented] <?What> { year: 1876 }
+}
+
+// 2. Variable in Attribute Query
+// Find the year Bell invented the Telephone
+!Query {
+  <Bell> [invented] <Telephone> { year: <?Year> }
+}
+
+// 3. Multi-Attribute Query
+// Find inventions with "High" impact in specific locations
+!Query {
+  <?Inventor> [invented] <?Invention> { impact: "High", location: <?City> }
+}
+
+// 4. Complex Expression in Attribute (future extension)
+// Ideally, we could query: year: > 1880
+// Currently supported: explicit value matching or variable binding
+!Query {
+  <Tesla> [invented] <AC_Motor> { year: <?Year>, impact: <?Impact> }
+}
