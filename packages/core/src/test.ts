@@ -427,6 +427,144 @@ test('Math: left associativity for subtraction', () => {
 // =============================================================================
 // Summary
 // =============================================================================
+// =============================================================================
+// Spatial & Swarm Parsing (v2.7.0)
+// =============================================================================
+console.log('\n--- Spatial & Swarm Parsing ---');
+
+test('Parser: parses !Consensus intent', () => {
+    const code = `
+      !Consensus (scope:local) {
+        topic = <Decision>
+        participants = [<AgentA>, <AgentB>]
+        threshold = 0.8
+        timeout = 5000
+      }
+    `;
+    const ast = parseAIQL(code);
+    const node = ast.body[0] as AST.ConsensusNode;
+    assert(AST.isConsensusNode(node), 'Should be ConsensusNode');
+    assert(node.threshold === 0.8, 'Threshold match');
+    assert(node.timeout === 5000, 'Timeout match');
+    assert(node.scope === 'local', 'Scope match');
+    assert((node.topic as AST.Concept).name === '<Decision>', 'Topic match');
+    assert(node.participants.length === 2, 'Participants match');
+});
+
+test('Parser: parses !Coordinate intent', () => {
+    const code = `
+      !Coordinate {
+        goal = <Attack>
+        participants = [<Squad1>]
+        strategy = "hierarchical"
+      }
+    `;
+    const ast = parseAIQL(code);
+    const node = ast.body[0] as AST.CoordinateNode;
+    assert(AST.isCoordinateNode(node), 'Should be CoordinateNode');
+    assert(node.strategy === 'hierarchical', 'Strategy match');
+    assert((node.goal as AST.Concept).name === '<Attack>', 'Goal match');
+});
+
+test('Parser: parses spatial literals', () => {
+    const code = `
+      !Assert {
+        <Location> = space:literal(37.7749, -122.4194)
+      }
+    `;
+    const ast = parseAIQL(code);
+    const intent = ast.body[0] as AST.Intent;
+    const stmt = intent.statements[0];
+    const expr = stmt.object as AST.SpatialExpression;
+    
+    assert(expr.type === 'SpatialExpression', 'Should be SpatialExpression');
+    assert(expr.source === 'literal', 'Source literal');
+    assert(expr.literal?.lat === 37.7749, 'Lat match');
+    assert(expr.literal?.lon === -122.4194, 'Lon match');
+});
+
+test('Parser: parses spatial variables', () => {
+    const code = `
+      !Query {
+        <Target> = space:variable(sector_7)
+      }
+    `;
+    const ast = parseAIQL(code);
+    const intent = ast.body[0] as AST.Intent;
+    const stmt = intent.statements[0];
+    const expr = stmt.object as AST.SpatialExpression;
+
+    assert(expr.type === 'SpatialExpression', 'Should be SpatialExpression');
+    assert(expr.source === 'variable', 'Source variable');
+    assert(expr.variableName === 'sector_7', 'Variable name match');
+});
+
+
+// =============================================================================
+// Spatial & Swarm Transpilation (v2.7.0)
+// =============================================================================
+console.log('\n--- Spatial & Swarm Transpilation ---');
+
+test('Transpiler: transpiles !Consensus to Python', () => {
+    const code = `
+      !Consensus {
+        topic = <Decision>
+        participants = [<AgentA>, <AgentB>]
+        threshold = 0.8
+        timeout = 5000
+      }
+    `;
+    const ast = parseAIQL(code);
+    const python = transpiler.transpile(ast, 'python');
+    
+    assert(python.includes('Consensus('), 'Should create Consensus object');
+    assert(python.includes('topic="<Decision>"'), 'Topic match');
+    assert(python.includes('participants=["<AgentA>", "<AgentB>"]'), 'Participants match');
+    assert(python.includes('threshold=0.8'), 'Threshold match');
+    assert(python.includes('timeout=5000'), 'Timeout match');
+});
+
+test('Transpiler: transpiles !Coordinate to Python', () => {
+    const code = `
+      !Coordinate {
+        goal = <Attack>
+        participants = [<Squad1>]
+        strategy = "hierarchical"
+      }
+    `;
+    const ast = parseAIQL(code);
+    const python = transpiler.transpile(ast, 'python');
+    
+    assert(python.includes('Coordinate('), 'Should create Coordinate object');
+    assert(python.includes('goal="<Attack>"'), 'Goal match');
+    assert(python.includes('strategy="hierarchical"'), 'Strategy match');
+});
+
+test('Transpiler: transpiles spatial literals to Python', () => {
+    const code = `
+      !Assert {
+        <Location> = space:literal(37.7749, -122.4194)
+      }
+    `;
+    const ast = parseAIQL(code);
+    const python = transpiler.transpile(ast, 'python');
+    
+    assert(python.includes('Location(lat=37.7749, lon=-122.4194)'), 'Should create Location object');
+});
+
+test('Transpiler: transpiles affective intents to soul.process', () => {
+    const code = `!Feel { <Self> [feels] <Joy> }`;
+    const ast = parseAIQL(code);
+    const python = transpiler.transpile(ast, 'python');
+    
+    assert(python.includes('soul.process'), 'Should call soul.process');
+    assert(python.includes('"type": "Reward"'), 'Should map Joy to Reward');
+});
+
+
+// =============================================================================
+// Summary
+// =============================================================================
 console.log('\n=== Test Summary ===');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failed}`);

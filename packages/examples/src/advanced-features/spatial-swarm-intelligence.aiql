@@ -1,0 +1,20 @@
+// Spatial Swarm Intelligence
+// Demonstrates Coordinated Action with Spatial Awareness
+
+!Consensus (scope:local) {
+  topic = <SearchStrategy>
+  participants = [<DroneA>, <DroneB>, <DroneC>]
+  threshold = 0.8
+  timeout = 5000
+}
+
+!Coordinate {
+  goal = <Exploration>
+  participants = [<Swarm>]
+  strategy = "decentralized"
+}
+
+!Assert {
+  <DroneA> [is_at] space:literal(37.7749, -122.4194)
+  <Target> [is_in] space:variable(sector_7)
+}

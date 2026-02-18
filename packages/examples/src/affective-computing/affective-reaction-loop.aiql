@@ -1,0 +1,16 @@
+// Affective Reaction Loop
+// Demonstrates !Feel, !Desire and Soul Processing
+
+!Feel {
+  <Self> [feels] <Curiosity> { intensity: 0.8 }
+  <Input> [causes] <Surprise>
+} @1.0
+
+!Desire {
+  <Self> [wants] <Knowledge>
+  <Self> [seeks] <Understanding>
+}
+
+// The Python transpiler will generate:
+// soul.process({"type": "Novelty", "intensity": 0.8, "source": "Self [feels] Curiosity"})
+// soul.process({"type": "Reward", "intensity": "unspecified", "source": "Self [seeks] Understanding"})

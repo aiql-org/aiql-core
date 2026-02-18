@@ -260,7 +260,7 @@ export class Parser {
     };
   }
 
-  private parseIntent(): AST.Intent {
+  private parseIntent(): AST.LogicalNode {
     // Check for security directive first
     let securityDirective: { type: string; params: string[] } | undefined;
     
@@ -423,7 +423,7 @@ export class Parser {
     return metadata;
   }
 
-  private intent(): AST.Intent {
+  private intent(): AST.Intent | AST.ConsensusNode | AST.CoordinateNode {
     const intentToken = this.consume(TokenType.INTENT, "Expect Intent marker (!Query, !Assert, etc.).");
     let scope: string | undefined;
     const contextParams: Record<string, string> = {};
@@ -468,6 +468,20 @@ export class Parser {
         this.consume(TokenType.SYMBOL, "Expect closing )"); 
     }
 
+    // Dispatch to specific intent parsers if needed
+    if (intentToken.value === '!Consensus') {
+        const node = this.parseConsensus();
+        if (Object.keys(contextParams).length > 0) node.contextParams = contextParams;
+        if (scope) node.scope = scope;
+        return node;
+    }
+    if (intentToken.value === '!Coordinate') {
+        const node = this.parseCoordinate();
+        if (Object.keys(contextParams).length > 0) node.contextParams = contextParams;
+        if (scope) node.scope = scope;
+        return node;
+    }
+
     this.consume(TokenType.SYMBOL, "Expect { to start statement block");
     
     const statements: AST.Statement[] = [];
@@ -498,6 +512,132 @@ export class Parser {
         statements,
         confidence
     };
+  }
+
+  private parseConsensus(): AST.ConsensusNode {
+      this.consume(TokenType.SYMBOL, "Expect {");
+      
+      let topic: AST.Expression | undefined;
+      const participants: AST.Expression[] = [];
+      let threshold = 0.5; // default
+      let timeout: number | undefined;
+      
+      while (!this.check(TokenType.SYMBOL) || this.peek().value !== '}') {
+          const key = this.consume(TokenType.IDENTIFIER, "Expect key").value;
+          this.consume(TokenType.ASSIGN, "Expect =");
+          
+          if (key === 'topic') {
+              topic = this.parseExpression();
+          } else if (key === 'participants') {
+              this.consume(TokenType.SYMBOL, "Expect [");
+              while (!this.check(TokenType.SYMBOL) || this.peek().value !== ']') {
+                  participants.push(this.parseExpression());
+                  if (this.check(TokenType.SYMBOL) && this.peek().value === ',') this.advance();
+              }
+              this.consume(TokenType.SYMBOL, "Expect ]");
+          } else if (key === 'threshold') {
+              const val = this.consume(TokenType.NUMBER, "Expect number");
+              threshold = parseFloat(val.value);
+          } else if (key === 'timeout') {
+              const val = this.consume(TokenType.NUMBER, "Expect number");
+              timeout = parseFloat(val.value);
+          }
+      }
+      this.consume(TokenType.SYMBOL, "Expect }");
+      
+      if (!topic) throw new Error("Consensus node missing 'topic'");
+      
+      return {
+          type: 'Consensus',
+          topic,
+          participants,
+          threshold,
+          timeout
+      };
+  }
+
+  private parseCoordinate(): AST.CoordinateNode {
+      this.consume(TokenType.SYMBOL, "Expect {");
+      
+      let goal: AST.Expression | undefined;
+      const participants: AST.Expression[] = [];
+      let strategy: 'hierarchical' | 'decentralized' | 'market' = 'decentralized';
+      
+      while (!this.check(TokenType.SYMBOL) || this.peek().value !== '}') {
+          const key = this.consume(TokenType.IDENTIFIER, "Expect key").value;
+          this.consume(TokenType.ASSIGN, "Expect =");
+          
+          if (key === 'goal') {
+              goal = this.parseExpression();
+          } else if (key === 'participants') {
+              this.consume(TokenType.SYMBOL, "Expect [");
+              while (!this.check(TokenType.SYMBOL) || this.peek().value !== ']') {
+                  participants.push(this.parseExpression());
+                  if (this.check(TokenType.SYMBOL) && this.peek().value === ',') this.advance();
+              }
+              this.consume(TokenType.SYMBOL, "Expect ]");
+          } else if (key === 'strategy') {
+              const val = this.consume(TokenType.STRING, "Expect string");
+              strategy = val.value.replace(/"/g, '') as 'hierarchical' | 'decentralized' | 'market'; // simplified
+          }
+      }
+      this.consume(TokenType.SYMBOL, "Expect }");
+      
+      if (!goal) throw new Error("Coordinate node missing 'goal'");
+      
+      return {
+          type: 'Coordinate',
+          goal,
+          participants,
+          strategy
+      };
+  }
+
+  // Helper to parse space: expressions
+  private parseSpatialExpression(): AST.SpatialExpression {
+      // Expecting space:literal(lat, lon) or space:variable(name)
+      // Current token is "space" (IDENTIFIER)
+      this.advance(); // consume space
+      this.consume(TokenType.SYMBOL, "Expect :"); 
+      
+      const type = this.consume(TokenType.IDENTIFIER, "Expect spatial type (literal, etc)").value;
+      this.consume(TokenType.SYMBOL, "Expect (");
+      
+      if (type === 'literal' || type === 'latlon') {
+          let lat: number;
+          if (this.check(TokenType.MINUS)) {
+              this.advance();
+              lat = -parseFloat(this.consume(TokenType.NUMBER, "Expect lat").value);
+          } else {
+              lat = parseFloat(this.consume(TokenType.NUMBER, "Expect lat").value);
+          }
+          
+          this.consume(TokenType.SYMBOL, "Expect ,");
+          
+          let lon: number;
+          if (this.check(TokenType.MINUS)) {
+              this.advance();
+              lon = -parseFloat(this.consume(TokenType.NUMBER, "Expect lon").value);
+          } else {
+              lon = parseFloat(this.consume(TokenType.NUMBER, "Expect lon").value);
+          }
+          
+          this.consume(TokenType.SYMBOL, "Expect )");
+          return {
+              type: 'SpatialExpression',
+              source: 'literal',
+              literal: { lat, lon }
+          };
+      } else {
+          // assume variable or region
+          const name = this.consume(TokenType.IDENTIFIER, "Expect name").value;
+          this.consume(TokenType.SYMBOL, "Expect )");
+          return {
+              type: 'SpatialExpression',
+              source: 'variable',
+              variableName: name
+          };
+      }
   }
 
   private extractValue(token: string, prefix: string): string {
@@ -769,6 +909,10 @@ export class Parser {
 
   private parseAtomicExpression(): AST.Expression {
       if (this.check(TokenType.IDENTIFIER)) {
+          // Check for space: prefix
+          if (this.peek().value === 'space' && this.peekNext().value === ':') {
+             return this.parseSpatialExpression();
+          }
           return { type: 'Identifier', name: this.advance().value };
       }
       if (this.check(TokenType.CONCEPT)) {

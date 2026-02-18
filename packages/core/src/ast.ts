@@ -84,8 +84,8 @@ export interface Relation extends Node {
 // Logical Operators (v2.0.0) - Keyword-based syntax
 export type LogicalOperator = 'and' | 'or' | 'not' | 'implies' | 'iff' | 'then';
 
-// Logical statement types (v2.0.0, v2.1.0 adds RelationshipNode, v2.2.0 adds ExampleNode)
-export type LogicalNode = Intent | LogicalExpression | QuantifiedExpression | RuleDefinition | RelationshipNode | ExampleNode;
+// Logical statement types (v2.0.0, v2.1.0 adds RelationshipNode, v2.2.0 adds ExampleNode, v2.7.0 adds Swarm/Spatial)
+export type LogicalNode = Intent | LogicalExpression | QuantifiedExpression | RuleDefinition | RelationshipNode | ExampleNode | ConsensusNode | CoordinateNode;
 
 // Logical Expression connecting statements or intents (v2.0.0)
 export interface LogicalExpression extends Node {
@@ -236,7 +236,7 @@ export interface UnaryExpression extends Node {
 }
 
 // Unified Expression Type
-export type Expression = Concept | Literal | MathExpression | SetExpression | FunctionApplication | LambdaExpression | Identifier | UnaryExpression;
+export type Expression = Concept | Literal | MathExpression | SetExpression | FunctionApplication | LambdaExpression | Identifier | UnaryExpression | SpatialExpression;
 
 export function isUnaryExpression(node: Expression): node is UnaryExpression {
   return node.type === 'UnaryExpression';
@@ -313,4 +313,78 @@ export function isFunctionApplication(node: Expression): node is FunctionApplica
 
 export function isLambdaExpression(node: Expression): node is LambdaExpression {
   return node.type === 'LambdaExpression';
+}
+
+// ===================================================================
+// Spatial Expressions (v2.7.0)
+// ===================================================================
+
+export interface SpatialExpression extends Node {
+  type: 'SpatialExpression';
+  source: 'literal' | 'variable';
+  literal?: {
+    lat: number;
+    lon: number;
+    region?: string;
+  };
+  variableName?: string;
+}
+
+export function isSpatialExpression(node: Node): node is SpatialExpression {
+  return node.type === 'SpatialExpression';
+}
+
+// ===================================================================
+// Swarm Intelligence Nodes (v2.7.0)
+// ===================================================================
+
+export interface ConsensusNode extends Node {
+  type: 'Consensus';
+  topic: Expression;
+  participants: Expression[];
+  threshold: number;
+  timeout?: number;
+  // Metadata
+  confidence?: number;
+  coherence?: number;
+  security?: SecurityMetadata;
+  identifier?: string;
+  groupIdentifier?: string;
+  sequenceNumber?: number;
+  temperature?: number;
+  entropy?: number;
+  version?: string;
+  origin?: string;
+  citations?: string[];
+  contextParams?: Record<string, string>; // for consensus specific context
+  scope?: string;
+}
+
+export interface CoordinateNode extends Node {
+  type: 'Coordinate';
+  goal: Expression;
+  participants: Expression[];
+  strategy: 'hierarchical' | 'decentralized' | 'market';
+  // Metadata
+  confidence?: number;
+  coherence?: number;
+  security?: SecurityMetadata;
+  identifier?: string;
+  groupIdentifier?: string;
+  sequenceNumber?: number;
+  temperature?: number;
+  entropy?: number;
+  version?: string;
+  origin?: string;
+  citations?: string[];
+  contextParams?: Record<string, string>;
+  scope?: string;
+}
+
+export function isConsensusNode(node: LogicalNode): node is ConsensusNode {
+  return node.type === 'Consensus';
+}
+
+export function isCoordinateNode(node: LogicalNode): node is CoordinateNode {
+  return node.type === 'Coordinate';
 }

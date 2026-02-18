@@ -196,8 +196,27 @@ export class Tokenizer {
       } else if (char === '<') {
         tokens.push(this.scanConcept());
       } else if (char === '[') {
-        // New relation syntax: [is_suited_for]
-        tokens.push(this.scanRelation());
+        // Disambiguate List vs Relation
+        // Heuristic: Lists contain separators (,) or complex types (<, {, ", $, [, etc.)
+        let isList = false;
+        let p = this.position + 1;
+        while (p < this.input.length) {
+            const c = this.input[p];
+            if (c === ']') break; // End of bracket
+            if (c === '\n') break; // Newline - probably error or end
+            if (c === ',' || c === '<' || c === '{' || c === '(' || c === '$' || c === '"' || c === '[') {
+                isList = true;
+                break; // Definitive list indicator
+            }
+            p++;
+        }
+        
+        if (isList) {
+             tokens.push(this.createToken(TokenType.SYMBOL, "["));
+             this.advance();
+        } else {
+             tokens.push(this.scanRelation());
+        }
       } else if (char === '-') {
         // Hyphen or arrow symbol
         if (this.peek(1) === '>') {

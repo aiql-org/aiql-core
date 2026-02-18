@@ -1,5 +1,11 @@
 import * as AST from '../ast.js';
 
+export interface SoulProcessCall {
+    type: string;
+    intensity: number | string;
+    source: string;
+}
+
 export abstract class TranspilerBase {
     /**
      * Transpile an AIQL program to the target language string or object.
@@ -10,22 +16,36 @@ export abstract class TranspilerBase {
      * Shared logic to detect affective relations and generate soul process calls.
      */
     protected detectAffectiveRelations(intent: AST.Intent): string[] {
+        const calls = this.getSoulProcessCalls(intent);
+        return calls.map(call => 
+            `${call.source} → soul.process({type: "${call.type}", intensity: ${call.intensity}})`
+        );
+    }
+
+    /**
+     * Get structured soul process calls from an intent.
+     */
+    protected getSoulProcessCalls(intent: AST.Intent): SoulProcessCall[] {
         const affectiveRelations = ['feels', 'desires', 'experiences', 'seeks', 'wants', 'avoids'];
-        const affectiveEmotions = [
-            'Joy', 'Happiness', 'Delight', // Positive emotions → Reward
-            'Suffering', 'Pain', 'Sadness', // Negative emotions → Pain
-            'Stress', 'Anxiety', 'Tension', // Stress emotions → Stress
-            'Curiosity', 'Interest', 'Wonder', // Curiosity emotions → Novelty
-            'Fear', 'Hope', 'Surprise', 'Empathy', 'Compassion'
-        ];
         
-        const detected: string[] = [];
+        const calls: SoulProcessCall[] = [];
         
         for (const node of intent.statements) {
-            const relation = node.relation.name.toLowerCase();
+            let relation = node.relation.name.toLowerCase();
+            
+            // Strip square brackets if present (e.g. [feels] -> feels)
+            if (relation.startsWith('[') && relation.endsWith(']')) {
+                relation = relation.substring(1, relation.length - 1);
+            }
             
             if (affectiveRelations.includes(relation)) {
-                const emotion = AST.isConcept(node.object) ? node.object.name : 'Unknown';
+                let emotion = AST.isConcept(node.object) ? node.object.name : 'Unknown';
+                
+                // Strip angle brackets if present (e.g. <Joy> -> Joy)
+                if (emotion.startsWith('<') && emotion.endsWith('>')) {
+                    emotion = emotion.substring(1, emotion.length - 1);
+                }
+
                 let stimulusType = 'Unknown';
                 
                 // Map emotions to soul stimulus types
@@ -39,19 +59,28 @@ export abstract class TranspilerBase {
                     stimulusType = 'Novelty';
                 }
                 
-                const intensity = node.attributes?.intensity || 'unspecified';
+                let intensity: number | string = 'unspecified';
+                if (node.attributes?.intensity !== undefined) {
+                    const val = node.attributes.intensity;
+                    if (typeof val === 'boolean') {
+                        intensity = val ? 1.0 : 0.0;
+                    } else {
+                        intensity = val;
+                    }
+                }
+                
                 // subject is Expression, but for affective relations we expect Concept generally
                 const subjectName = AST.isConcept(node.subject) ? node.subject.name : this.expressionToString(node.subject);
-                detected.push(`${subjectName} [${relation}] ${emotion} → soul.process({type: "${stimulusType}", intensity: ${intensity}})`);
-            }
-            
-            // Check for affective objects even without affective relations
-            if (AST.isConcept(node.object) && affectiveEmotions.includes(node.object.name)) {
-                detected.push(`Emotion concept: ${node.object.name}`);
+                
+                calls.push({
+                    type: stimulusType,
+                    intensity: intensity,
+                    source: `${subjectName} [${relation}] ${emotion}`
+                });
             }
         }
         
-        return detected;
+        return calls;
     }
 
     /**

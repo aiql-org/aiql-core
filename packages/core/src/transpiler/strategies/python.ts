@@ -33,6 +33,12 @@ export class PythonTranspiler extends TranspilerBase {
             } else if (AST.isRelationshipNode(node)) {
                 lines.push(this.relationshipToPython(node));
                 lines.push("");
+            } else if (AST.isConsensusNode(node)) {
+                lines.push(this.transpileConsensus(node));
+                lines.push("");
+            } else if (AST.isCoordinateNode(node)) {
+                lines.push(this.transpileCoordinate(node));
+                lines.push("");
             }
         }
         return lines.join('\n');
@@ -185,6 +191,39 @@ export class PythonTranspiler extends TranspilerBase {
         return code;
     }
 
+    private transpileConsensus(node: AST.ConsensusNode): string {
+        const lines: string[] = [];
+        lines.push(`# Consensus: ${this.expressionToPython(node.topic)}`);
+        
+        const participants = node.participants.map(p => this.expressionToPython(p)).join(', ');
+        const timeoutStr = node.timeout ? `, timeout=${node.timeout}` : '';
+        
+        lines.push(`consensus = Consensus(`);
+        lines.push(`    topic=${this.expressionToPython(node.topic)},`);
+        lines.push(`    participants=[${participants}],`);
+        lines.push(`    threshold=${node.threshold}${timeoutStr}`);
+        lines.push(`)`);
+        lines.push(`result = consensus.resolve()`);
+        
+        return lines.join('\n');
+    }
+
+    private transpileCoordinate(node: AST.CoordinateNode): string {
+        const lines: string[] = [];
+        lines.push(`# Coordinate: ${this.expressionToPython(node.goal)}`);
+        
+        const participants = node.participants.map(p => this.expressionToPython(p)).join(', ');
+        
+        lines.push(`coordination = Coordinate(`);
+        lines.push(`    goal=${this.expressionToPython(node.goal)},`);
+        lines.push(`    participants=[${participants}],`);
+        lines.push(`    strategy="${node.strategy}"`);
+        lines.push(`)`);
+        lines.push(`plan = coordination.execute()`);
+        
+        return lines.join('\n');
+    }
+
     private transpileIntent(intent: AST.Intent): string {
         const graphRep = intent.statements.map((node: AST.Statement) => {
             const attrs = node.attributes ? `, attributes=${JSON.stringify(node.attributes)}` : "";
@@ -197,14 +236,16 @@ export class PythonTranspiler extends TranspilerBase {
         const cohStr = intent.coherence !== undefined ? `, Coherence: ${intent.coherence}` : '';
         lines.push(`# AIQL Intent: ${intent.intentType} (${confStr}${cohStr})`);
         
-        // Detect affective relations and add placeholder comments
-        const affectiveInfo = this.detectAffectiveRelations(intent);
-        if (affectiveInfo.length > 0) {
-            lines.push(`# Affective Relations Detected:`);
-            affectiveInfo.forEach(info => {
-                lines.push(`#   - ${info}`);
+        // Detect affective relations and generate soul.process() calls
+        const soulCalls = this.getSoulProcessCalls(intent);
+        if (soulCalls.length > 0) {
+            lines.push(`# Affective Relations: Generating soul.process() calls`);
+            soulCalls.forEach(call => {
+                lines.push(`# Source: ${call.source}`);
+                // Ensure intensity is handled correctly (string vs number)
+                const intensityVal = typeof call.intensity === 'string' ? `"${call.intensity}"` : call.intensity;
+                lines.push(`soul.process({"type": "${call.type}", "intensity": ${intensityVal}, "source": "${call.source}"})`);
             });
-            lines.push(`# NOTE: Automatic soul.process() integration planned for v0.7.0`);
         }
         
         // Add metadata information
@@ -292,6 +333,15 @@ export class PythonTranspiler extends TranspilerBase {
 
 
     private expressionToPython(expr: AST.Expression): string {
+        if (AST.isSpatialExpression(expr)) {
+            if (expr.source === 'literal' && expr.literal) {
+                const { lat, lon, region } = expr.literal;
+                const regionStr = region ? `, region="${region}"` : "";
+                return `Location(lat=${lat}, lon=${lon}${regionStr})`;
+            } else if (expr.source === 'variable' && expr.variableName) {
+                return `Location(ref="${expr.variableName}")`;
+            }
+        }
         if (AST.isConcept(expr)) return `"${expr.name}"`;
         if (AST.isIdentifier(expr)) return expr.name;
         if (AST.isLiteral(expr)) return JSON.stringify(expr.value);
