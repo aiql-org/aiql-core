@@ -14,18 +14,14 @@ description: Verify codebase (Build, Test, Examples) and check for warnings befo
 // turbo
 6. node scripts/verify-examples.js
 
-7. Verify Website (Build & Lint)
+7. Verify Docker Build (CLI)
 // turbo
-8. cd ../aiql-org-web && npm run build
+8. docker build -f docker/cli.Dockerfile .
 
-9. Verify Docker Build (CLI)
+9. Verify Docker Build (API)
 // turbo
-10. docker build -f docker/cli.Dockerfile .
+10. docker build -f docker/api.Dockerfile .
 
-11. Verify Docker Build (API)
+11. Verify Docker Build (Playground)
 // turbo
-12. docker build -f docker/api.Dockerfile .
-
-13. Verify Docker Build (Playground)
-// turbo
-14. docker build -f docker/playground.Dockerfile .
+12. docker build -f docker/playground.Dockerfile .
