@@ -1,12 +1,27 @@
-// Lambda Functions
-// Anonymous functions for flexible, reusable calculations.
-// Syntax: lambda params: expression
+// Mathematics: Lambda Functions
+// ==============================================================================
+// This file demonstrates anonymous functions for dynamic computation.
+//
+// Key Concepts:
+// 1. Logic Agnostic: Lambdas work across Python, JS, and formal verification.
+// 2. Syntax: lambda params: expression.
+// 3. Reusability: Defining reusable calculation logic in the graph.
+// ==============================================================================
+
+@version:"2.6.0"
+
+// ------------------------------------------------------------------------------
+// Function Definitions
+// ------------------------------------------------------------------------------
 !MathFunctions {
+  // Basic Arithmetic
   <Square> = lambda x: x ^ 2
   <Cube> = lambda x: x ^ 3
+  
+  // Multi-parameter
   <DoubleSum> = lambda a, b: (a + b) * 2
-  <KineticEnergy> = lambda m, v: 0.5 * m * v ^ 2
   <AreaRectangle> = lambda w, h: w * h
+  
+  // Physics Formulas
+  <KineticEnergy> = lambda m, v: 0.5 * m * v ^ 2
 } @0.97
-
-// Lambdas transpile to Python lambda expressions

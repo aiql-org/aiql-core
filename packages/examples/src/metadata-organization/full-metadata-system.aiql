@@ -1,14 +1,29 @@
-// Full Metadata System
-// Shows all 5 metadata markers: $id (identifier), $$group (grouping),
-// ##seq (sequence ordering), ~temp (AI temperature 0-2), ~~entropy (0-1).
-// Essential for tracking, organizing, and controlling AI reasoning chains.
-$id:statement001
-$$group:research
-##seq:1
-~temp:0.7
-~~entropy:0.5
+// Metadata: Full System Capability
+// ==============================================================================
+// This file showcases the complete metadata tagging system in AIQL.
+//
+// Key Concepts:
+// 1. $id: Unique identifier for referencing this block elsewhere.
+// 2. $$group: Logical grouping for batch processing or categorization.
+// 3. ##seq: Explicit execution order or narrative sequence.
+// 4. ~temp: Controls generation creativity/randomness (0.0 - 2.0).
+// 5. ~~entropy: Measures or sets the information density/disorder (0.0 - 1.0).
+// ==============================================================================
+
+@version:"2.0.0"
+
+// ------------------------------------------------------------------------------
+// Complex Statement Block
+// ------------------------------------------------------------------------------
+$id:statement001        // Reference ID
+$$group:research        // Semantic Group
+##seq:1                 // Sequence Number
+~temp:0.7               // High creativity
+~~entropy:0.5           // Medium complexity
+
 !Assert {
   <AI> [capable_of] <CreativeReasoning> {
-    domain: "mathematics"
+    domain: "mathematics",
+    method: "intuition_simulation"
   }
 } @0.85

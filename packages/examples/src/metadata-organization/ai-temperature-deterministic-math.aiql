@@ -1,9 +1,23 @@
-// AI Temperature: Deterministic Math
-// Controls AI reasoning creativity with ~temp metadata (0.0=deterministic, 2.0=creative).
-// Low temperature (0.3) ensures precise, logical reasoning for math problems.
-~temp:0.3
+// Metadata: AI Temperature Control
+// ==============================================================================
+// This file demonstrates controlling AI creativity via the ~temp marker.
+//
+// Key Concepts:
+// 1. Temperature (~temp): Scale 0.0 (Deterministic) to 2.0 (Creative/Random).
+// 2. Determinism: Low temp (0.0-0.3) forces precise, repeatable logic.
+// 3. Creativity: High temp (0.8+) encourages novel connections and hypotheses.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// Deterministic Query
+// Goal: Solve a math problem with zero hallucination/creativity.
+// ------------------------------------------------------------------------------
+~temp:0.0
 !Query {
-  <MathProblem> [requires] <PreciseReasoning> {
-    type: "deterministic"
+  <MathProblem> [requires] <PreciseAnswer> {
+    calculation: "16384 * 256",
+    constraints: "exact"
   }
-} @0.95
+} @1.0

@@ -1,8 +1,29 @@
-// Statement Grouping: Physics Laws
-// Groups logically related statements using $$group and ##seq markers.
-// Essential for organizing knowledge bases, proofs, and multi-step reasoning.
+// Metadata: Statement Grouping
+// ==============================================================================
+// This file demonstrates logical grouping of statements.
+//
+// Key Concepts:
+// 1. $$group: Agnostic tag for categorizing statements.
+// 2. Usage: Filter by group, export specific groups, or apply group-level rules.
+// 3. Organization: Keeps large knowledge bases structured.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// Physics Laws Group
+// ------------------------------------------------------------------------------
 $$group:physics_laws
 ##seq:1
 !Assert {
-  <Energy> [is_conserved] <ClosedSystem>
+  <Energy> [is_conserved] <ClosedSystem> {
+    law: "First Law of Thermodynamics"
+  }
+} @1.0
+
+##seq:2
+!Assert {
+  <Entropy> [increases_in] <ClosedSystem> {
+    law: "Second Law of Thermodynamics"
+  }
 } @1.0

@@ -1,0 +1,92 @@
+// Feature Showcase: Question Statements & Queries
+// ==============================================================================
+// This file demonstrates the Query capabilities of AIQL.
+//
+// Key Concepts:
+// 1. !Query Intent: The primary mechanism for asking questions.
+// 2. <?Variables>: Placeholders (prefixed with ?) representing unknown values to find.
+// 3. Context Parameters: Scoping queries to specific times, domains, or modes.
+// 4. Meta-Cognition: Querying the AI's own knowledge state.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// 1. Basic Fact Retrieval
+// Goal: Find the object of a specific relation.
+// Natural Language: "What is the capital of France?"
+// ------------------------------------------------------------------------------
+!Query {
+  // <?City> is the unbound variable the inference engine will solve for.
+  <France> [has_capital] <?City>
+}
+
+// ------------------------------------------------------------------------------
+// 2. Reverse Query
+// Goal: Find the subject when the object is known.
+// Natural Language: "Which country has Paris as its capital?"
+// ------------------------------------------------------------------------------
+!Query {
+  // The inference engine searches for any Concept satisfying this pattern.
+  <?Country> [has_capital] <Paris>
+}
+
+// ------------------------------------------------------------------------------
+// 3. Multi-Variable Complex Query
+// Goal: Retrieve multiple related pieces of information simultaneously.
+// Natural Language: "Who invented the telephone, and in what year?"
+// ------------------------------------------------------------------------------
+!Query {
+  // We can bind multiple variables in a single graph pattern.
+  // Here, we find the Inventor of the Telephone.
+  // Note: Attributes are currently used for value constraints (filtering).
+  <?Inventor> [invented] <Telephone> {
+    year: 1876
+  }
+}
+
+// ------------------------------------------------------------------------------
+// 4. Contextual Query (Temporal & Spatial)
+// Goal: Limit the search scope to a specific context.
+// Natural Language: "What is the projected population of Mars in the future?"
+// ------------------------------------------------------------------------------
+!Query(time:future, scope:system_solar, mode:prediction) {
+  // The 'time:future' parameter tells the engine to look for theoretical 
+  // or predictive models rather than current facts.
+  <Mars> [has_population] <?Count>
+}
+
+// ------------------------------------------------------------------------------
+// 5. Boolean Existence Check
+// Goal: Verify if a specific statement is true (Yes/No).
+// Natural Language: "Does the Electron have a Positive charge?"
+// ------------------------------------------------------------------------------
+!Query {
+  // If this graph pattern exists in the Knowledge Base, the result is TRUE.
+  // If it contradicts known facts, it is FALSE.
+  // If unknown, it returns UNKNOWN (Open World Assumption).
+  <Electron> [has_charge] <Positive>
+}
+
+// ------------------------------------------------------------------------------
+// 6. Meta-Cognitive Introspection
+// Goal: Ask the AI about its own knowledge gaps or capabilities.
+// Natural Language: "Do I know anything about Quantum Mechanics?"
+// ------------------------------------------------------------------------------
+!Query {
+  // <Self> represents the agent's own cognitive state.
+  // [has_knowledge_about] is a meta-relation defined in the ontology.
+  <Self> [has_knowledge_about] <QuantumMechanics>
+}
+
+// ------------------------------------------------------------------------------
+// 7. Logic-Based Query with Constraints
+// Goal: Find items that satisfy logical conditions.
+// Natural Language: "Find a planet that is habitable AND has water."
+// ------------------------------------------------------------------------------
+!Query {
+  // Multiple patterns in a Query block imply an AND relationship.
+  // All patterns must be satisfied for a match.
+  <?Planet> [is] <Habitable>
+  <?Planet> [contains] <Water>
+}

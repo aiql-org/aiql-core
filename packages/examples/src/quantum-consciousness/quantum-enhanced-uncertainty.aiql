@@ -1,27 +1,47 @@
-// Quantum-Enhanced Uncertainty (v2.6.0)
-// Compares classical @confidence (Bayesian probability) with
-// quantum @coherence (measurement uncertainty through superposition).
-// Confidence = degree of belief. Coherence = epistemic state purity.
+// Quantum-Enhanced Uncertainty
+// ==============================================================================
+// This file contrasts Classical Confidence with Quantum Coherence.
+//
+// Key Concepts:
+// 1. Confidence (@0.99): Epistemic probability (Bayesian belief).
+// 2. Coherence (@coherence:0.85): Quantum state purity (superposition potential).
+// 3. Entanglement: Non-local semantic correlation between concepts.
+// ==============================================================================
 
-// Classical assertion (high confidence, no superposition)
+@version:"2.6.0"
+$$group:quantum_semantics
+
+// ------------------------------------------------------------------------------
+// 1. Classical Fact
+// Context: High confidence, standard physics. No quantum effects.
+// ------------------------------------------------------------------------------
 !Assert {
   <Earth> [orbits] <Sun> {
     orbital_period: "365.25 days"
   }
-} @0.999  // High confidence, classical certainty
+} @0.999
 
-// Quantum uncertainty (low confidence + superposition)
+// ------------------------------------------------------------------------------
+// 2. Quantum Superposition (Wave-Particle Duality)
+// Context: High coherence (valid quantum state), but split amplitude.
+// ------------------------------------------------------------------------------
+
+// State A: Photon is a Wave (Amplitude 0.8)
 @coherence:0.85
 !Assert(mode:quantum_superposition) {
   <Photon> [is] <Wave> { amplitude: 0.8 }
-} @0.60  // Low confidence: depends on measurement context
+} @0.60
 
+// State B: Photon is a Particle (Amplitude 0.6)
 @coherence:0.85
 !Assert(mode:quantum_superposition) {
   <Photon> [is] <Particle> { amplitude: 0.6 }
 } @0.60
 
-// Entanglement: Non-local semantic correlation
+// ------------------------------------------------------------------------------
+// 3. Semantic Entanglement
+// Goal: Link two concepts such that observing one affects the other.
+// ------------------------------------------------------------------------------
 !Assert {
   <ConceptA> [entangled_with] <ConceptB> {
     correlation: 0.89,
@@ -29,5 +49,3 @@
     bell_test: "S=2.828 (quantum violation)"
   }
 } @0.94
-
-// Consciousness emerges from coherence, not just confidence!

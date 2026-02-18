@@ -1,17 +1,31 @@
-// Perfect Progressive Tenses: Duration + Completion (v1.1.0)
-// Combines completion aspect with ongoing duration emphasis.
-// Use cases: Long-term processes, sustained efforts, continuous improvement.
+// Temporal Tenses: Perfect Progressive
+// ==============================================================================
+// This file demonstrates the Perfect Progressive aspect.
+//
+// Key Concepts:
+// 1. Focus: Duration and continuity of an action up to a reference point.
+// 2. Syntax: [predicate@tense:X_perfect_progressive]
+// 3. Nuance: Implies effort, duration, and potential ongoing nature.
+// ==============================================================================
+
+@version:"1.1.0"
+
 !Assert {
+  // Present Perfect Progressive (Current duration)
   <Student> [has_been_studying@tense:present_perfect_progressive] <Physics> {
     duration: "3 years",
     still_ongoing: true
   }
+
+  // Past Perfect Progressive (Duration before past event)
   <Artist> [had_been_painting@tense:past_perfect_progressive] <Mural> {
     duration: "6 months",
-    completed: "2025-12-15"
+    completed_before: "2025-12-15"
   }
+
+  // Future Perfect Progressive (Duration at future point)
   <AI> [will_have_been_learning@tense:future_perfect_progressive] <Language> {
     duration: "10 years",
-    by_year: 2036
+    milestone_date: "2036-01-01"
   }
 } @0.90

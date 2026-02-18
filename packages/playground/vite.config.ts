@@ -1,5 +1,4 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import path from 'path';
@@ -12,6 +11,9 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
   ],
+  define: {
+    'process.env': JSON.stringify({ NODE_ENV: 'production' }),
+  },
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),

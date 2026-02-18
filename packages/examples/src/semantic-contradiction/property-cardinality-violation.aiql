@@ -1,19 +1,43 @@
-// Property Cardinality Violation (v2.5.0)
-// OntologyReasoner enforces cardinality constraints on properties.
-// Objects can only have ONE value for certain properties (temperature, age, shape).
-// Multiple different values for same property = semantic contradiction.
+// Semantic Contradiction: Property Cardinality Violation
+// ==============================================================================
+// This file demonstrates cardinality constraints (Functional Properties).
+//
+// Key Concepts:
+// 1. Functional Property: A property that can only have ONE value (e.g., birthDate).
+// 2. Cardinality Violation: Asserting two different values for a functional property.
+// 3. Severity: Often indicates data corruption or conflicting sensors.
+// ==============================================================================
+
+@version:"2.5.0"
+$$group:semantic_integrity
+
+// ------------------------------------------------------------------------------
+// 1. Assertion A
+// ------------------------------------------------------------------------------
 !Assert {
   <Object> [has_temperature] <100C> {
-    measurement_time: "10:00am"
+    measurement_time: "10:00am",
+    sensor_id: "A"
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// 2. Assertion B (Conflicting)
+// Context: Same object, same time, but different value.
+// ------------------------------------------------------------------------------
 !Assert {
   <Object> [has_temperature] <50C> {
-    measurement_time: "10:00am"
+    measurement_time: "10:00am",
+    sensor_id: "B"
   }
 } @0.90
 
-// Conflict detected: cardinality:'one' constraint violated
-// Same object cannot have two different temperatures at same time
-// Severity: major (physical impossibility)
+// ------------------------------------------------------------------------------
+// 3. Reasoning
+// ------------------------------------------------------------------------------
+// The system knows that [has_temperature] is a functional property (cardinality: 1).
+// It detects that <100C> != <50C> at the same temporal point.
+//
+// Result:
+// A generic contradiction graph is generated, flagging Sensor A and Sensor B 
+// as being in conflict.

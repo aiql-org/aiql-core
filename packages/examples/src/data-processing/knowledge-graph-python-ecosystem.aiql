@@ -1,19 +1,39 @@
 // Knowledge Graph: Python Ecosystem
-// Multi-relation knowledge graph: is_a, created_by, has_version, used_for.
-// Demonstrates rich ontology construction for programming language ecosystems.
+// ==============================================================================
+// This file demonstrates constructing a rich domain ontology.
+//
+// Key Concepts:
+// 1. Multi-Relation Graph: Using various predicates (is_a, created_by, used_for).
+// 2. Global Scope: Facts that are universally true in this domain.
+// 3. Provenance: @origin tracking where this knowledge came from.
+// ==============================================================================
+
 @version:"1.0.0"
 @origin:"knowledge-base-v2"
 
+// ------------------------------------------------------------------------------
+// Core Definitions
+// ------------------------------------------------------------------------------
 $id:kb_001
 !Assert(scope:global) {
+  // Classification
   <Python> [is_a] <ProgrammingLanguage>
+  
+  // Attribution
   <Python> [created_by] <GuidoVanRossum>
+  
+  // Metadata
   <Python> [has_version] <Python3_12> { release: "2023-10" }
+  
+  // Applications
   <Python> [used_for] <WebDevelopment>
   <Python> [used_for] <MachineLearning>
   <Python> [used_for] <DataScience>
 } @0.99
 
+// ------------------------------------------------------------------------------
+// Framework Relationships
+// ------------------------------------------------------------------------------
 $id:kb_002
 !Assert {
   <Django> [is_framework_for] <Python>

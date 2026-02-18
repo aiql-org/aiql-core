@@ -1,7 +1,19 @@
-// v2.1.0 Relationship: Scientific Discovery Relationships
-// Logical relationships express support, contradiction, equivalence.
-// Relation types: supports, contradicts, equivalent_to
-// Use cases: Hypothesis testing, theory validation, knowledge integration.
+// Relationship: Scientific Discovery
+// ==============================================================================
+// This file demonstrates logical relationships in scientific discourse.
+//
+// Key Concepts:
+// 1. Support: Evidence strengthening a hypothesis (<Observation> [supports] <Theory>).
+// 2. Contradiction: Theories conflicting in specific contexts.
+// 3. Prediction: Theories implying the existence of phenomena before observation.
+// ==============================================================================
+
+@version:"2.1.0"
+
+// ------------------------------------------------------------------------------
+// 1. Theory: General Relativity
+// Prediction: Gravitational Waves exist.
+// ------------------------------------------------------------------------------
 $id:theory_relativity
 !Assert {
   <GeneralRelativity> [predicts] <GravitationalWaves> {
@@ -10,6 +22,10 @@ $id:theory_relativity
   }
 } @0.99
 
+// ------------------------------------------------------------------------------
+// 2. Observation: LIGO
+// Fact: Gravitational Waves detected.
+// ------------------------------------------------------------------------------
 $id:observation_ligo
 !Assert {
   <LIGO> [detected] <GravitationalWaves> {
@@ -18,17 +34,25 @@ $id:observation_ligo
   }
 } @0.99
 
-// Observation SUPPORTS theory
+// ------------------------------------------------------------------------------
+// Logical Link: Observation Confirms Theory
+// ------------------------------------------------------------------------------
 !Relationship(type:logical, source:$id:observation_ligo, target:$id:theory_relativity) {
-  <Observation> [supports] <Theory>
+  <Observation> [supports] <Theory> {
+    significance: "Nobel_Prize"
+  }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// 3. Contradiction: Newtonian Gravity
+// Context: Strong gravitational fields (e.g., near Black Holes).
+// ------------------------------------------------------------------------------
 $id:newtonian_gravity
 !Assert {
   <NewtonianGravity> [describes] <WeakFields>
 } @0.98
 
-// Einstein's theory CONTRADICTS Newton's at strong fields
+// Einstein's theory CONTRADICTS Newton's in extreme contexts
 !Relationship(type:logical, source:$id:theory_relativity, target:$id:newtonian_gravity) {
   <Relativity> [contradicts] <NewtonianGravity> {
     context: "strong_gravitational_fields"

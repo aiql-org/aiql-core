@@ -1,29 +1,52 @@
-// Uncertainty Acknowledgment (v2.2.0)
-// Agent identifies statements with low confidence.
-// Meta-cognitive awareness of epistemic limitations.
-// Honest about what it doesn't know well.
+// Meta-Cognition: Uncertainty Acknowledgment
+// ==============================================================================
+// This file demonstrates the agent's ability to recognize and express low confidence.
+//
+// Key Concepts:
+// 1. Low Confidence (@0.40): Explicitly marking statements as uncertain.
+// 2. Uncertainty Query: Asking the agent to identify what it is unsure about.
+// 3. Emotional Expression (!Feel): Affective response to lack of knowledge (Confusion).
+// ==============================================================================
+
+@version:"2.2.0"
+
+// ------------------------------------------------------------------------------
+// 1. Uncertain Knowledge
+// Goal: Assert facts but with explicitly low confidence scores.
+// ------------------------------------------------------------------------------
+
+// "I think Dark Matter is 27% of the universe, but I'm only 40% sure."
 !Assert {
   <DarkMatter> [constitutes] <Universe> {
     percentage: 0.27
   }
-} @0.40  // Low confidence!
+} @0.40  // Low confidence
 
+// "I'm 55% sure Quantum Supremacy will happen by 2030."
 !Assert {
   <QuantumComputing> [will_achieve] <Supremacy> {
     timeline: "2030"
   }
-} @0.55  // Medium confidence
+} @0.55  // Medium-Low confidence
 
-// Agent recognizes uncertainty
+// ------------------------------------------------------------------------------
+// 2. Identifying Uncertainty
+// Goal: The agent introspects to find topics where its confidence is below a threshold.
+// Natural Language: "What am I uncertain about?"
+// ------------------------------------------------------------------------------
 !Query {
   <Self> [uncertain_about] <?Topic>
 }
-// Returns statements with confidence < 0.6:
-// <DarkMatter>, <QuantumComputing>
+// Expected Result: Returns <DarkMatter>, <QuantumComputing> (confidence < 0.6)
 
-// Can express confusion (reuse existing semantics!)
+// ------------------------------------------------------------------------------
+// 3. Expressing Confusion
+// Goal: Use affective syntax to communicate the state of uncertainty.
+// Natural Language: "I feel confused about Dark Matter because I have insufficient data."
+// ------------------------------------------------------------------------------
 !Feel {
   <Self> [confused_about] <DarkMatter> {
-    reason: "insufficient_data"
+    reason: "insufficient_data",
+    state: "seeking_clarification"
   }
 } @0.70

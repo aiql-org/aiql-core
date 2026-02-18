@@ -1,9 +1,19 @@
 // Semantic Taxonomy: Animal Kingdom
-// Hierarchical is_a ontology: Animal → Mammal → Primate → Human/Chimpanzee.
-// Supports property inheritance queries: Human inherits traits from all ancestors.
+// ==============================================================================
+// This file demonstrates hierarchical knowledge definition.
+//
+// Key Concepts:
+// 1. [is_a] Relation: The fundamental operator for taxonomy.
+// 2. Inheritance: Properties defined at higher levels (Mammal) apply to lower (Human).
+// 3. Sequential Definition (##seq): Building the tree from root to leaf.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:ontology_definition
 
+// ------------------------------------------------------------------------------
+// Level 1: Mammal -> Animal
+// ------------------------------------------------------------------------------
 ##seq:1
 !Assert {
   <Mammal> [is_a] <Animal> {
@@ -12,6 +22,9 @@ $$group:ontology_definition
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Level 2: Primate -> Mammal
+// ------------------------------------------------------------------------------
 ##seq:2
 !Assert {
   <Primate> [is_a] <Mammal> {
@@ -20,6 +33,9 @@ $$group:ontology_definition
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Level 3: Human -> Primate
+// ------------------------------------------------------------------------------
 ##seq:3
 !Assert {
   <Human> [is_a] <Primate> {
@@ -29,6 +45,9 @@ $$group:ontology_definition
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Level 3: Chimpanzee -> Primate
+// ------------------------------------------------------------------------------
 ##seq:4
 !Assert {
   <Chimpanzee> [is_a] <Primate> {
@@ -37,7 +56,10 @@ $$group:ontology_definition
   }
 } @1.0
 
-// Property inheritance query
+// ------------------------------------------------------------------------------
+// Logic Check
+// Goal: Verify that Humans inherit properties from Animals (via Primate -> Mammal).
+// ------------------------------------------------------------------------------
 !Query(mode:inheritance) {
   <Human> [inherits_properties_from] <Animal>
 }

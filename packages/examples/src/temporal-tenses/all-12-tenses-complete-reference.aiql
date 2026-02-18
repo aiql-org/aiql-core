@@ -1,23 +1,34 @@
-// All 12 Temporal Tenses - Complete Reference Card (v1.1.0)
-// Demonstrates all tense values supported by AIQL for quick reference.
+// Temporal Tenses: Complete Reference Card
+// ==============================================================================
+// This file demonstrates the 12 temporal tenses supported by AIQL relationships.
+// Relation Format: [predicate@tense:value]
+//
+// Full List:
+// - Simple: past, present, future
+// - Perfect: past_perfect, present_perfect, future_perfect
+// - Progressive: past_progressive, present_progressive, future_progressive
+// - Perfect Progressive: past_perfect_progressive, present_perfect_progressive, future_perfect_progressive
+// ==============================================================================
+
 @version:"1.1.0"
+
 !Assert {
-  // Simple tenses (3)
+  // 1. Simple Tenses
   <Napoleon> [conquered@tense:past] <Europe>
   <AI> [transforms@tense:present] <World>
   <AGI> [will_achieve@tense:future] <Goals>
   
-  // Perfect aspect (3)
+  // 2. Perfect Aspect (Completed actions relative to time)
   <Team> [has_completed@tense:present_perfect] <Sprint>
   <Company> [had_launched@tense:past_perfect] <Product>
   <System> [will_have_processed@tense:future_perfect] <Data>
   
-  // Progressive aspect (3)
+  // 3. Progressive Aspect (Ongoing actions)
   <Athlete> [is_running@tense:present_progressive] <Race>
   <Dev> [was_debugging@tense:past_progressive] <Code>
   <Bot> [will_be_monitoring@tense:future_progressive] <Metrics>
   
-  // Perfect progressive (3)
+  // 4. Perfect Progressive Aspect (Ongoing duration up to a point)
   <Student> [has_been_studying@tense:present_perfect_progressive] <Math>
   <Artist> [had_been_creating@tense:past_perfect_progressive] <Art>
   <AI> [will_have_been_optimizing@tense:future_perfect_progressive] <Models>

@@ -1,10 +1,24 @@
 // Multi-Context: Mars Colonization
-// Demonstrates context parameters (time, scope) for temporal and spatial reasoning.
-// v1.0 parses contexts; v0.5+ will add full temporal semantics (dates, durations).
-// Future: time:+3d, time:"2026-01-01", time:[start,end]
+// ==============================================================================
+// This file demonstrates using multiple context parameters simultaneously.
+//
+// Key Concepts:
+// 1. Temporal Context (time:future): The statement applies to a future timeline.
+// 2. Spatial/Scope Context (scope:global): Applies to the general consensus reality.
+// 3. Probabilistic Assertion: Combining future context with confidence < 1.0.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// Future Prediction
+// Goal: predict the colonization of Mars.
+// Natural Language: "In the future, Humans will colonize Mars (85% certainty)."
+// ------------------------------------------------------------------------------
 !Assert(time:future, scope:global) {
   <Mars> [colonized_by] <Humans> {
     estimated_date: "2050-2100",
-    probability: 0.65
+    probability: 0.65,
+    milestone: "first_permanent_habitat"
   }
 } @0.85

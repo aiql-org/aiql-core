@@ -1,9 +1,21 @@
 // Analogical Reasoning: King-Queen Pattern
-// Encodes analogies (A:B :: C:D) with structural and functional similarity mappings.
-// Classic example: King:Queen :: Man:Woman (gender transformation pattern).
+// ==============================================================================
+// This file demonstrates how AIQL encodes analogies using structural mappings.
+//
+// Key Concepts:
+// 1. Analogical Mapping: Relating a source domain to a target domain (A:B :: C:D).
+// 2. Vector Offsets: Representing the transformation rules (e.g., gender swap).
+// 3. Cross-Domain Mapping: Applying patterns from one field (Physics) to another (Biology).
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:analogy_reasoning
 
+// ------------------------------------------------------------------------------
+// 1. Base Strategy (Source Domain)
+// Goal: Define the source relationship (King -> Queen).
+// Natural Language: "A King relates to a Queen via a gender transformation in the monarchy domain."
+// ------------------------------------------------------------------------------
 $id:analogy_base
 !Assert {
   <King> [relates_to] <Queen> {
@@ -13,6 +25,11 @@ $id:analogy_base
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// 2. Target Strategy (Target Domain)
+// Goal: Apply the base strategy to finding the missing term.
+// Natural Language: "Find the concept that relates to 'Man' like 'Queen' relates to 'King'."
+// ------------------------------------------------------------------------------
 $id:analogy_target
 !Query(mode:analogical) {
   <Man> [relates_to] <Woman> {
@@ -22,7 +39,11 @@ $id:analogy_target
   }
 } @0.93
 
-// Cross-domain mapping
+// ------------------------------------------------------------------------------
+// 3. Cross-Domain Analogy (Physics -> Astronomy)
+// Goal: Map atomic structure to solar system structure.
+// Natural Language: "An Atom is analogous to a Solar System (Nucleus~Sun, Electrons~Planets)."
+// ------------------------------------------------------------------------------
 $id:structure_analogy
 !Assert {
   <Atom> [analogous_to] <SolarSystem> {
@@ -33,6 +54,11 @@ $id:structure_analogy
   }
 } @0.75
 
+// ------------------------------------------------------------------------------
+// 4. Functional Analogy (Biology -> Computing)
+// Goal: Map brain functions to computer functions despite physical differences.
+// Natural Language: "A Brain is analogous to a Computer (Neurons~Transistors)."
+// ------------------------------------------------------------------------------
 $id:function_analogy
 !Assert {
   <Brain> [analogous_to] <Computer> {

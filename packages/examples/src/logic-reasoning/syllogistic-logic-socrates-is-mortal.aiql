@@ -1,23 +1,45 @@
 // Syllogistic Logic: Socrates is Mortal
-// Classic syllogism using ##seq markers for premise ordering (1,2 → 3).
-// Low temperature (0.1) ensures deterministic logical deduction.
+// ==============================================================================
+// This file demonstrates a classic Aristotelian syllogism.
+//
+// Key Concepts:
+// 1. Categorical Statements: "All Men are Mortal".
+// 2. Sequential Reasoning: Using ##seq markers to order the logical flow.
+// 3. Deductive Inference: Deriving specific truths from general laws.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:logical_inference
 
+// ------------------------------------------------------------------------------
+// Premise 1 (Minor Premise)
+// Logic: "Socrates is a Man."
+// ------------------------------------------------------------------------------
 ##seq:1
 !Assert {
   <Socrates> [is_a] <Man>
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Premise 2 (Major Premise)
+// Logic: "All Men are Mortal."
+// ------------------------------------------------------------------------------
 ##seq:2
 !Assert {
   <AllMen> [are] <Mortal>
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Conclusion (Inference)
+// Goal: Verify if Socrates is Mortal based on the premises.
+// ------------------------------------------------------------------------------
 ##seq:3
-~temp:0.1
+~temp:0.1 // Low temperature for strict logic
 !Query {
   <Socrates> [is] <Mortal>
 } @0.99
 
-// Sequential reasoning: If (1) and (2) then (3)
+// Logic Flow:
+// 1. Socrates -> is_a -> Man
+// 2. Man (AllMen) -> are -> Mortal
+// 3. Therefore, Socrates -> is -> Mortal

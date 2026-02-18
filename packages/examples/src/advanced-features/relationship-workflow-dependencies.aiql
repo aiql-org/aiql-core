@@ -1,6 +1,18 @@
-// v2.1.0 Relationship: Workflow Dependencies
-// Causal relationship with 'depends_on' expresses required prerequisites.
-// Use cases: Project management, task scheduling, dependency tracking.
+// Relationship: Workflow Dependencies
+// ==============================================================================
+// This file demonstrates modeling project dependencies.
+//
+// Key Concepts:
+// 1. Dependency Graph: Tasks linked by [depends_on] relations.
+// 2. Causal Type: A task *causes* the readiness of the next task.
+// 3. Scheduling: AI agents can use this graph to sequence actions.
+// ==============================================================================
+
+@version:"2.1.0"
+
+// ------------------------------------------------------------------------------
+// Phase 1: Design
+// ------------------------------------------------------------------------------
 $id:design_phase
 !Task {
   <Designer> [creates] <UIPrototype> {
@@ -9,6 +21,9 @@ $id:design_phase
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// Phase 2: Implementation
+// ------------------------------------------------------------------------------
 $id:implementation
 !Task {
   <Developer> [implements] <Frontend> {
@@ -16,17 +31,20 @@ $id:implementation
   }
 } @0.90
 
-// Implementation DEPENDS_ON completed design
+// Dependency: Code starts after Design
 !Relationship(type:causal, source:$id:implementation, target:$id:design_phase) {
   <Implementation> [depends_on] <DesignPhase>
 } @0.98
 
+// ------------------------------------------------------------------------------
+// Phase 3: Testing
+// ------------------------------------------------------------------------------
 $id:testing
 !Task {
   <Tester> [validates] <Features>
 } @0.92
 
-// Testing DEPENDS_ON implementation
+// Dependency: Testing starts after Code
 !Relationship(type:causal, source:$id:testing, target:$id:implementation) {
   <Testing> [depends_on] <Implementation>
 } @0.99

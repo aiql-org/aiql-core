@@ -1,14 +1,29 @@
-// Progressive Tenses: Ongoing Actions (v1.1.0)
-// Present, past, and future progressive tenses describe actions in progress.
-// Use cases: Real-time monitoring, continuous processes, status tracking.
+// Temporal Tenses: Progressive Aspect
+// ==============================================================================
+// This file demonstrates the Progressive aspect (Ongoing).
+//
+// Key Concepts:
+// 1. Focus: Action is in progress / continuous / temporary.
+// 2. Syntax: [predicate@tense:X_progressive]
+// 3. Nuance: Frame-by-frame view of an event.
+// ==============================================================================
+
+@version:"1.1.0"
+
 !Assert {
+  // Present Progressive (Happening right now)
   <Athlete> [is_running@tense:present_progressive] <Marathon> {
-    distance_remaining: "10km"
+    current_location: "Mile 20"
   }
+
+  // Past Progressive (Was happening when interrupted)
   <Developer> [was_coding@tense:past_progressive] <Feature> {
     interrupted_by: "meeting"
   }
+
+  // Future Progressive (Will be happening at that time)
   <Robot> [will_be_working@tense:future_progressive] <Factory> {
-    shift: "night"
+    shift: "night",
+    task: "assembly"
   }
 } @0.92

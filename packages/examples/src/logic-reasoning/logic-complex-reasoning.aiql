@@ -1,26 +1,40 @@
-// v2.0.0 Complex Logical Reasoning
-// Combines operators, quantifiers, and inference for sophisticated reasoning.
-// Showcases AI's ability to perform multi-step logical deductions.
+// Complex Logical Reasoning
+// ==============================================================================
+// This file demonstrates sophisticated logical patterns including disjunctions,
+// negations, and syllogisms.
+//
+// Key Concepts:
+// 1. Disjunctive Syllogism: (A OR B) AND (NOT A) -> B.
+// 2. Hypothetical Syllogism: (A -> B) AND (B -> C) -> (A -> C).
+// 3. Universal Instantiation: Applying general rules (forall) to specific instances.
+// ==============================================================================
+
 @version:"2.0.0"
 @origin:"textbook:formal_logic"
 $$group:advanced_reasoning
 ~temp:0.2
 
-// Disjunctive Syllogism: (A OR B) AND NOT-A |- B
-// If "coffee or tea" and "not coffee", then "tea"
+// ------------------------------------------------------------------------------
+// 1. Disjunctive Syllogism
+// Logic: "Either coffee or tea is available. Coffee is NOT available. Therefore, tea."
+// ------------------------------------------------------------------------------
 !Assert {
   <Meeting> [offers] <Coffee>
 } or !Assert {
   <Meeting> [offers] <Tea>
 }
 
+// Fact: No coffee.
 not !Assert {
   <Meeting> [offers] <Coffee>
 }
-// Inference: Meeting offers tea (can be derived)
+// Inference Result: <Meeting> [offers] <Tea> is TRUE.
 
-// Hypothetical Syllogism: (A -> B) AND (B -> C) |- (A -> C)
-// Chain of implications
+
+// ------------------------------------------------------------------------------
+// 2. Hypothetical Syllogism (Chain of Thought)
+// Logic: Study -> Knowledge -> Problem Solving -> Innovation.
+// ------------------------------------------------------------------------------
 !Assert {
   <Study> [leads_to] <Knowledge>
 } implies !Assert {
@@ -32,15 +46,22 @@ not !Assert {
 } implies !Assert {
   <Problem-solving> [creates] <Innovation>
 }
-// Inference: Study -> Innovation (transitive chain)
+// Inference Result: <Study> [transitively_leads_to] <Innovation> is derived.
 
-// Universal instantiation with implications
+
+// ------------------------------------------------------------------------------
+// 3. Universal Instantiation
+// Logic: "All AI systems require training data. GPT-4 is an AI system. Therefore..."
+// ------------------------------------------------------------------------------
 forall sys: !Assert {
   <AI_System> [requires] <Training_Data>
 } implies !Assert {
   <AI_System> [can_learn] <Patterns>
 } @0.95
 
+// Fact: GPT-4 is an instance of AI_System
 !Assert {
   <GPT4> [is_an] <AI_System>
 } @0.9
+
+// Inference Result: <GPT4> [can_learn] <Patterns>

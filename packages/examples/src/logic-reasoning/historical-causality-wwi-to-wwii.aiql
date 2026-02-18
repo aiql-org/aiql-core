@@ -1,9 +1,21 @@
 // Historical Causality: WWI to WWII
-// Complex temporal event sequence (1914→1918→1919→1939) with long-term causality.
-// Demonstrates time:past context, historical reasoning, and multi-decade causal chains.
+// ==============================================================================
+// This file demonstrates temporal reasoning and long-term historical causality.
+//
+// Key Concepts:
+// 1. Sequence Markers (##seq): Ordering events explicitly.
+// 2. Temporal Context (time:past): Asserting facts about historical states.
+// 3. Long-Term Causality: Linking events separated by decades.
+// 4. Multi-Factor Causality: Events triggered by complex conditions.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:event_sequence
 
+// ------------------------------------------------------------------------------
+// 1. The Spark (1914)
+// Natural Language: "Archduke Franz Ferdinand was assassinated in Sarajevo on June 28, 1914."
+// ------------------------------------------------------------------------------
 ##seq:1
 $id:event_spark
 !Assert(time:past) {
@@ -12,8 +24,12 @@ $id:event_spark
     context: "Balkan_tensions",
     date: "1914-06-28"
   }
-} @1.0
+} @1.0 // Historical fact
 
+// ------------------------------------------------------------------------------
+// 2. The Escalation (July 1914)
+// Natural Language: "Austria-Hungary declared war on Serbia on July 28, 1914."
+// ------------------------------------------------------------------------------
 ##seq:2
 $id:event_escalation
 !Assert(time:past) {
@@ -24,6 +40,10 @@ $id:event_escalation
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// 3. The Cascade (August 1914)
+// Natural Language: "The alliance system triggered World War I involving 32 nations."
+// ------------------------------------------------------------------------------
 ##seq:3
 $id:event_cascade
 !Assert(time:past) {
@@ -35,6 +55,10 @@ $id:event_cascade
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// 4. The Consequence (1918)
+// Natural Language: "WWI resulted in the Treaty of Versailles in 1918."
+// ------------------------------------------------------------------------------
 ##seq:4
 $id:event_consequence
 !Assert(time:past) {
@@ -45,17 +69,25 @@ $id:event_consequence
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// 5. Long-Term Causality (1939)
+// Natural Language: "The Treaty of Versailles contributed to the cause of WWII 21 years later."
+// ------------------------------------------------------------------------------
 ##seq:5
 $id:event_longterm
 !Assert(time:past) {
   <TreatyOfVersailles> [contributes_to] <WorldWar2> {
-    causal_path: "economic_hardship → nationalism → WW2",
+    causal_path: "economic_hardship -> nationalism -> WW2",
     time_lag: "21_years",
     historians_consensus: "0.85"
   }
 } @0.85
 
-// Query causal chain
+// ------------------------------------------------------------------------------
+// 6. Causal Query
+// Goal: Verify the causal chain from 1914 to 1939.
+// Natural Language: "Did the Assassination of 1914 eventually lead to WWII?"
+// ------------------------------------------------------------------------------
 !Query(mode:temporal_reasoning) {
   <Assassination1914> [eventually_leads_to] <WorldWar2>
 }

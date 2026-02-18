@@ -1,21 +1,41 @@
-// Semantic Exploration Triggering (v2.2.0)
-// Curiosity emerges from knowledge gaps + novelty.
-// Agent autonomously generates exploration queries.
-// Demonstrates organic knowledge graph evolution.
+// Meta-Cognition: Semantic Exploration Triggering
+// ==============================================================================
+// This file demonstrates how knowledge gaps and novelty trigger exploration.
+//
+// Key Concepts:
+// 1. Organic Evolution: The Knowledge Graph grows autonomously.
+// 2. Exploration Query: A query generated *by the agent* to learn.
+// 3. Curiosity-Driven: The 'why' behind the query is internal drive (novelty).
+// ==============================================================================
+
+@version:"2.2.0"
+
+// ------------------------------------------------------------------------------
+// 1. Initial State
+// Goal: Introduce a new concept (AGI) with minimal definition.
+// ------------------------------------------------------------------------------
 !Assert {
   <AI> [is_subfield_of] <ComputerScience>
   <AGI> [related_to] <AI>
 } @0.90
 
-// AGI mentioned but low connectivity (only 1 relation)
-// Semantic weight high → exploration triggered
+// ------------------------------------------------------------------------------
+// 2. Internal State (Implicit)
+// Analysis: <AGI> is a "novel" node because it has low connectivity (1 edge).
+// Affective State: High novelty -> High curiosity.
+// ------------------------------------------------------------------------------
+// (The Soul Engine processes this in the background)
 
-// Integration with soul.ts affective engine:
-// novelty > 70 → curiosity increases
-// Generates exploration query automatically:
+// ------------------------------------------------------------------------------
+// 3. Exploration Query
+// Goal: The agent autonomously generates this query to learn more about AGI.
+// Natural Language: "I'm curious about AGI. How does it relate to other things? What are its properties?"
+// ------------------------------------------------------------------------------
 !Query(scope:exploration, curiosity_driven:true) {
+  // Pattern matching for ANY relationship to AGI
   <?Concept> [relates_to] <AGI>
+  
+  // Pattern matching for properties of AGI
   <AGI> [has_property] <?Property>
 }
-
-// Goal: Fill semantic gaps while preserving graph coherence
+// The response to this query (from external sources or tools) will expand the graph.

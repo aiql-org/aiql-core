@@ -1,28 +1,48 @@
-// v2.0.0 Logic: Propositional Operators
-// Demonstrates AND, OR, NOT, IMPLIES operators.
-// Foundation for formal reasoning, proofs, and knowledge inference.
+// Logic: Propositional Operators
+// ==============================================================================
+// This file demonstrates the basic boolean operators in AIQL.
+//
+// Key Concepts:
+// 1. Conjunction (and): Both A and B must be true.
+// 2. Disjunction (or): At least one of A or B must be true.
+// 3. Negation (not): Inverts the truth value of a statement.
+// 4. Implication (implies): Conditional reasoning (if A then B).
+// ==============================================================================
+
 @version:"2.0.0"
 
-// Conjunction: Both conditions must be true
+// ------------------------------------------------------------------------------
+// 1. Conjunction
+// Logic: "AI can learn from data AND AI can improve over time."
+// ------------------------------------------------------------------------------
 !Assert {
   <AI> [can_learn] <FromData>
 } and !Assert {
   <AI> [can_improve] <OverTime>
 } @0.95
 
-// Disjunction: At least one condition is true
+// ------------------------------------------------------------------------------
+// 2. Disjunction
+// Logic: "AGI is achieved via Neural Networks OR Symbolic AI (or both)."
+// ------------------------------------------------------------------------------
 !Assert {
   <AGI> [achieved_via] <NeuralNetworks>
 } or !Assert {
   <AGI> [achieved_via] <SymbolicAI>
 } @0.85
 
-// Negation: Expressing false or absence
+// ------------------------------------------------------------------------------
+// 3. Negation
+// Logic: "It is NOT the case that Current AI has True Consciousness."
+// ------------------------------------------------------------------------------
 not !Assert {
   <CurrentAI> [has] <TrueConsciousness>
 } @0.9
 
-// Implication: If-then reasoning
+// ------------------------------------------------------------------------------
+// 4. Implication
+// Logic: "If a System is Turing-complete, implies it can compute any algorithm."
+// ------------------------------------------------------------------------------
 !Assert {
   <System> [is] <Turing-complete>
 } implies !Assert {

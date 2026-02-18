@@ -1,33 +1,48 @@
-// v2.0.1 Coq Transpilation: Formal Mathematical Proofs
-// Transpiles AIQL logic to Coq (Gallina specification language).
-// Enables formal verification of mathematical theorems and logical proofs.
-// Use COQ tab to see Gallina output with Lemmas and Theorems.
+// Formal Verification: Coq Transpilation
+// ==============================================================================
+// This file demonstrates transpiling AIQL logic to Coq (Gallina).
+//
+// Key Concepts:
+// 1. Formal Proofs: Converting AIQL Assertions into Theorems.
+// 2. Logic Mapping: forall/implies -> Coq syntax.
+// 3. Verification: Enabling mathematical certainty for AI correctness.
+// ==============================================================================
+
 @version:"2.0.1"
 @origin:"formal_verification_showcase"
 
-// Universal statement: All humans are mortal
+// ------------------------------------------------------------------------------
+// Theorem 1: Syllogism
+// Goal: Prove that if All Humans are Mortal, and Socrates is Human, he is Mortal.
+// ------------------------------------------------------------------------------
+
+// Premise 1: Universal quantification
 forall h: !Assert {
   <Human> [is] <Mortal>
 } @1.0
 
-// Specific instance: Socrates is human
+// Premise 2: Instance assertion
 !Assert {
   <Socrates> [is_a] <Human>
 } @1.0
 
-// Implication: If Socrates is human, then Socrates is mortal
+// Theorem: Implication
 !Assert {
   <Socrates> [is_a] <Human>
 } implies !Assert {
   <Socrates> [is] <Mortal>
 } @0.99
 
-// Coq Output:
-// Theorem socrates_mortal : 
-//   (socrates_is_a_human -> socrates_is_mortal).
-// Proof. intros. admit. Qed.
+/* 
+  Coq Output (Conceptual):
+  Theorem socrates_mortal : (Human -> Mortal) -> Human_Socrates -> Mortal_Socrates.
+  Proof. intros. apply H. apply H0. Qed.
+*/
 
-// Mathematical property: Commutative addition
+// ------------------------------------------------------------------------------
+// Theorem 2: Mathematical Property
+// Goal: Assert property of commutativity for addition.
+// ------------------------------------------------------------------------------
 forall x: forall y: !Assert {
   <Addition> [satisfies] <Commutativity>
 } @1.0

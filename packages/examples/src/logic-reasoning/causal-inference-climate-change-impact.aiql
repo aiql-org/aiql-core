@@ -1,9 +1,21 @@
 // Causal Inference: Climate Change Impact
-// Multi-hop causal chain (A→B→C→D) with confidence decay across inferences.
-// Demonstrates transitive reasoning: if A causes B and B causes C, then A indirectly causes C.
+// ==============================================================================
+// This file demonstrates multi-hop causal reasoning and transitive inference.
+//
+// Key Concepts:
+// 1. Causal Chains: Linking events A -> B -> C -> D.
+// 2. Confidence Decay: Uncertainty increases with each step in the chain.
+// 3. Transitive Causality: Inferring indirect causes (If A->B->C, then A->C).
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:causal_analysis
 
+// ------------------------------------------------------------------------------
+// 1. Primary Cause
+// Goal: Define the root cause mechanism.
+// Natural Language: "Climate Change causes Rising Sea Levels via thermal expansion."
+// ------------------------------------------------------------------------------
 $id:cause_001
 !Assert {
   <ClimateChange> [causes] <RisingSeas> {
@@ -13,6 +25,11 @@ $id:cause_001
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// 2. Secondary Effect
+// Goal: Link sea level rise to direct physical consequences.
+// Natural Language: "Rising Sea Levels cause Coastal Flooding."
+// ------------------------------------------------------------------------------
 $id:cause_002
 !Assert {
   <RisingSeas> [causes] <CoastalFlooding> {
@@ -22,6 +39,11 @@ $id:cause_002
   }
 } @0.90
 
+// ------------------------------------------------------------------------------
+// 3. Tertiary Consequence
+// Goal: Link flooding to humanitarian impact.
+// Natural Language: "Coastal Flooding causes Mass Displacement of populations."
+// ------------------------------------------------------------------------------
 $id:cause_003
 !Assert {
   <CoastalFlooding> [causes] <MassDisplacement> {
@@ -30,9 +52,16 @@ $id:cause_003
   }
 } @0.85
 
-// Transitive inference: ClimateChange → MassDisplacement
+// ------------------------------------------------------------------------------
+// 4. Transitive Inference Query
+// Goal: Infer the indirect link from the root cause to the final effect.
+// Natural Language: "Does Climate Change transitively cause Mass Displacement?"
+// ------------------------------------------------------------------------------
 $id:inference_001
 ~temp:0.2
 !Query(mode:inference) {
+  // The engine traverses the causal graph:
+  // ClimateChange -> RisingSeas -> CoastalFlooding -> MassDisplacement
+  // Confidence = 0.95 * 0.90 * 0.85 approx 0.72
   <ClimateChange> [transitively_causes] <MassDisplacement>
 } @0.72

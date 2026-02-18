@@ -1,6 +1,21 @@
-// KYBER Quantum Encryption
-// Quantum-resistant encryption using NIST KYBER KEM + AES-256-GCM.
-// Protects confidential agent communications from quantum computer attacks.
+// Security: KYBER Quantum Encryption
+// ==============================================================================
+// This file demonstrates Post-Quantum Cryptographic (PQC) encryption.
+//
+// Key Concepts:
+// 1. NIST KYBER: A lattice-based Key Encapsulation Mechanism (KEM).
+// 2. Hybrid Model: Uses KYBER for key exchange + AES-256-GCM for payload.
+// 3. Confidentiality: content is unreadable without the recipient's private key.
+// ==============================================================================
+
+@version:"2.7.0"
+$$group:post_quantum_crypto
+
+// ------------------------------------------------------------------------------
+// 1. Encrypted Query
+// Directive: #encrypt("recipient-id") encrypts the AST node using the recipient's public key.
+// Goal: Ask a sensitive question only 'claude-3-instance-001' can read.
+// ------------------------------------------------------------------------------
 #encrypt("claude-3-instance-001")
 !Query {
   <AI> [is_capable_of] <ReasoningAboutItsOwnLimitations> {

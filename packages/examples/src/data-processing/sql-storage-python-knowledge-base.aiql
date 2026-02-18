@@ -1,9 +1,19 @@
 // SQL Storage: Python Knowledge Base
-// Transpiles AIQL to SQL: creates 4-table schema (statements, concepts, relations, attributes).
-// Generates INSERT statements and graph-traversal queries for knowledge bases.
+// ==============================================================================
+// This file demonstrates AIQL's mapping to Relational Databases.
+//
+// Key Concepts:
+// 1. Table Mapping: !Assert -> INSERT INTO statements.
+// 2. Attributes: JSON/Key-Value storage within relational columns.
+// 3. Scope:database: Explicitly targeting persistent storage.
+// ==============================================================================
+
 @version:"1.0.0"
 @origin:"aiql-playground"
 
+// ------------------------------------------------------------------------------
+// Entity Definition (Concepts)
+// ------------------------------------------------------------------------------
 $id:knowledge_001
 !Assert(scope:database) {
   <Python> [is_a] <ProgrammingLanguage> {
@@ -13,6 +23,9 @@ $id:knowledge_001
   }
 } @0.99
 
+// ------------------------------------------------------------------------------
+// Relationship Definition (Edges)
+// ------------------------------------------------------------------------------
 $id:knowledge_002
 !Assert {
   <Python> [created_by] <GuidoVanRossum> {
@@ -21,5 +34,8 @@ $id:knowledge_002
   }
 } @0.95
 
-// Transpiles to SQL tables: statements, concepts, relations, attributes
-// Plus example queries: MATCH patterns, provenance tracking
+/*
+  Generated SQL (Conceptual):
+  INSERT INTO concepts (name, type) VALUES ('Python', 'ProgrammingLanguage');
+  INSERT INTO relations (source, target, type, attributes) ...
+*/

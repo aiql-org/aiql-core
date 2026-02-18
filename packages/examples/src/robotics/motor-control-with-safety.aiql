@@ -1,26 +1,50 @@
-// Motor Control with Safety (v2.4.0 Organic)
-// Uses !Task Intent with context params instead of special syntax.
-// Safety expressed as semantic knowledge (!Assert monitoring).
-// No special tokens - pure triple-based representation!
+// Robotics: Motor Control with Safety
+// ==============================================================================
+// This file demonstrates actuating hardware with integrated safety constraints.
+//
+// Key Concepts:
+// 1. !Task Intent: Used for actuation commands (changing state).
+// 2. Semantic Safety: Safety rules are defined as knowledge (!Assert), not code.
+// 3. Real-time Constraint: Context parameters (`mode:realtime`) enforce timing.
+// ==============================================================================
+
+@version:"2.4.0"
+$$group:robotics_control
+
+// ------------------------------------------------------------------------------
+// 1. Movement Command
+// Goal: Spin the left motor at 100 RPM.
+// ------------------------------------------------------------------------------
 !Task(device_type:motor, device_id:motor_left, mode:realtime) {
+  // Target State
   <MotorLeft> [has_target] <Velocity> { 
     value: 100, 
     unit: "rpm" 
   }
+  
+  // Associating active safety monitors with this specific task
   <MotorLeft> [monitored_by] <CollisionDetector> { 
-    margin: 0.1 
+    margin: 0.1,
+    action: "emergency_stop"
   }
+  
+  // Temporal Constraints
   <Task> [has_deadline] <Timing> { 
     max_duration: 50, 
     unit: "ms" 
   }
 } @0.95
 
-// Safety as knowledge (not special syntax!)
+// ------------------------------------------------------------------------------
+// 2. Safety Rules Definition
+// Goal: Define the persistent safety constraints for the motor.
+// Natural Language: "The CollisionDetector safeguards the MotorLeft with a 0.1m buffer."
+// ------------------------------------------------------------------------------
 !Assert {
   <CollisionDetector> [monitors] <MotorLeft>
   <MotorLeft> [constrained_by] <SafetyZone> { 
     min_distance: 0.1, 
-    unit: "m" 
+    unit: "m",
+    violation_response: "halt"
   }
-} @0.99  // High confidence for safety rules
+} @0.99  // High confidence required for safety rules

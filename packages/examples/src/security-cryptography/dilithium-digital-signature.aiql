@@ -1,10 +1,25 @@
-// DILITHIUM Digital Signature
-// Quantum-proof cryptographic signing using NIST DILITHIUM (post-quantum security).
-// Ensures statement integrity and agent authentication in multi-agent systems.
+// Security: DILITHIUM Digital Signature
+// ==============================================================================
+// This file demonstrates Post-Quantum Cryptographic (PQC) signing.
+//
+// Key Concepts:
+// 1. NIST DILITHIUM: A lattice-based digital signature scheme secure against quantum attacks.
+// 2. Statement Integrity: Using #sign directive to prove authorship.
+// 3. Non-Repudiation: The agent cannot deny creating this statement.
+// ==============================================================================
+
+@version:"2.7.0"
+$$group:post_quantum_crypto
+
+// ------------------------------------------------------------------------------
+// 1. Signed Assertion
+// Directive: #sign("agent-id") generates a cryptographic signature for the following block.
+// ------------------------------------------------------------------------------
 #sign("gpt-4-instance-001")
 !Assert {
   <AI> [proved] <RiemannHypothesis> {
     confidence: 0.85,
-    algorithm: "DILITHIUM"
+    algorithm: "DILITHIUM",
+    verification_key: "public_key_string"
   }
 } @0.85

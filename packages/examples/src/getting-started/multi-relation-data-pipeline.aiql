@@ -1,8 +1,30 @@
 // Multi-Relation Data Pipeline
-// Shows multiple semantic relations within one !Task for data transformations.
-// Models ETL workflows: extraction → filtering → transformation chains.
+// ==============================================================================
+// This file demonstrates how to model data processing workflows in AIQL.
+//
+// Key Concepts:
+// 1. !Task Intent: Used for procedural or workflow-oriented statements.
+// 2. Chained Relations: Connecting concepts to represent flow (Extraction -> Filtration -> Transformation).
+// 3. Attribute Metadata: Adding specific parameters (like `min_age`) to relations.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// 1. ETL Workflow Definition
+// Goal: Define a sequence of operations to process user data.
+// Natural Language: "Extract UserData from Database, filter by Age >= 25, then transform to CleanDataset."
+// ------------------------------------------------------------------------------
 !Task {
+  // Step 1: Extraction
   <UserData> [extracted_from] <Database>
-  <UserData> [filtered_by] <AgeFilter> { min_age: 25 }
+  
+  // Step 2: Filtration
+  // Attributes (min_age: 25) define the criteria for this relationship.
+  <UserData> [filtered_by] <AgeFilter> { 
+    min_age: 25 
+  }
+  
+  // Step 3: Transformation
   <UserData> [transformed_to] <CleanDataset>
-} @0.90
+} @0.90 // High confidence in this workflow definition

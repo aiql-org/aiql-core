@@ -1,22 +1,45 @@
-// Knowledge Gap Detection (v2.2.0)
-// Agent identifies concepts mentioned but not well-defined.
-// Semantic gaps detected through low graph connectivity.
-// Triggers curiosity-driven exploration when gaps found.
+// Meta-Cognition: Knowledge Gap Detection
+// ==============================================================================
+// This file demonstrates how the agent identifies missing information.
+//
+// Key Concepts:
+// 1. Semantic Gaps: Concepts that are mentioned but have few or no defining relations.
+// 2. Connectivity: The number of edges connected to a concept node.
+// 3. Curiosity Trigger: Automatically seeking to fill identified gaps.
+// ==============================================================================
+
+@version:"2.2.0"
+
+// ------------------------------------------------------------------------------
+// 1. Establishing Partial Knowledge
+// Goal: Define a relationship where one concept (MachineLearning) is under-defined.
+// Note: <Python> is defined (is_a ProgrammingLanguage), but <MachineLearning> is just a subject/object.
+// ------------------------------------------------------------------------------
 !Assert {
   <Python> [is_a] <ProgrammingLanguage>
   <MachineLearning> [uses] <Python>
 } @0.90
 
-// MachineLearning mentioned but not defined - GAP!
+// ------------------------------------------------------------------------------
+// 2. Detecting the Gap
+// Goal: Query for concepts that the agent "knows about" but "lacks knowledge" (definitions).
+// Natural Language: "What topics do I mention but lack deep understanding of?"
+// ------------------------------------------------------------------------------
 !Query {
   <Self> [lacks_knowledge_about] <?MissingTopic>
 }
-// Returns: { concept: "MachineLearning", confidence: 0.8 }
+// Expected Result: { concept: "MachineLearning", confidence: 0.8 }
+// Reason: <MachineLearning> has low connectivity compared to <Python>.
 
-// Express curiosity about the gap (existing !Desire syntax!)
+// ------------------------------------------------------------------------------
+// 3. Expressing Curiosity (Closing the Gap)
+// Goal: The agent actively desires to fill this gap.
+// Natural Language: "I want to learn more about MachineLearning."
+// ------------------------------------------------------------------------------
 !Desire(intensity:high) {
   <Self> [seeks] <Knowledge> {
     about: "MachineLearning",
-    priority: "exploration"
+    priority: "exploration",
+    reason: "gap_detected"
   }
 } @0.88

@@ -1,22 +1,39 @@
 // AIQL Syntax: Comments
-// Full comment support: // single-line and /* multi-line */ for documentation.
-// Comments preserved during tokenization but not included in AST output.
+// ==============================================================================
+// This file demonstrates the comment syntax in AIQL.
+//
+// Key Concepts:
+// 1. Single-Line Comments: Using `//` for brief explanations.
+// 2. Multi-Line Comments: Using `/* ... */` for block documentation.
+// 3. Parser Behavior: Comments are stripped during tokenization but
+//    useful for human readability and documentation generators.
+// ==============================================================================
+
 @version:"1.0.0"
 
 /* 
-  Multi-line comment block
-  Useful for documenting complex reasoning chains
-  or providing context for AI agents
+  Multi-Line Comment Block
+  ------------------------
+  This block is useful for detailed descriptions, licensing information,
+  or complex reasoning chains that require multiple lines of text.
 */
 
+// ------------------------------------------------------------------------------
+// 1. Asserting Comment Support
+// Goal: Self-referential assertion about the language's own features.
+// ------------------------------------------------------------------------------
 !Assert {
   <AIQL> [supports] <Comments> {
     single_line: "//",
-    multi_line: "/* */"
+    multi_line: "/* */",
+    purpose: "documentation"
   }
 } @1.0
 
-// Comments are preserved during parsing but not in AST
+// ------------------------------------------------------------------------------
+// 2. Querying Readability
+// Note: Comments do not affect the AST, so this query runs purely on the structure.
+// ------------------------------------------------------------------------------
 !Query {
   <Comments> [enhance] <Readability>
 }

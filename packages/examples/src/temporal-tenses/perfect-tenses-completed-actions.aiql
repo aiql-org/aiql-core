@@ -1,14 +1,31 @@
-// Perfect Tenses: Completed Actions (v1.1.0)
-// Present, past, and future perfect tenses emphasize completion.
-// Use cases: Achievement tracking, state transitions, milestone recording.
+// Temporal Tenses: Perfect Aspect
+// ==============================================================================
+// This file demonstrates the Perfect aspect (Completion).
+//
+// Key Concepts:
+// 1. Focus: Completion of an action relative to a reference time.
+// 2. Syntax: [predicate@tense:X_perfect]
+// 3. Nuance: Emphasizes the result or state of being finished.
+// ==============================================================================
+
+@version:"1.1.0"
+
 !Assert {
+  // Present Perfect (Completed recently / relevance to now)
   <Scientists> [have_discovered@tense:present_perfect] <Cure> {
-    disease: "malaria"
+    disease: "malaria",
+    impact: "high"
   }
+
+  // Past Perfect (Completed before another past event)
   <Team> [had_completed@tense:past_perfect] <Project> {
-    deadline: "Q4_2025"
+    deadline: "Q4_2025",
+    status: "delivered"
   }
+
+  // Future Perfect (Completed before a future point)
   <AI> [will_have_learned@tense:future_perfect] <Skills> {
-    by_date: "2030"
+    by_date: "2030",
+    mastery: "expert"
   }
 } @0.95

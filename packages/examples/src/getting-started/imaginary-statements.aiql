@@ -1,0 +1,82 @@
+// Feature Showcase: Imaginary & Hypothetical Statements
+// ==============================================================================
+// This file demonstrates how to use AIQL for simulation, imagination, and counterfactuals.
+//
+// Key Concepts:
+// 1. !Assert(mode:hypothetical): Defines statements that are not asserted as true facts
+//    but as temporary assumptions for reasoning.
+// 2. !Hypothesis: A dedicated Intent for scientific or logical hypotheses.
+// 3. !Imagine: A creative Intent for generative or unregulated scenarios.
+// 4. Context Scoping: Using 'scope' to isolate imaginary worlds from the global knowledge base.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// 1. Hypothetical Reasoning
+// Goal: Create a temporary assumption to test consequences.
+// Natural Language: "Let's assume hypothetically that the sun is blue..."
+// ------------------------------------------------------------------------------
+!Assert(mode:hypothetical, scope:scenario_A) {
+  // These facts do not pollute the global knowledge base.
+  // They exist only within 'scope:scenario_A'.
+  <Sun> [has_color] <Blue>
+  
+  // Logical inference can now run LOCALLY within this scope.
+  // e.g. Plants might evolve to absorb different wavelengths.
+  <Plants> [absorb] <YellowLight>
+} @0.5 // Confidence represents the plausibility of the hypothesis
+
+// ------------------------------------------------------------------------------
+// 2. Simulation Task
+// Goal: Define initial conditions for a physics or logic simulation.
+// Natural Language: "Run a simulation 'sim_gravity_2x' where gravity is doubled."
+// ------------------------------------------------------------------------------
+!Task(type:simulation, id:sim_gravity_2x) {
+  // Setting parameters for the simulation environment.
+  <World> [has_gravity] <2.0g>
+  
+  // Defining expected behaviors or laws in this simulation.
+  <Objects> [fall_acceleration] <19.6m_s2>
+  
+  // Linking this simulation to a specific purpose
+  <Simulation> [tests] <StructuralIntegrity>
+}
+
+// ------------------------------------------------------------------------------
+// 3. Counterfactual History
+// Goal: Model alternative historical timelines ("What If?").
+// Natural Language: "If Napoleon had won the Battle of Waterloo in 1815..."
+// ------------------------------------------------------------------------------
+!Assert(mode:counterfactual, time:1815, scope:timeline_alt_victory) {
+  <Napoleon> [wins] <BattleOfWaterloo>
+  <FrenchEmpire> [controls] <Europe>
+  
+  // This contradicts real history, so isolation via 'scope' is critical.
+  <BritishEmpire> [suffers] <Defeat>
+}
+
+// ------------------------------------------------------------------------------
+// 4. Scientific Hypothesis
+// Goal: Formally state a falsifiable scientific theory.
+// Natural Language: "Hypothesis: Dark Matter is composed of Axions."
+// ------------------------------------------------------------------------------
+!Hypothesis(field:physics) {
+  <DarkMatter> [composed_of] <Axions>
+  
+  // Metadata can track the status of this hypothesis
+  <Hypothesis> [status] <Untested>
+} @0.6 // Preliminary confidence level
+
+// ------------------------------------------------------------------------------
+// 5. Creative Imagination
+// Goal: Unconstrained generation of concepts for fiction or art.
+// Natural Language: "Imagine a dragon made of crystal breathing light."
+// ------------------------------------------------------------------------------
+!Imagine {
+  // Creative intents allow for "impossible" physics or semantics.
+  <Dragon> [made_of] <Crystal>
+  <Dragon> [breathes] <Light>
+  
+  <CrystalDragon> [lives_in] <PrismCave>
+}

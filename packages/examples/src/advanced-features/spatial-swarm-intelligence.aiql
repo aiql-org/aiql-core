@@ -1,6 +1,17 @@
-// Spatial Swarm Intelligence
-// Demonstrates Coordinated Action with Spatial Awareness
+// Spatial Swarm Intelligence (v2.6.0)
+// ==============================================================================
+// This file demonstrates Swarm Intelligence primitives (Consensus/Coordinate).
+//
+// Key Concepts:
+// 1. !Consensus: Swarm agreeing on a shared state/strategy.
+// 2. !Coordinate: Assigning roles and goals to swarm members.
+// 3. Spatial Context: Using coordinate systems for geolocation.
+// ==============================================================================
 
+// ------------------------------------------------------------------------------
+// 1. Swarm Consensus
+// Goal: Agree on a search strategy with 80% threshold.
+// ------------------------------------------------------------------------------
 !Consensus (scope:local) {
   topic = <SearchStrategy>
   participants = [<DroneA>, <DroneB>, <DroneC>]
@@ -8,12 +19,20 @@
   timeout = 5000
 }
 
+// ------------------------------------------------------------------------------
+// 2. Swarm Coordination
+// Goal: Execute the exploration mission using decentralized strategy.
+// ------------------------------------------------------------------------------
 !Coordinate {
   goal = <Exploration>
   participants = [<Swarm>]
   strategy = "decentralized"
 }
 
+// ------------------------------------------------------------------------------
+// 3. Spatial Awareness
+// Goal: Define positions using literal coordinates and variable sectors.
+// ------------------------------------------------------------------------------
 !Assert {
   <DroneA> [is_at] space:literal(37.7749, -122.4194)
   <Target> [is_in] space:variable(sector_7)

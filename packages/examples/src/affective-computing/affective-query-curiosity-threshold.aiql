@@ -1,8 +1,23 @@
-// Affective Query: Curiosity Threshold
-// Queries emotional states with conditional thresholds for introspection.
-// Enables AI agents to check their own affective states and curiosity levels.
+// Affective Computing: Curiosity Threshold
+// ==============================================================================
+// This file demonstrates querying internal affective states with conditions.
+//
+// Key Concepts:
+// 1. Introspection: The agent querying its own feelings.
+// 2. Conditional Query: Checking if an emotion exceeds a threshold.
+// 3. Self-Regulation: Used by agents to decide when to stop/start exploration.
+// ==============================================================================
+
+@version:"1.0.0"
+$$group:affective_introspection
+
+// ------------------------------------------------------------------------------
+// 1. Curiosity Check
+// Goal: "Am I curious enough to continue exploring?" (Threshold: 0.5)
+// ------------------------------------------------------------------------------
 !Query {
   <AI> [experiences] <Curiosity> {
-    threshold: 0.5
+    threshold: 0.5,
+    operator: ">="
   }
 }

@@ -1,7 +1,19 @@
-// v2.1.0 Relationship: Bidirectional Temporal
-// Some relationships are symmetric (bidirectional): simultaneous, concurrent.
-// AIQL automatically sets bidirectional flag for these relation types.
-// Use cases: Concurrent events, parallel processes, synchronization.
+// Relationship: Bidirectional Temporal
+// ==============================================================================
+// This file demonstrates explicit relationship nodes for temporal synchronization.
+//
+// Key Concepts:
+// 1. !Relationship Intent: Defining meta-relations between other IDs.
+// 2. Bidirectional: Flagging a relation as symmetric (A <-> B).
+// 3. Simultaneity: Events occurring at the exact same time.
+// 4. Concurrency: Processes running in parallel intervals.
+// ==============================================================================
+
+@version:"2.1.0"
+
+// ------------------------------------------------------------------------------
+// 1. Define Event A (Launch)
+// ------------------------------------------------------------------------------
 $id:apollo11_launch
 !Assert {
   <Apollo11> [launched] <1969-07-16> {
@@ -9,6 +21,9 @@ $id:apollo11_launch
   }
 } @0.99
 
+// ------------------------------------------------------------------------------
+// 2. Define Event B (Broadcast)
+// ------------------------------------------------------------------------------
 $id:global_broadcast
 !Assert {
   <TV> [broadcasted] <MoonLanding> {
@@ -16,16 +31,20 @@ $id:global_broadcast
   }
 } @0.99
 
-// Events happening SIMULTANEOUSLY (bidirectional: true)
+// ------------------------------------------------------------------------------
+// 3. Link A and B (Simultaneity)
+// Goal: Explicitly state that Launch and Broadcast happened together.
+// ------------------------------------------------------------------------------
 !Relationship(type:temporal, source:$id:apollo11_launch, target:$id:global_broadcast) {
   <LaunchEvent> [simultaneous] <BroadcastEvent>
 } @0.90
 
+// ------------------------------------------------------------------------------
+// 4. Concurrency Example (Parallel Tasks)
+// ------------------------------------------------------------------------------
 $id:ai_training
 !Task {
-  <GPU_Cluster> [trains] <LLM> {
-    model_size: "70B"
-  }
+  <GPU_Cluster> [trains] <LLM> { model_size: "70B" }
 } @0.95
 
 $id:data_preprocessing
@@ -33,7 +52,6 @@ $id:data_preprocessing
   <Pipeline> [processes] <Dataset>
 } @0.92
 
-// Tasks running CONCURRENTLY (also bidirectional)
 !Relationship(type:temporal, source:$id:ai_training, target:$id:data_preprocessing) {
   <Training> [concurrent] <Preprocessing>
 } @0.85

@@ -1,19 +1,40 @@
-// Self-Knowledge Introspection (v2.2.0)
-// Agent queries its own knowledge base using meta-semantic relations.
-// No new syntax - just !Query with <Self> meta-concept!
-// Demonstrates: reflexive querying, epistemic self-awareness.
+// Meta-Cognition: Self-Knowledge Introspection
+// ==============================================================================
+// This file demonstrates reflexive querying (the agent querying itself).
+//
+// Key Concepts:
+// 1. <Self> Concept: A special meta-concept representing the agent's identity.
+// 2. Reflexive Relations: Relations like [has_knowledge_about] targeting internal state.
+// 3. Epistemic Awareness: Knowing *what* you know.
+// ==============================================================================
+
+@version:"2.2.0"
+
+// ------------------------------------------------------------------------------
+// 1. Building the Knowledge Base
+// Goal: Add some facts so the agent has something to know.
+// ------------------------------------------------------------------------------
 !Assert {
   <Python> [is_a] <ProgrammingLanguage>
   <Python> [used_for] <DataScience>
 } @0.95
 
-// Agent introspects: "What do I know about?"
+// ------------------------------------------------------------------------------
+// 2. General Introspection
+// Goal: List all topics the agent considers itself knowledgeable about.
+// Natural Language: "What topics do I have knowledge of?"
+// ------------------------------------------------------------------------------
 !Query {
   <Self> [has_knowledge_about] <?Topic>
 }
-// Returns: <Python>, <ProgrammingLanguage>, <DataScience>
+// Expected Result: <Python>, <ProgrammingLanguage>, <DataScience>
 
+// ------------------------------------------------------------------------------
+// 3. Specific Introspection
+// Goal: Retrieve all details known about a specific topic.
+// Natural Language: "What exactly do I know about Python?"
+// ------------------------------------------------------------------------------
 !Query {
   <Self> [has_knowledge_about] <Python>
 }
-// Returns all statements mentioning Python
+// Expected Result: Returns the graph fragment related to <Python>.

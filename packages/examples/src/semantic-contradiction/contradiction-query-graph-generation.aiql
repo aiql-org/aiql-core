@@ -1,20 +1,38 @@
-// Contradiction Query & Graph Generation (v2.5.0)
-// Query detected contradictions and generate relationship graphs.
-// InferenceEngine.detectSemanticContradictions() finds conflicts.
-// generateContradictionGraph() creates !Relationship nodes.
+// Semantic Contradiction: Query & Graph Generation
+// ==============================================================================
+// This file demonstrates how to detect and query semantic conflicts.
+//
+// Key Concepts:
+// 1. Semantic Contradiction: Statements that logically cannot both be true.
+// 2. Contradiction Query: Asking the system "What conflicts exist?"
+// 3. Conflict Types: Taxonomy (IsA X vs IsA Y) and Cardinality (Value A vs Value B).
+// ==============================================================================
 
-// Define conflicting statements
+@version:"2.5.0"
+$$group:semantic_integrity
+
+// ------------------------------------------------------------------------------
+// 1. Asserting Conflicting Information
+// Goal: Intentionally introduce contradictions to test detection.
+// ------------------------------------------------------------------------------
+
+// Statement Set A (High Confidence)
 !Assert {
   <Cat> [is_a] <Mammal>
   <Cat> [has_temperature] <38C>
 } @0.95
 
+// Statement Set B (Contradictory)
 !Assert {
-  <Cat> [is_a] <Reptile>  // Taxonomy conflict!
-  <Cat> [has_temperature] <35C>  // Cardinality violation!
+  <Cat> [is_a] <Reptile>  // CONTRADICTION: Taxonomy (Mammal vs Reptile are disjoint)
+  <Cat> [has_temperature] <35C>  // CONTRADICTION: Cardinality (Can't have 2 temps)
 } @0.70
 
-// Query contradictions
+// ------------------------------------------------------------------------------
+// 2. Detecting Contradictions
+// Goal: Query the system for any detected integrity violations.
+// Natural Language: "Did the system detect any critical taxonomy contradictions?"
+// ------------------------------------------------------------------------------
 !Query {
   <System> [detected] <?Contradiction> {
     conflict_type: "taxonomy",
@@ -22,9 +40,15 @@
   }
 }
 
-// Auto-generated contradiction graph:
-// !Relationship(type:logical) {
-//   <Statement1> [contradicts] <Statement2> {
-//     reason: "Disjoint classes: Mammal/Reptile"
-//   }
-// }
+// ------------------------------------------------------------------------------
+// 3. Expected Output (Graph Representation)
+// The system generates a !Relationship node representing the conflict:
+// ------------------------------------------------------------------------------
+/*
+!Relationship(type:logical) {
+  <Statement:CatIsMammal> [contradicts] <Statement:CatIsReptile> {
+    reason: "Disjoint Classes",
+    severity: 0.9
+  }
+}
+*/

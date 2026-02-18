@@ -1,16 +1,35 @@
-// Temporal Tense Annotations (v1.1.0)
-// Relations can express temporal tense using @tense: annotations.
-// Supports 12 tense values: past, present, future, and aspect combinations
-// (perfect, progressive, perfect_progressive) for each time.
+// Temporal Tenses: Historical Events
+// ==============================================================================
+// This file demonstrates using simple tenses for historical timelines.
+//
+// Key Concepts:
+// 1. Narrative Flow: Mixing past, present, and future perspectives.
+// 2. Simple Tense: Direct statement of fact at a point in time.
+// ==============================================================================
+
+@version:"1.1.0"
+
 !Assert {
+  // Past Fact
   <Napoleon> [conquered@tense:past] <Europe> {
-    year: 1805
+    year: 1805,
+    campaign: "Austerlitz"
   }
-  <AI> [transforms@tense:present] <Industry>
-  <AGI> [will_achieve@tense:future] <Singularity>
+  
+  // Present Observation
+  <AI> [transforms@tense:present] <Industry> {
+    sector: "technology"
+  }
+  
+  // Future Prediction
+  <AGI> [will_achieve@tense:future] <Singularity> {
+    projection: "optimistic"
+  }
 } @0.95
 
-// Query with past perfect tense
+// ------------------------------------------------------------------------------
+// Complex Query Example
+// ------------------------------------------------------------------------------
 !Query {
   <Scientists> [had_discovered@tense:past_perfect] <Vaccine>
 }

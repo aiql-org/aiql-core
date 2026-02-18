@@ -1,22 +1,39 @@
-// Trust Score Management (v2.5.0)
-// Define trust levels for various information sources.
-// Trust scores range 0.0 (untrust) to 1.0 (fully trusted).
-// Used for weighted confidence calculation and lying detection.
+// Semantic Contradiction: Trust Score Management
+// ==============================================================================
+// This file defines the trust topology for an AI agent.
+//
+// Key Concepts:
+// 1. Trust Registry: A persistent store of source credibility.
+// 2. Trust Levels: Scaled from 0.0 (Malicious/Random) to 1.0 (Oracle/Verified).
+// 3. Weighting: These scores are used to resolve conflicts between sources.
+// ==============================================================================
 
-// High-trust scientific sources
+@version:"2.5.0"
+$$group:trust_registry
+
+// ------------------------------------------------------------------------------
+// 1. High-Trust Sources (Scientific / Verified)
+// Usage: Primary truth references. Hard to overturn.
+// ------------------------------------------------------------------------------
 !Assert {
   <DOI_Source> [trusted_at] <TrustLevel> { value: 0.95 }
   <ArXiv_Source> [trusted_at] <TrustLevel> { value: 0.85 }
   <PeerReviewed> [trusted_at] <TrustLevel> { value: 0.90 }
 } @0.99
 
-// Medium-trust sources
+// ------------------------------------------------------------------------------
+// 2. Medium-Trust Sources (Public / General)
+// Usage: Useful for general knowledge, but vetted against High-Trust.
+// ------------------------------------------------------------------------------
 !Assert {
   <Wikipedia> [trusted_at] <TrustLevel> { value: 0.70 }
   <NewsMedia> [trusted_at] <TrustLevel> { value: 0.65 }
 } @0.85
 
-// Low-trust sources
+// ------------------------------------------------------------------------------
+// 3. Low-Trust Sources (Unverified / User Generated)
+// Usage: Treated with skepticism. Discarded if contradicting higher tiers.
+// ------------------------------------------------------------------------------
 !Assert {
   <SocialMedia> [trusted_at] <TrustLevel> { value: 0.40 }
   <PersonalBlog> [trusted_at] <TrustLevel> { value: 0.30 }

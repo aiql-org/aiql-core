@@ -1,6 +1,18 @@
-// Meta-Reasoning: Future AI Beliefs
-// Represents nested beliefs using context parameters (time:future, mode:possibility).
-// Models meta-cognitive reasoning: beliefs about predictions, second-order knowledge.
+// Temporal Tenses: Meta-Reasoning Future Beliefs
+// ==============================================================================
+// This file demonstrates nesting future beliefs about predictions.
+//
+// Key Concepts:
+// 1. Context Params (time:future): The entire assertion is about the future.
+// 2. Mode (mode:possibility): The assertion is probabilistic, not fact.
+// 3. Nested Beliefs: Stating what people *will believe* in the future.
+// ==============================================================================
+
+@version:"1.1.0"
+
+// ------------------------------------------------------------------------------
+// Predictive Model
+// ------------------------------------------------------------------------------
 !Assert(time:future, mode:possibility) {
   <Futurists> [believe] <Prediction> {
     claim: "AI will surpass human intelligence",

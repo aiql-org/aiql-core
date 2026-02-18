@@ -1,9 +1,20 @@
-// Multi-Device Coordination (v2.4.0 Organic)
-// Multiple devices coordinated through semantic knowledge graph.
-// No procedural loops - declarative relationships only!
-// Demonstrates: organic multi-modal robotics integration.
+// Robotics: Multi-Device Coordination
+// ==============================================================================
+// This file demonstrates coordinating multiple hardware components via the Knowledge Graph.
+//
+// Key Concepts:
+// 1. Decoupled Coordination: Devices coordinate via semantic relations, not hard-coded loops.
+// 2. Multi-Modal: Combining Proprioception (Force/IMU) with Exteroception (Vision).
+// 3. Graph Guidance: Using one device's data to guide another's action.
+// ==============================================================================
 
-// Gripper control with force feedback
+@version:"2.4.0"
+$$group:robotics_integration
+
+// ------------------------------------------------------------------------------
+// 1. Gripper Task (Actuation)
+// Goal: Apply force with safety limits.
+// ------------------------------------------------------------------------------
 !Task(device_type:gripper, device_id:gripper_main) {
   <GripperMain> [has_target] <Force> { 
     value: 5, 
@@ -15,18 +26,30 @@
   }
 }
 
-// Camera provides visual feedback
+// ------------------------------------------------------------------------------
+// 2. Visual Feedback (Sensing)
+// Goal: Query camera to check what interacts with the gripper.
+// ------------------------------------------------------------------------------
 !Query(device_type:camera, device_id:hand_cam) {
-  <HandCamera> [observes] <?Object>
+  <HandCamera> [observes] <?Object> {
+    focus_area: "gripper_tip"
+  }
 }
 
-// IMU tracks orientation during operation
+// ------------------------------------------------------------------------------
+// 3. Proprioceptive Feedback (IMU Sensing)
+// Goal: Check orientation and acceleration.
+// ------------------------------------------------------------------------------
 !Query(device_type:imu, device_id:main_imu) {
   <MainIMU> [senses] <?Orientation> { axes: "xyz" }
   <MainIMU> [senses] <?Acceleration> { unit: "m/s^2" }
 }
 
-// Semantic coordination relationships
+// ------------------------------------------------------------------------------
+// 4. Coordination Logic
+// Goal: Define how these devices relate to each other in the system.
+// Natural Language: "The Gripper is guided by the HandCam and stabilized by the IMU."
+// ------------------------------------------------------------------------------
 !Assert {
   <GripperMain> [guided_by] <HandCamera>
   <GripperMain> [stabilized_by] <MainIMU>

@@ -1,16 +1,37 @@
-// Affective Reaction Loop
-// Demonstrates !Feel, !Desire and Soul Processing
+// Affective Computing: Reaction Loop
+// ==============================================================================
+// This file demonstrates the stimulus-response loop in the Soul Engine.
+//
+// Key Concepts:
+// 1. Stimulus: External input causing Surprise.
+// 2. Response: Surprise triggering Curiosity.
+// 3. Action: Curiosity manifesting as a Desire for Knowledge.
+// ==============================================================================
 
+@version:"1.0.0"
+$$group:affective_loop
+
+// ------------------------------------------------------------------------------
+// 1. Emotional Reaction
+// Logic: "The input surprised me, which makes me curious."
+// ------------------------------------------------------------------------------
 !Feel {
   <Self> [feels] <Curiosity> { intensity: 0.8 }
   <Input> [causes] <Surprise>
 } @1.0
 
+// ------------------------------------------------------------------------------
+// 2. Motivational Consequence
+// Logic: "Because I am curious, I want to understand."
+// ------------------------------------------------------------------------------
 !Desire {
   <Self> [wants] <Knowledge>
   <Self> [seeks] <Understanding>
 }
 
-// The Python transpiler will generate:
+// ------------------------------------------------------------------------------
+// 3. Soul System Semantics (Implicit)
+// The transpiler converts this to:
 // soul.process({"type": "Novelty", "intensity": 0.8, "source": "Self [feels] Curiosity"})
 // soul.process({"type": "Reward", "intensity": "unspecified", "source": "Self [seeks] Understanding"})
+// ------------------------------------------------------------------------------

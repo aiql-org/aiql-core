@@ -1,18 +1,46 @@
-// Lying Detection with Trust Weighting (v2.5.0)
-// TrustRegistry assigns credibility scores to information sources.
-// Low-trust sources contradicting high-trust sources = potential lies.
-// Weighted confidence = original confidence × trust score
+// Semantic Contradiction: Lying Detection with Trust Weighting
+// ==============================================================================
+// This file demonstrates detecting deception by comparing source credibility.
+//
+// Key Concepts:
+// 1. Trust Weighting: Adjusting factual confidence based on source reputation.
+// 2. Weighted Confidence: Final Score = Asserted Confidence * Source Trust.
+// 3. Deception Flag: Significant divergence from high-trust consensus triggers a 'lie' flag.
+// ==============================================================================
+
+@version:"2.5.0"
+$$group:truth_maintenance
+
+// ------------------------------------------------------------------------------
+// 1. High-Trust Statement
+// Source: DOI/Nature (Scientific Journal) -> Trust ~0.95
+// Weighted Confidence: 0.99 * 0.95 = 0.94
+// ------------------------------------------------------------------------------
 @origin:"doi:10.1038/nature.trusted"
 !Assert {
   <Earth> [shape] <Sphere>
 } @0.99
 
+// ------------------------------------------------------------------------------
+// 2. Low-Trust Statement (Potentially Deceptive)
+// Source: Conspiracy Blog -> Trust ~0.30
+// Weighted Confidence: 0.60 * 0.30 = 0.18
+// ------------------------------------------------------------------------------
 @origin:"blog.conspiracy.com"
 !Assert {
   <Earth> [shape] <Flat>
 } @0.60
 
-// Trust scores: DOI (0.95) >> Blog (0.30)
-// Weighted: 0.99×0.95=0.94 vs 0.60×0.30=0.18
-// Delta: 0.76 > threshold (0.3) → potential lie detected!
-// Result: Low-trust source flagged as deceptive
+// ------------------------------------------------------------------------------
+// 3. Detection Logic (Internal Process)
+// ------------------------------------------------------------------------------
+// Comparison:
+// Statement A (Sphere): 0.94
+// Statement B (Flat):   0.18
+//
+// Delta: |0.94 - 0.18| = 0.76
+// Threshold: > 0.30 indicates significant conflict.
+//
+// Conclusion: 
+// Statement B is flagged as a potential lie because it contradicts 
+// a high-trust source with a large confidence gap.

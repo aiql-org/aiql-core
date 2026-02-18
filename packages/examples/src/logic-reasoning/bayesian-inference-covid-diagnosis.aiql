@@ -1,9 +1,22 @@
 // Bayesian Inference: COVID Diagnosis
-// Models probabilistic reasoning: prior → evidence (test + symptoms) → posterior.
-// Demonstrates Bayes' theorem: P(disease|evidence) using multiple confidence values.
+// ==============================================================================
+// This file demonstrates probabilistic reasoning using Bayes' Theorem.
+//
+// Key Concepts:
+// 1. Prior Probability: Initial belief before evidence (P(Disease)).
+// 2. Evidence: New information (Positive Test, Symptoms) with sensitivity/specificity.
+// 3. Posterior Probability: Updated belief after considering evidence (P(Disease|Evidence)).
+// 4. mode:bayesian_update: Explicitly triggering a Bayesian update query.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:bayesian_inference
 
+// ------------------------------------------------------------------------------
+// 1. Establishing the Prior
+// Goal: Define the baseline probability of having the disease in the general population.
+// Natural Language: "The prior probability of a random person having COVID-19 is 5%."
+// ------------------------------------------------------------------------------
 $id:prior
 !Assert {
   <Patient> [has_disease] <COVID19> {
@@ -11,17 +24,27 @@ $id:prior
     population: "general",
     context: "pre_test"
   }
-} @0.05
+} @0.05 // Initial low confidence matching the prior
 
+// ------------------------------------------------------------------------------
+// 2. Evidence A: Diagnostic Test
+// Goal: Add evidence from a medical test with known accuracy properties.
+// Natural Language: "The patient tested positive. The test has 90% sensitivity and 95% specificity."
+// ------------------------------------------------------------------------------
 $id:evidence_positive_test
 !Assert {
   <Patient> [tested_positive] <RapidTest> {
-    test_sensitivity: 0.90,
-    test_specificity: 0.95,
+    test_sensitivity: 0.90, // P(Positive|Disease)
+    test_specificity: 0.95, // P(Negative|No_Disease)
     result: "positive"
   }
-} @0.99
+} @0.99 // Confidence in the FACT that the test result was positive
 
+// ------------------------------------------------------------------------------
+// 3. Evidence B: Symptom Observation
+// Goal: Add clinical observation evidence.
+// Natural Language: "The patient exhibits fever, cough, and fatigue."
+// ------------------------------------------------------------------------------
 $id:evidence_symptoms
 !Assert {
   <Patient> [exhibits] <Symptoms> {
@@ -32,13 +55,17 @@ $id:evidence_symptoms
   }
 } @0.85
 
-// Posterior probability inference
+// ------------------------------------------------------------------------------
+// 4. Posterior Inference
+// Goal: Calculate the updated probability of infection given the evidence.
+// Natural Language: "Given the positive test and symptoms, what is the probability the patient has COVID-19?"
+// ------------------------------------------------------------------------------
 $id:posterior
-~temp:0.1
+~temp:0.1 // Low temperature for precise calculation
 !Query(mode:bayesian_update) {
   <Patient> [has_disease] <COVID19> {
-    posterior_probability: 0.47,
+    posterior_probability: 0.47, // Expected result from inference engine
     given_evidence: "positive_test_and_symptoms",
     reasoning: "bayes_theorem"
   }
-} @0.47
+} @0.47 // The inferred probability

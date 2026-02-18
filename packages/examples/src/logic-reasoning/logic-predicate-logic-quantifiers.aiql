@@ -1,28 +1,52 @@
-// v2.0.0 Predicate Logic: Universal & Existential Quantifiers
-// FORALL expresses "for all" - universal statements.
-// EXISTS expresses "there exists" - existential claims.
+// Predicate Logic: Quantifiers
+// ==============================================================================
+// This file demonstrates First-Order Logic quantifiers in AIQL.
+//
+// Key Concepts:
+// 1. Universal Quantifier (forall): Applies a rule to all members of a set.
+// 2. Existential Quantifier (exists): Asserts that at least one member satisfies a condition.
+// 3. Mixed Quantifiers: Combining forall and exists for complex logic.
+// ==============================================================================
+
 @version:"2.0.0"
 
-// Universal Quantifier: All members of a domain have a property
+// ------------------------------------------------------------------------------
+// 1. Universal Quantifier
+// Logic: "For all x, if x is Human, then x is Mortal."
+// ------------------------------------------------------------------------------
 forall x: !Assert {
   <Human> [is] <Mortal>
 } @0.99
 
-// Existential Quantifier: At least one member has the property
+// ------------------------------------------------------------------------------
+// 2. Existential Quantifier
+// Logic: "There exists at least one ProgrammingLanguage that is Turing-complete."
+// ------------------------------------------------------------------------------
 exists lang: !Assert {
   <ProgrammingLanguage> [is] <Turing-complete>
 } @1.0
 
-// Mixed Quantifiers: Complex logical statements
+// ------------------------------------------------------------------------------
+// 3. Mixed Quantifiers (Nested)
+// Logic: "For every Integer n, there exists a Prime p that is a factor of n."
+// ------------------------------------------------------------------------------
 forall n: exists p: !Assert {
   <Integer> [has_prime_factor] <Prime>
 } @1.0
 
-// Classic Socrates Syllogism with Quantifiers
+// ------------------------------------------------------------------------------
+// 4. Syllogism with Quantifiers
+// Goal: Prove Socrates is mortal using formal quantification.
+// ------------------------------------------------------------------------------
+
+// Universal Rule: All Men must be Mortal.
 forall m: !Assert {
   <Man> [must_be] <Mortal>
 } @0.99
 
+// Fact: Socrates is a Man.
 !Assert {
   <Socrates> [is_a] <Man>
 } @0.95
+
+// Inference Result: <Socrates> [must_be] <Mortal> derived.

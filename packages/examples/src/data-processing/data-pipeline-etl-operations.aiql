@@ -1,13 +1,41 @@
-// Data Pipeline: ETL Operations
-// Graph-based ETL: extract → filter → sort → limit using semantic relations.
-// v1.0 tokenizes pipes; v0.5+ adds pipeline operators for functional composition.
+// Data Pipeline: ETL Operations (Functional)
+// ==============================================================================
+// This file demonstrates a functional data processing pipeline.
+//
+// Key Concepts:
+// 1. Chained Tasks: Simulating UNIX pipes or functional composition.
+// 2. Data Flow: Extracted -> Filtered -> Sorted -> Limited.
+// 3. Planned Syntax: Future AIQL versions will support `|` operators.
+// ==============================================================================
+
 @version:"1.0.0"
 
+// ------------------------------------------------------------------------------
+// Functional ETL Chain
+// Goal: Get the top 100 recent users over age 25.
+// ------------------------------------------------------------------------------
 !Task {
+  // 1. Extract
   <UserData> [extracted_from] <Database>
-  <UserData> [filtered_by] <Criteria> { age_min: 25 }
-  <FilteredData> [sorted_by] <Timestamp>
-  <SortedData> [limited_to] <TopResults> { limit: 100 }
+  
+  // 2. Filter
+  <UserData> [filtered_by] <Criteria> { 
+    age_min: 25,
+    status: "active"
+  }
+  
+  // 3. Sort
+  <FilteredData> [sorted_by] <Timestamp> {
+    order: "descending"
+  }
+  
+  // 4. Limit
+  <SortedData> [limited_to] <TopResults> { 
+    limit: 100 
+  }
 } @0.90
 
-/* Planned v0.5.0: | filter(age > 25) | sort(timestamp) | limit(100) */
+/* 
+  Future Vision (v0.5.0+): 
+  data = query(database) | filter(age > 25) | sort(timestamp) | limit(100) 
+*/

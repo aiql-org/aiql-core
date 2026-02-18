@@ -1,11 +1,28 @@
-// Nested Mathematical Expressions
-// Shows nested function calls and complex formulas.
-// Demonstrates operator precedence and parenthetical grouping.
+// Mathematics: Nested Complex Formulas
+// ==============================================================================
+// This file demonstrates operator precedence and complex nesting.
+//
+// Key Concepts:
+// 1. Nesting: Functions inside functions `sqrt(pow(x))`.
+// 2. Precedence: Standard algebraic order of operations.
+// 3. Symbolic Math: Variables (<A>, <B>) are resolved at runtime.
+// ==============================================================================
+
+@version:"2.6.0"
+
+// ------------------------------------------------------------------------------
+// Complex Definition
+// ------------------------------------------------------------------------------
 !ComplexFormulas {
+  // Pythagorean Theorem
   <Distance> = sqrt(<A> ^ 2 + <B> ^ 2)
+  
+  // Geometry
   <Volume> = <Pi> * <Radius> ^ 3
+  
+  // Growth
   <Exponential> = exp(<Rate> * <Time>)
+  
+  // Polynomial
   <Polynomial> = <A> * <X> ^ 2 + <B> * <X> + <C>
 } @0.92
-
-// Nested expressions maintain correct order of operations

@@ -1,10 +1,20 @@
-// Temporal Tense with Context Parameters and Provenance (v1.1.0)
-// Combines tense annotations with time context and origin metadata.
-// Use cases: Historical analysis, temporal databases, event timelines.
+// Temporal Tenses: Context Integration
+// ==============================================================================
+// This file demonstrates combining Tense Annotations with Context Parameters.
+//
+// Key Concepts:
+// 1. Tense + Context: Reinforcing the timeline (e.g., [past] + time:1969).
+// 2. Provenance: Citing historical records.
+// 3. Scope: Differentiating 'historical' fact from 'prediction'.
+// ==============================================================================
+
 @version:"1.1.0"
 @origin:"doi:10.1234/history"
 @cite:["Smith2024", "NASA_Archives"]
 
+// ------------------------------------------------------------------------------
+// Historical Context (1969)
+// ------------------------------------------------------------------------------
 !Assert(time:1969, scope:historical) {
   <Apollo11> [landed@tense:past] <Moon> {
     date: "1969-07-20",
@@ -15,8 +25,12 @@
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// Future Context (Prediction)
+// ------------------------------------------------------------------------------
 !Query(time:future, mode:prediction) {
   <Humanity> [will_establish@tense:future] <MarsColony> {
-    estimated_year: 2040
+    estimated_year: 2040,
+    probability: 0.75
   }
 } @0.75

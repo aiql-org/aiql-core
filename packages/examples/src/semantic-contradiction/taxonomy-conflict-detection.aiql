@@ -1,17 +1,43 @@
-// Taxonomy Conflict Detection (v2.5.0)
-// OntologyReasoner detects when entities belong to disjoint classes.
-// Uses transitive closure to find taxonomy violations in class hierarchies.
-// Example: Mammal and Reptile are mutually exclusive categories.
+// Semantic Contradiction: Taxonomy Conflict Detection
+// ==============================================================================
+// This file demonstrates ontological conflicts in class hierarchies.
+//
+// Key Concepts:
+// 1. Disjoint Classes: Sets that cannot overlap (e.g., Triangle vs Circle).
+// 2. Transitive Closure: Inheriting properties up the hierarchy (Dog -> Mammal).
+// 3. Logical Contradiction: An entity belonging to two disjoint sets.
+// ==============================================================================
+
+@version:"2.5.0"
+$$group:ontology_validation
+
+// ------------------------------------------------------------------------------
+// 1. Establishing Hierarchy A
+// Logic: Fido is a Dog -> Dog is a Mammal -> Fido is a Mammal.
+// ------------------------------------------------------------------------------
 !Assert {
   <Fido> [is_a] <Dog>
   <Dog> [is_a] <Mammal>
 } @0.99
 
+// ------------------------------------------------------------------------------
+// 2. Establishing Hierarchy B (Conflicting)
+// Logic: Fido is a Reptile.
+// ------------------------------------------------------------------------------
 !Assert {
   <Fido> [is_a] <Reptile>
 } @0.80
 
-// The inference engine detects this semantic contradiction:
-// Fido cannot be both Mammal and Reptile (disjoint classes)
-// Conflict type: taxonomy, severity: critical
-// No resolution strategy - AIQL only detects and represents
+// ------------------------------------------------------------------------------
+// 3. Detection Logic
+// ------------------------------------------------------------------------------
+// The Ontology Reasoner defines:
+// Disjoint(Mammal, Reptile)
+//
+// Inference:
+// 1. Fido is Mammal (Current Knowledge)
+// 2. Fido is Reptile (New Assertion)
+// 3. Mammal and Reptile are Disjoint.
+// 4. Therefore, Fido cannot be both.
+//
+// Result: Critical Error caught by Inference Engine.

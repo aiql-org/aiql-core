@@ -1,32 +1,54 @@
-// ETL Pipeline: Extract-Transform-Load
-// Sequential !Task workflow using ##seq for dependency ordering (1→2→3).
-// Models real-world data pipelines: API extraction → transformation → database loading.
+// ETL Pipeline: Extract-Transform-Load (Sequential)
+// ==============================================================================
+// This file demonstrates a sequential ETL workflow using task dependencies.
+//
+// Key Concepts:
+// 1. ##seq Marker: Explicitly ordering steps (Extraction -> Transformation -> Loading).
+// 2. !Task Intent: Representing discrete units of work.
+// 3. Attributes: Configuring API endpoints, batch sizes, and cleanup rules.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:data_pipeline
 
+// ------------------------------------------------------------------------------
+// Step 1: Extraction
+// Source: External API
+// ------------------------------------------------------------------------------
 ##seq:1
 $id:task_extract
 !Task {
   <RawData> [extracted_from] <APIEndpoint> {
     url: "https://api.example.com/data",
-    method: "GET"
+    method: "GET",
+    auth: "bearer_token"
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// Step 2: Transformation
+// Operation: Cleaning and Normalization
+// ------------------------------------------------------------------------------
 ##seq:2
 $id:task_transform
 !Task {
   <RawData> [transformed_to] <CleanData> {
     operations: "normalize,deduplicate,validate",
-    steps: 3
+    steps: 3,
+    schema: "v2.1"
   }
 } @0.90
 
+// ------------------------------------------------------------------------------
+// Step 3: Loading
+// Destination: Data Warehouse
+// ------------------------------------------------------------------------------
 ##seq:3
 $id:task_load
 !Task {
   <CleanData> [loaded_into] <Database> {
     table: "processed_data",
-    batch_size: 1000
+    batch_size: 1000,
+    mode: "append"
   }
 } @0.95

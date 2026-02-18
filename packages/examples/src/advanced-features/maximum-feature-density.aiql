@@ -1,26 +1,44 @@
-// Maximum Feature Density: AIQL v1.0
-// Combines ALL v1.0 features: security (#sign), 5 metadata types, provenance (@version/@origin/@cite),
-// multi-context params, multi-relation graph. The ultimate showcase example.
+// Maximum Feature Density (Showcase)
+// ==============================================================================
+// This file combines ALL major AIQL v1.0 features into a single example.
+//
+// Key Concepts:
+// 1. Metadata: @version, @origin, @cite, $id, $$group, ##seq, ~temp, ~~entropy.
+// 2. Security: #sign directive for agent authentication.
+// 3. Context: Multi-parameter context (time, mode, scope).
+// 4. Complexity: Nested attributes and multi-line values.
+// ==============================================================================
+
 @version:"1.0.0"
 @origin:"doi:10.5555/aiql-complete-example"
 @cite:["arxiv:2501.56789", "isbn:978-1-234-56789-0"]
 
+// Security Directive: Signed by the Alpha Researcher Agent
 #sign("alpha-researcher-agent")
+
+// Metadata Block
 $id:complete_statement_001
 $$group:breakthrough_research
 ##seq:42
-~temp:0.85
-~~entropy:0.4
+~temp:0.85      // High temperature for creative/bold assertion
+~~entropy:0.4   // Medium-Low entropy (structured but complex)
 
+// ------------------------------------------------------------------------------
+// Dense Assertion
+// ------------------------------------------------------------------------------
 !Assert(time:present, mode:declarative, scope:global) {
+  // Relation 1: Achievement
   <QuantumAI> [achieves] <SuperhumanReasoning> {
     domain: "mathematical_proofs",
     benchmark_score: 0.98,
     architecture: "hybrid_quantum_classical",
     training_data: "10^15_tokens"
   }
+  
+  // Relation 2: Attribution
   <QuantumAI> [developed_by] <ResearchTeam> {
     institution: "AI Safety Institute",
-    location: "global_collaboration"
+    location: "global_collaboration",
+    funding: "non_profit_grant"
   }
-} @0.92
+} @0.92 // High confidence in this composite statement

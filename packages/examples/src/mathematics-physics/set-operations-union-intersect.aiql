@@ -1,10 +1,25 @@
-// Set Operations
-// Demonstrates union and intersect operations on sets.
-// Use cases: Data classification, taxonomy, logical grouping.
+// Mathematics: Set Operations
+// ==============================================================================
+// This file demonstrates set theory operations.
+//
+// Key Concepts:
+// 1. Union: Combining elements from two sets.
+// 2. Intersect: Finding common elements between sets.
+// 3. Uses: Taxonomy, classification logic, Venn diagram representations.
+// ==============================================================================
+
+@version:"2.6.0"
+
+// ------------------------------------------------------------------------------
+// Set Logic
+// ------------------------------------------------------------------------------
 !SetOperations {
+  // Mathematical Sets
   <AllNumbers> = <Integers> union <Decimals>
+  
+  // Logical Intersection
   <CommonElements> = <SetA> intersect <SetB>
+  
+  // Physics Classification
   <Particles> = <Fermions> union <Bosons>
 } @0.99
-
-// Set operations transpile to Python sets and SQL set queries

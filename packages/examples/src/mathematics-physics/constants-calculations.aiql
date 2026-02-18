@@ -1,12 +1,26 @@
-// Mathematical Constants and Formulas
-// Demonstrates constants, variables, and formula definitions.
-// Use for scientific computing, physics models, engineering.
+// Mathematics: Constants and Calculations
+// ==============================================================================
+// This file demonstrates defining physical constants and basic formulas.
+//
+// Key Concepts:
+// 1. !PhysicsConstants: A specialized container for immutable values.
+// 2. Variable Assignment: <Key> = <Value>.
+// 3. Arithmetic Operations: *, /, +, -, ^.
+// ==============================================================================
+
+@version:"2.6.0"
+
+// ------------------------------------------------------------------------------
+// Physics Constants
+// Standard values for scientific computation.
+// ------------------------------------------------------------------------------
 !PhysicsConstants {
+  // Fundamental Constants
   <Gravity> = 9.81
   <SpeedOfLight> = 299792458
   <Pi> = 3.14159
+  
+  // Formulas relying on variables (Context-dependent)
   <KineticEnergy> = 0.5 * <Mass> * <Velocity> ^ 2
   <Momentum> = <Mass> * <Velocity>
 } @0.97
-
-// Constants and formulas for scientific computation

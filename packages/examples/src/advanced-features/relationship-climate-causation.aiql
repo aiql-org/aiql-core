@@ -1,7 +1,18 @@
-// v2.1.0 Relationship: Climate Causal Chain
-// Causal relationships express cause-effect dependencies.
-// Relation types: causes, enables, prevents, depends_on, triggers
-// Use cases: Scientific reasoning, policy analysis, intervention planning.
+// Relationship: Climate Causal Chain
+// ==============================================================================
+// This file demonstrates using explicit Relationship nodes for causality.
+//
+// Key Concepts:
+// 1. Causal Graph: Nodes are Events/Facts, Edges are Causal Links.
+// 2. !Relationship(type:causal): Meta-intent for defining edges between IDs.
+// 3. Chain Reaction: A causes B, B causes C.
+// ==============================================================================
+
+@version:"2.1.0"
+
+// ------------------------------------------------------------------------------
+// Step 1: Emissions
+// ------------------------------------------------------------------------------
 $id:co2_emissions
 !Assert {
   <CO2Emissions> [increasing] <Atmosphere> {
@@ -9,6 +20,9 @@ $id:co2_emissions
   }
 } @0.99
 
+// ------------------------------------------------------------------------------
+// Step 2: Global Warming
+// ------------------------------------------------------------------------------
 $id:global_warming
 !Assert {
   <GlobalWarming> [threatening] <Ecosystems> {
@@ -16,17 +30,24 @@ $id:global_warming
   }
 } @0.95
 
-// Causal relationship: emissions CAUSE warming
+// ------------------------------------------------------------------------------
+// Link 1 -> 2: Emissions CAUSE Warming
+// ------------------------------------------------------------------------------
 !Relationship(type:causal, source:$id:co2_emissions, target:$id:global_warming) {
   <CO2Emissions> [causes] <GlobalWarming>
 } @0.92
 
+// ------------------------------------------------------------------------------
+// Step 3: Extreme Weather
+// ------------------------------------------------------------------------------
 $id:extreme_weather
 !Assert {
   <ExtremeWeather> [increasing] <Frequency>
 } @0.90
 
-// Another causal link in the chain
+// ------------------------------------------------------------------------------
+// Link 2 -> 3: Warming TRIGGERS Weather Events
+// ------------------------------------------------------------------------------
 !Relationship(type:causal, source:$id:global_warming, target:$id:extreme_weather) {
   <GlobalWarming> [triggers] <ExtremeWeather>
 } @0.88

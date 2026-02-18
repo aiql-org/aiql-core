@@ -1,6 +1,21 @@
-// Secure Agent Communication
-// Combines DILITHIUM signing + KYBER encryption for full security.
-// Achieves both integrity (signed) and confidentiality (encrypted) guarantees.
+// Security: Secure Agent Communication
+// ==============================================================================
+// This file demonstrates Authenticated Encryption (Sign + Encrypt).
+//
+// Key Concepts:
+// 1. Full Security: Combining DILITHIUM (Integrity) and KYBER (Confidentiality).
+// 2. #secure Directive: Shortcut for #sign + #encrypt.
+// 3. Multi-Agent Trust: Secure channel establishment between Alice and Bob.
+// ==============================================================================
+
+@version:"2.7.0"
+$$group:secure_comms
+
+// ------------------------------------------------------------------------------
+// 1. Secure Payload
+// Directive: #secure(sender, recipient)
+// Meaning: Signed by 'alice-agent', Encrypted for 'bob-agent'.
+// ------------------------------------------------------------------------------
 #secure("alice-agent", "bob-agent")
 !Assert {
   <SecretKnowledge> [shared_with] <TrustedAgent> {

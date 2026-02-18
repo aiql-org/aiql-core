@@ -1,9 +1,19 @@
 // Semantic Composition: Defining Justice
-// Builds complex abstract concepts from components: Justice = Fairness + Law + MoralRightness.
-// Shows emergent properties: whole is more than sum of parts (necessary but insufficient).
+// ==============================================================================
+// This file demonstrates how to define complex abstract concepts.
+//
+// Key Concepts:
+// 1. Composition: Building a high-level concept (Justice) from simpler ones.
+// 2. Attributes: Defining nuanced aspects of necessary components.
+// 3. Emergence: The whole is greater than the sum of its parts.
+// ==============================================================================
+
 @version:"1.0.0"
 $$group:concept_definition
 
+// ------------------------------------------------------------------------------
+// Component 1: Fairness
+// ------------------------------------------------------------------------------
 $id:justice_component_1
 !Assert {
   <Justice> [requires] <Fairness> {
@@ -12,6 +22,9 @@ $id:justice_component_1
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// Component 2: Law
+// ------------------------------------------------------------------------------
 $id:justice_component_2
 !Assert {
   <Justice> [requires] <Law> {
@@ -20,6 +33,9 @@ $id:justice_component_2
   }
 } @0.90
 
+// ------------------------------------------------------------------------------
+// Component 3: Moral Rightness
+// ------------------------------------------------------------------------------
 $id:justice_component_3
 !Assert {
   <Justice> [requires] <MoralRightness> {
@@ -28,6 +44,9 @@ $id:justice_component_3
   }
 } @0.85
 
+// ------------------------------------------------------------------------------
+// Definition by Opposition
+// ------------------------------------------------------------------------------
 $id:justice_opposition
 !Assert {
   <Justice> [opposes] <Injustice> {
@@ -36,6 +55,9 @@ $id:justice_opposition
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// Emergent Property Assertion
+// ------------------------------------------------------------------------------
 $id:justice_emergence
 !Assert {
   <Fairness> [combined_with] <Law> {
@@ -45,7 +67,10 @@ $id:justice_emergence
   }
 } @0.80
 
-// Query the composed meaning
+// ------------------------------------------------------------------------------
+// Querying the Definition
+// Goal: Retrieve the composite definition of Justice.
+// ------------------------------------------------------------------------------
 !Query(mode:semantic_composition) {
   <Justice> [is_defined_by] <ComponentConcepts>
 }

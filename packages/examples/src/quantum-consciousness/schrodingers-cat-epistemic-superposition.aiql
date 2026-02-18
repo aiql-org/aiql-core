@@ -1,24 +1,42 @@
-// Schrödinger's Cat (Epistemic Superposition) - v2.6.0
-// Demonstrates quantum superposition of contradictory beliefs using
-// mode:quantum_superposition context and @coherence: marker.
-// Until observed, the cat exists in epistemic superposition (both alive and dead).
+// Schrödinger's Cat (Epistemic Superposition)
+// ==============================================================================
+// This file models the famous thought experiment using AIQL quantum modes.
+//
+// Key Concepts:
+// 1. Epistemic Superposition: The state of knowledge is simultaneously A and B.
+// 2. mode:quantum_superposition: Context parameter enabling contradictory states.
+// 3. Observer Effect: Querying the state collapses the superposition.
+// ==============================================================================
 
-// Quantum superposition of contradictory states
+@version:"2.6.0"
+$$group:quantum_thought_experiment
+
+// ------------------------------------------------------------------------------
+// 1. Superposition State
+// The cat is both Alive and Dead with equal probability amplitude.
+// Coherence is 1.0 (Perfectly isolated quantum system).
+// ------------------------------------------------------------------------------
+
+// State |Alive>
 @coherence:1.0
 !Assert(mode:quantum_superposition) {
   <Cat> [is] <Alive> { amplitude: 0.707, phase: 0 }
 } @0.95
 
+// State |Dead>
 @coherence:1.0
 !Assert(mode:quantum_superposition) {
   <Cat> [is] <Dead> { amplitude: 0.707, phase: 3.14159 }
 } @0.95
 
-// Measurement collapses superposition (observer_effect)
+// ------------------------------------------------------------------------------
+// 2. The Measurement (Observer Effect)
+// Goal: Open the box. This query forces a collapse to a single state.
+// ------------------------------------------------------------------------------
 !Query(observer_effect:true) {
   <Cat> [state] <?Outcome> {
     measurement: "box_opened"
   }
 }
 
-// After observation: coherence → 0.0, classical state emerges
+// Result: Coherence drops to 0.0. Only one state remains true (@1.0 confidence).

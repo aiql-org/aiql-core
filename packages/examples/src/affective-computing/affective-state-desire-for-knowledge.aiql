@@ -1,9 +1,23 @@
-// Affective State: Desire for Knowledge
-// Models agent desires and motivational states with intensity and domain.
-// Critical for goal-directed behavior and curiosity-driven learning systems.
+// Affective Computing: Desire for Knowledge
+// ==============================================================================
+// This file demonstrates goal-directed motivation.
+//
+// Key Concepts:
+// 1. !Desire Intent: Represents future-oriented goals or wants.
+// 2. Domain Specificity: Targeting desire towards a specific field (Quantum Physics).
+// 3. Intrinsic Motivation: The agent "wants" to learn, driving autonomous behavior.
+// ==============================================================================
+
+@version:"1.0.0"
+
+// ------------------------------------------------------------------------------
+// 1. Asserting Desire
+// Natural Language: "The Agent strongly desires knowledge about Quantum Physics."
+// ------------------------------------------------------------------------------
 !Assert {
   <Agent> [desires] <Knowledge> {
     intensity: 0.85,
-    domain: "quantum_physics"
+    domain: "quantum_physics",
+    motivation_type: "intrinsic"
   }
 } @0.90

@@ -1,28 +1,54 @@
-// v2.1.0 Relationship: Historical Timeline
-// Temporal relationships express time ordering between events.
-// Relation types: before, after, simultaneous, concurrent, during
-// Essential for chronological reasoning, event causation, narrative construction.
+// Relationship: Historical Timeline
+// ==============================================================================
+// This file demonstrates temporal ordering using Relationship nodes.
+//
+// Key Concepts:
+// 1. Temporal Constraints: Before, after, during.
+// 2. Timeline Construction: Linking independent events into a narrative.
+// 3. Chronological Reasoning: Enabling the AI to understand cause-and-effect sequences.
+// ==============================================================================
+
+@version:"2.1.0"
+
+// ------------------------------------------------------------------------------
+// Step 1: French Revolution
+// ------------------------------------------------------------------------------
 $id:french_revolution
 !Assert {
-  <FrenchRevolution> [occurred_in] <1789>
+  <FrenchRevolution> [occurred_in] <1789> {
+    location: "France",
+    significance: "high"
+  }
 } @0.99
 
+// ------------------------------------------------------------------------------
+// Step 2: Napoleonic Wars
+// ------------------------------------------------------------------------------
 $id:napoleonic_wars
 !Assert {
-  <NapoleonicWars> [occurred_in] <1803-1815>
+  <NapoleonicWars> [occurred_in] <1803-1815> {
+    continent: "Europe"
+  }
 } @0.99
 
-// Temporal relationship: french_revolution happened BEFORE napoleonic_wars
+// ------------------------------------------------------------------------------
+// Link 1 -> 2: Revolution predicts/precedes Wars
+// ------------------------------------------------------------------------------
 !Relationship(type:temporal, source:$id:french_revolution, target:$id:napoleonic_wars) {
   <FrenchRevolution> [before] <NapoleonicWars>
 } @0.95
 
+// ------------------------------------------------------------------------------
+// Step 3: World War I
+// ------------------------------------------------------------------------------
 $id:ww1
 !Assert {
   <WorldWar1> [occurred_in] <1914-1918>
 } @0.99
 
-// Another temporal relationship
+// ------------------------------------------------------------------------------
+// Link 2 -> 3: Wars precede WWI (Long-term historical flow)
+// ------------------------------------------------------------------------------
 !Relationship(type:temporal, source:$id:napoleonic_wars, target:$id:ww1) {
   <NapoleonicWars> [before] <WorldWar1>
 } @0.98

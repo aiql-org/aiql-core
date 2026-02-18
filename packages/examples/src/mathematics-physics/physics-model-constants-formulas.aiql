@@ -1,13 +1,32 @@
-// Physics Model: Constants & Formulas
-// Demonstrates mathematical expressions with constants, formulas, and operators.
-// New in v2.6.0: Full support for arithmetic (+, -, *, /, ^), functions, lambdas, sets.
+// Physics Model: Integrated System
+// ==============================================================================
+// This file integrates constants, formulas, and set operations.
+//
+// Key Concepts:
+// 1. Math Interop: Mixing arithmetic, lambdas, and set theory.
+// 2. Domain Specific Language: Tailored for physics modeling.
+// 3. Transpilation: Converts to Python/NumPy or standard SQL.
+// ==============================================================================
+
+@version:"2.6.0"
+
+// ------------------------------------------------------------------------------
+// Integrated Model
+// ------------------------------------------------------------------------------
 !PhysicsModel {
+  // Constant
   <Gravity> = 9.81
+  
+  // Kinematics Formula
   <Distance> = <Velocity> * <Time> + 0.5 * <Acceleration> * <Time> ^ 2
+  
+  // Wave Mechanics
   <WaveHeight> = <Amplitude> * sin(<AngularFrequency> * <Time> + <PhaseShift>)
+  
+  // Dynamic Calculation
   <CalculateKE> = lambda m, v: 0.5 * m * v ^ 2
+  
+  // Classification (Set Theory)
   <Fermions> = <Quarks> union <Leptons>
   <CommonParticles> = <Protons> intersect <Baryons>
 } @0.95
-
-// Transpiles to Python, SQL with full mathematical support

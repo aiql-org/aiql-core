@@ -1,31 +1,53 @@
 // Goal-Driven Learning: Quantum Physics
-// !Goal intent models agent objectives with prerequisites and progress tracking.
-// Demonstrates hierarchical goal decomposition with subgoal dependencies.
+// ==============================================================================
+// This file demonstrates how agents structure learning objectives.
+//
+// Key Concepts:
+// 1. !Goal Intent: Explicitly defining objectives with deadlines and priority.
+// 2. Hierarchical Decomposition: Breaking a main goal into actionable subgoals.
+// 3. Status Tracking: Properties like `status`, `progress`, and `prerequisite_for`.
+// ==============================================================================
+
 @version:"1.0.0"
 
+// ------------------------------------------------------------------------------
+// 1. Main Objective (High Level)
+// Goal: Master Quantum Physics by the end of 2026.
+// ------------------------------------------------------------------------------
 $id:goal_main
 !Goal {
   <Agent> [aims_to] <UnderstandQuantumPhysics> {
     priority: "high",
     deadline: "2026-12-31",
-    progress: 0.45
+    progress: 0.45,
+    domain: "physics"
   }
 } @0.85
 
+// ------------------------------------------------------------------------------
+// 2. Subgoal A (Completed Prerequisite)
+// Goal: Learn Linear Algebra as a foundation.
+// ------------------------------------------------------------------------------
 $id:subgoal_001
 $$group:learning_path
 !Goal {
   <Agent> [must_learn] <LinearAlgebra> {
     prerequisite_for: "quantum_mechanics",
-    status: "completed"
+    status: "completed",
+    mastery_level: "advanced"
   }
 } @1.0
 
+// ------------------------------------------------------------------------------
+// 3. Subgoal B (Active Prerequisite)
+// Goal: Learn Complex Numbers. Currently in progress.
+// ------------------------------------------------------------------------------
 $id:subgoal_002
 $$group:learning_path
 !Goal {
   <Agent> [must_learn] <ComplexNumbers> {
     prerequisite_for: "quantum_mechanics",
-    status: "in_progress"
+    status: "in_progress",
+    current_module: "euler_formula"
   }
 } @0.70

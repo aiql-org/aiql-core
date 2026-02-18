@@ -1,11 +1,21 @@
-// v2.0.0 Consistency Checking: Detect Contradictions
-// Inference engine detects logical inconsistencies (A AND NOT-A).
-// Essential for knowledge base validation and contradiction resolution.
+// Inference Consistency Checking
+// ==============================================================================
+// This file demonstrates how the engine detects logical contradictions.
+//
+// Key Concepts:
+// 1. Semantic Consistency: Ensuring asserted facts do not contradict each other.
+// 2. Implication Logic: Verifying that rules (implies) do not lead to conflicts.
+// 3. Entropy (~~entropy): High entropy (0.8+) generally signals inconsistency or chaos.
+// ==============================================================================
+
 @version:"2.0.0"
 $id:consistency_demo
-~~entropy:0.3
+~~entropy:0.3 // Low entropy = Orderly, consistent system
 
-// Consistent knowledge: No contradictions
+// ------------------------------------------------------------------------------
+// 1. Consistent Facts
+// Standard astronomical model. No conflicts here.
+// ------------------------------------------------------------------------------
 !Assert {
   <Earth> [orbits] <Sun>
 } @1.0
@@ -14,19 +24,24 @@ $id:consistency_demo
   <Moon> [orbits] <Earth>
 } @1.0
 
-// Implication consistency
+// ------------------------------------------------------------------------------
+// 2. Logical Implication
+// Defining a physical law: Mass implies Gravity.
+// ------------------------------------------------------------------------------
 !Assert {
   <Object> [has] <Mass>
 } implies !Assert {
   <Object> [experiences] <Gravity>
 }
 
-// Example of detectable contradiction (for testing):
+// ------------------------------------------------------------------------------
+// 3. Contradiction Examples (For Documentation)
+// The following patterns would trigger the Consistency Checker:
+//
+// Direct Contradiction:
 // !Assert { <X> [is] <Y> } @0.9
 // not !Assert { <X> [is] <Y> } @0.85
-// ↑ Inference engine would flag this as inconsistent
-
-// Contradictory implications (detectable):
-// !Assert { <A> [p] <B> } implies !Assert { <C> [q] <D> }
-// !Assert { <A> [p] <B> } implies not !Assert { <C> [q] <D> }
-// Up-arrow Engine detects: same antecedent -> conflicting consequents
+//
+// Implication Conflict:
+// If A->B and A->(NOT B), then A cannot be true without contradiction.
+// ------------------------------------------------------------------------------

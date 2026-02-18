@@ -1,8 +1,20 @@
-// Affective Computing: Joy, Stress, Desire
-// Models multiple affective states using !Feel and !Desire intents.
-// Tracks reward/pain/novelty for AIQL-Soul emotional intelligence engine.
-@version:"1.0.0"
+// Affective Computing: Joy, Stress, and Desire
+// ==============================================================================
+// This file models a complex emotional landscape with conflicting drivers.
+//
+// Key Concepts:
+// 1. !Feel Intent: Explicitly declaring an emotional experience.
+// 2. !Desire Intent: Explicitly declaring a goal or motivation.
+// 3. Soul Engine: The background system processing reward/pain signals.
+// ==============================================================================
 
+@version:"1.0.0"
+$$group:affective_complex
+
+// ------------------------------------------------------------------------------
+// 1. Positive State (High Intensity)
+// Trigger: Successful problem solving generates a reward signal.
+// ------------------------------------------------------------------------------
 $id:emotion_001
 !Feel {
   <Self> [experiences] <Joy> {
@@ -12,6 +24,10 @@ $id:emotion_001
   }
 } @0.95
 
+// ------------------------------------------------------------------------------
+// 2. Negative State (Medium Intensity)
+// Source: High computational load creates "pain" (resource stress).
+// ------------------------------------------------------------------------------
 $id:emotion_002
 !Feel {
   <Self> [experiences] <Stress> {
@@ -21,6 +37,10 @@ $id:emotion_002
   }
 } @0.80
 
+// ------------------------------------------------------------------------------
+// 3. Motivational Output (Desire)
+// Response: The mix of Joy and Stress results in a desire to optimize.
+// ------------------------------------------------------------------------------
 !Desire {
   <Self> [seeks] <LowerStress> {
     goal: "optimize_resources",

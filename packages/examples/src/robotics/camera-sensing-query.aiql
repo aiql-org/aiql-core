@@ -1,19 +1,39 @@
-// Camera Sensing Query (v2.4.0 Organic)
-// Sensing uses !Query Intent with device context parameters.
-// No special SENSE tokens - just semantic object queries.
-// Demonstrates: organic robotics, graph-traversable perception.
+// Robotics: Camera Sensing Query
+// ==============================================================================
+// This file demonstrates how robotic agents query sensory data.
+//
+// Key Concepts:
+// 1. Organic Integration: No special "SENSE" keywords; sensing is just a Query.
+// 2. Device Context: Specifying which sensor (`front_cam`) context to query.
+// 3. Object Recognition: Returning semantic concepts (`<Person>`) from raw data.
+// ==============================================================================
+
+@version:"2.4.0"
+$$group:robotics_perception
+
+// ------------------------------------------------------------------------------
+// 1. Sensing Request
+// Goal: Ask the front camera what it currently sees.
+// Context: device_type:camera ensures the query is routed to the vision subsystem.
+// ------------------------------------------------------------------------------
 !Query(device_type:camera, device_id:front_cam) {
   <FrontCamera> [observes] <?Object> { 
     timestamp: "now",
-    resolution: "1920x1080"
+    resolution: "1920x1080",
+    mode: "object_detection"
   }
 }
 
-// Process sensor data as knowledge
+// ------------------------------------------------------------------------------
+// 2. Processed Perception (Simulated Result)
+// Goal: Represent the result of the sensing operation as knowledge.
+// Natural Language: "The Front Camera detected a Person with 87% confidence."
+// ------------------------------------------------------------------------------
 !Assert {
   <FrontCamera> [detected] <Person> {
     confidence: 0.87,
     position: "center",
-    distance: "2.5m"
+    distance: "2.5m",
+    bounding_box: "[100, 200, 300, 400]"
   }
-} @0.87
+} @0.87 // Confidence reflects the sensor's certainty

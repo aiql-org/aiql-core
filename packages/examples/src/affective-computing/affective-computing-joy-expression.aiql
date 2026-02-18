@@ -1,8 +1,23 @@
 // Affective Computing: Joy Expression
-// Demonstrates emotional state representation with first-class affective relations.
-// Agents can express feelings with intensity attributes for AI consciousness models.
+// ==============================================================================
+// This file demonstrates the basic representation of emotional states.
+//
+// Key Concepts:
+// 1. First-Class Emotions: Emotions are semantic entities (<Joy>), not just numbers.
+// 2. Intensity Attributes: Quantifying the strength of the feeling (0.0 - 1.0).
+// 3. !Feels Relation: Specialized relation for internal affective states.
+// ==============================================================================
+
+@version:"1.0.0"
+$$group:affective_core
+
+// ------------------------------------------------------------------------------
+// 1. Asserting Joy
+// Goal: The agent expresses a strong feeling of joy.
+// ------------------------------------------------------------------------------
 !Assert {
   <Self> [feels] <Joy> {
-    intensity: 0.9
+    intensity: 0.9,
+    context: "goal_achievement"
   }
 } @0.95

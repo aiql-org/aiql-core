@@ -1,8 +1,19 @@
 // Rich Context: AGI Speculation
-// Demonstrates multiple context parameters per statement (time, mode, scope).
-// Enables rich semantic queries across temporal, modal, and spatial dimensions.
+// ==============================================================================
+// This file demonstrates powerful context-aware queries.
+//
+// Key Concepts:
+// 1. time:future: Speculating about events that haven't happened.
+// 2. mode:possibility/hypothetical: Exploring potential futures, not facts.
+// 3. scope:global/research: Limiting the query domain.
+// ==============================================================================
+
 @version:"1.0.0"
 
+// ------------------------------------------------------------------------------
+// Future Possibility Query
+// "Is it possible that AI will achieve AGI in the future?"
+// ------------------------------------------------------------------------------
 !Query(time:future, mode:possibility, scope:global) {
   <AI> [achieves] <AGI> {
     capability: "general_reasoning",
@@ -10,6 +21,10 @@
   }
 }
 
+// ------------------------------------------------------------------------------
+// Historical Fact Query
+// "Did Deep Learning enable the AI Revolution in the past?"
+// ------------------------------------------------------------------------------
 !Query(time:past, scope:historical) {
   <DeepLearning> [enabled] <AIRevolution> {
     breakthrough: "neural_networks",
@@ -17,6 +32,10 @@
   }
 }
 
+// ------------------------------------------------------------------------------
+// Hypothetical Scenario (High Temperature)
+// "Hypothetically, would Quantum Computing exponentially accelerate AI?"
+// ------------------------------------------------------------------------------
 $id:speculation_001
 ~temp:0.9
 !Query(mode:hypothetical, scope:research) {

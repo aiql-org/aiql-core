@@ -1,31 +1,51 @@
-// v2.0.0 Inference Rules: Modus Ponens (A, A -> B |- B)
-// Classic inference rule: If A is true and A implies B, then B is true.
-// Foundation for automated reasoning and proof systems.
+// Inference Rules: Modus Ponens
+// ==============================================================================
+// This file demonstrates the classic "Modus Ponens" inference rule.
+//
+// Key Concepts:
+// 1. Implication: A rule stating "If P then Q" (P implies Q).
+// 2. Modus Ponens: If P is true, and P implies Q, then Q must be true.
+// 3. Automated Derivation: The inference engine automatically deduces Q.
+// ==============================================================================
+
 @version:"2.0.0"
 $id:modus_ponens_demo
 
-// Premise 1: Fact A is true
+// ------------------------------------------------------------------------------
+// Example 1: Physical Causality
+// Rule: "If it is raining, the ground becomes wet."
+// ------------------------------------------------------------------------------
+
+// Premise 1 (Fact): It is raining.
 !Assert {
   <Rain> [is_falling] <Now>
 } @1.0
 
-// Premise 2: A implies B
+// Premise 2 (Rule): Rain implies Wet Ground.
 !Assert {
   <Rain> [is_falling] <Now>
 } implies !Assert {
   <Ground> [becomes] <Wet>
 } @0.98
 
-// Conclusion: B can be inferred (ground is wet)
-// Inference engine automatically derives this fact
+// Conclusion (Implicit): <Ground> [becomes] <Wet> is now derived as True.
 
-// Another example: Knowledge implication
+// ------------------------------------------------------------------------------
+// Example 2: Cognitive Development
+// Rule: "Studying mathematics develops logical thinking."
+// ------------------------------------------------------------------------------
+
+// Premise 1 (Rule):
 !Assert {
   <Student> [studies] <Mathematics>
 } implies !Assert {
   <Student> [develops] <LogicalThinking>
 } @0.9
 
+// Premise 2 (Fact): Alice studies Mathematics.
 !Assert {
   <Alice> [studies] <Mathematics>
 } @0.85
+
+// Conclusion (Implicit): Alice develops LogicalThinking.
+// Confidence of conclusion = 0.9 * 0.85 = 0.765

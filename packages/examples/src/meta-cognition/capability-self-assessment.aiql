@@ -1,22 +1,45 @@
-// Capability Self-Assessment (v2.2.0)
-// Agent infers its own capabilities from KB structure.
-// Has logical statements → can reason logically.
-// Has affective statements → can model emotions.
-// Demonstrates meta-cognitive capability inference.
+// Meta-Cognition: Capability Self-Assessment
+// ==============================================================================
+// This file demonstrates how an AI agent detects its own capabilities.
+//
+// Key Concepts:
+// 1. Meta-Cognition: The ability of the agent to reason about itself.
+// 2. Capability Inference: Deriving abilities (Logic, Affect) from the types of
+//    statements present in the Knowledge Base.
+// 3. Introspection: Querying the <Self> concept.
+// ==============================================================================
 
-// Define logical implication (demonstrates reasoning capability)
-!Assert { <Animal> [is_a] <Mammal> } implies !Assert { <Animal> [has] <Spine> }
+@version:"2.2.0"
 
-// Add affective statement (demonstrates affective capability)
+// ------------------------------------------------------------------------------
+// 1. Evidence of Logical Reasoning
+// Goal: Add a logical rule. The existence of "implies" implies logical capability.
+// ------------------------------------------------------------------------------
 !Assert {
-  <Agent> [experiences] <Curiosity> {
+  <Animal> [is_a] <Mammal>
+} implies !Assert {
+  <Animal> [has] <Spine>
+}
+
+// ------------------------------------------------------------------------------
+// 2. Evidence of Affective Reasoning
+// Goal: Add an affective state. The existence of !Feel/Desire implies affective capability.
+// ------------------------------------------------------------------------------
+!Assert {
+  <Self> [experiences] <Curiosity> {
     about: "quantum_physics",
     intensity: 0.7
   }
 } @0.85
 
-// Agent introspects on capabilities
+// ------------------------------------------------------------------------------
+// 3. Introspection Query
+// Goal: Ask "What am I capable of?"
+// Natural Language: "Identify my capabilities based on my internal state."
+// ------------------------------------------------------------------------------
 !Query {
   <Self> [has_capability] <?Skill>
 }
-// Returns: <LogicalReasoning>, <AffectiveReasoning>
+// Expected Inference Result:
+// <Self> [has_capability] <LogicalReasoning> (derived from rule existence)
+// <Self> [has_capability] <AffectiveModeling> (derived from emotion existence)
