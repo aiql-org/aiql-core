@@ -114,8 +114,9 @@ docker run -v $(pwd):/data aiql/cli transpile /data/example.aiql -t json
 
 ---
 
-## 🌟 Key Features (v2.6.0)
+## 🌟 Key Features (v2.7.0)
 
+- **Attribute Querying**: Query and unify statements based on complex attribute matching (`{ year: <?Year> }`).
 - **Quantum Semantics**: Model epistemic uncertainty with `@coherence` metrics and superposition states.
 - **Affective Computing**: Built-in emotional modeling via `@aiql-org/soul` (Stress/Novelty/Reward).
 - **Security First**: Native support for **Dilithium** signatures and **Kyber** encryption.

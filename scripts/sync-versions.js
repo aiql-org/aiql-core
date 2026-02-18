@@ -32,6 +32,7 @@ let updated = 0;
 for (const name of packages) {
   const pkgPath = join(packagesDir, name, 'package.json');
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+  const oldVersion = pkg.version;
   pkg.version = targetVersion;
 
   // Update internal @aiql/* dependency versions

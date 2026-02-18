@@ -1,6 +1,6 @@
 {
   "name": "aiql-sdk",
-  "version": "2.6.2",
+  "version": "2.7.0",
   "private": true,
   "description": "AIQL SDK - AI Query Language transpilers, tools, and runtime packages",
   "workspaces": [
