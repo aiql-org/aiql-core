@@ -12,7 +12,8 @@
       "@aiql-org/semantics",
       "@aiql-org/soul",
       "@aiql-org/utils",
-      "@aiql-org/examples"
+      "@aiql-org/examples",
+      "@aiql-org/playground"
     ]
   ],
   "linked": [],

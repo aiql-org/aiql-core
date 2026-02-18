@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 const PKG_FILE = path.resolve(__dirname, '../package.json');
 const SRC_DIR = path.resolve(__dirname, '../src');
 const OUTPUT_FILE = path.resolve(__dirname, '../dist/examples.json');
+const OUTPUT_TS_FILE = path.resolve(__dirname, '../src/generated/examples.ts');
 
 // Get version
 const pkg = JSON.parse(fs.readFileSync(PKG_FILE, 'utf-8'));
@@ -44,6 +45,9 @@ function generate() {
 
     if (!fs.existsSync(path.dirname(OUTPUT_FILE))) {
         fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+    }
+    if (!fs.existsSync(path.dirname(OUTPUT_TS_FILE))) {
+        fs.mkdirSync(path.dirname(OUTPUT_TS_FILE), { recursive: true });
     }
 
     const categories = [];
@@ -95,7 +99,29 @@ function generate() {
     };
 
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log(`Generated dist/examples.json v${version} with ${categories.length} categories.`);
+    
+    // Generate TS Source
+    const tsContent = `/**
+ * Auto-generated examples manifest.
+ * Do not edit manually.
+ */
+
+export interface Example {
+    label: string;
+    code: string;
+    path: string;
+}
+
+export interface ExampleCategory {
+    category: string;
+    examples: Example[];
+}
+
+export const examples: { version: string; categories: ExampleCategory[] } = ${JSON.stringify(output, null, 2)};
+`;
+    fs.writeFileSync(OUTPUT_TS_FILE, tsContent);
+
+    console.log(`Generated dist/examples.json and src/generated/examples.ts v${version} with ${categories.length} categories.`);
 }
 
 generate();
