@@ -1,6 +1,6 @@
 {
   "name": "@aiql-org/playground",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "AIQL Playground React Component",
   "type": "module",
   "main": "./dist/aiql-playground.umd.js",
@@ -23,8 +23,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@aiql-org/core": "^2.8.0",
-    "@aiql-org/examples": "^2.8.0",
+    "@aiql-org/core": "^2.9.0",
+    "@aiql-org/examples": "^2.9.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.563.0",
