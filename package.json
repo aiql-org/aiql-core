@@ -13,10 +13,11 @@
     "packages/api",
     "packages/utils",
     "packages/examples",
-    "packages/playground"
+    "packages/playground",
+    "packages/docgen"
   ],
   "scripts": {
-    "build": "npm run lint && npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/cli && npm run build -w packages/api && npm run build -w packages/examples && npm run build -w packages/playground",
+    "build": "npm run lint && npm run build -w packages/core && npm run build -w packages/security && npm run build -w packages/inference && npm run build -w packages/soul && npm run build -w packages/semantics && npm run build -w packages/utils && npm run build -w packages/docgen && npm run build -w packages/cli && npm run build -w packages/api && npm run build -w packages/examples && npm run build -w packages/playground",
     "test": "npm run test --workspaces --if-present",
     "test:examples": "node scripts/verify-examples.js",
     "clean": "npm run clean --workspaces --if-present",

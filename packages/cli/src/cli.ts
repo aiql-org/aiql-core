@@ -151,6 +151,53 @@ program
     }
   });
 
+program
+  .command('doc')
+  .description('Generate documentation from AIQL source')
+  .argument('<file>', 'AIQL source file')
+  .option('-o, --output <dir>', 'Output directory', 'docs')
+  .option('-f, --format <format>', 'Output format (markdown)', 'markdown')
+  .action(async (file: string, options: { output: string; format: string }) => {
+    try {
+      // Dynamic import to support ESM/CJS dual package issues if any, but static is fine here
+      const { generateDocs } = await import('@aiql-org/docgen');
+      
+      const filePath = resolve(file);
+      const code = readFileSync(filePath, 'utf-8');
+      const basename = filePath.split('/').pop()?.replace('.aiql', '') || 'docs';
+      
+      console.error(chalk.blue(`Generating documentation for ${file}...`));
+      
+      const tokenizer = new Tokenizer(code);
+      const tokens = tokenizer.tokenize();
+      const parser = new Parser(tokens);
+      const ast = parser.parse();
+      
+      const output = generateDocs(ast, { format: options.format as 'markdown' });
+      
+      // Ensure output directory exists
+      // mkdirSync(options.output, { recursive: true }); // Need import
+      
+      // For now just console log or write to file if easier, following pattern
+      // pattern uses writeFileSync.
+      
+      // Let's rely on fs from above
+      const fs = await import('fs'); // or use existing import
+      if (!fs.existsSync(options.output)) {
+        fs.mkdirSync(options.output, { recursive: true });
+      }
+
+      const outFile = resolve(options.output, `${basename}.md`);
+      writeFileSync(outFile, output);
+      
+      console.error(chalk.green(`✓ Documentation written to ${outFile}`));
+      
+    } catch (error) {
+       console.error(chalk.red('✗ Documentation generation error:'), error instanceof Error ? error.message : error);
+       process.exit(1);
+    }
+  });
+
 // Global error handler
 process.on('unhandledRejection', (reason) => {
   console.error(chalk.red('✗ Unhandled error:'), reason);

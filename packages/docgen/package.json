@@ -1,0 +1,44 @@
+{
+  "name": "@aiql-org/docgen",
+  "version": "2.8.0",
+  "description": "Semantic Documentation Generator for AIQL",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "tsc && node dist/test.js"
+  },
+  "keywords": [
+    "aiql",
+    "documentation",
+    "generator",
+    "semantic"
+  ],
+  "author": "AIQL Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "@aiql-org/core": "^2.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
