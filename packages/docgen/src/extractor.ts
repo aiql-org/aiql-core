@@ -3,12 +3,16 @@ import {
   Program, 
   Intent, 
   RuleDefinition, 
-  Statement, 
   isIntent, 
   isRuleDefinition,
   Expression,
   isConcept,
-  isLiteral
+  isLiteral,
+  isConsensusNode,
+  isCoordinateNode,
+  ConsensusNode,
+  CoordinateNode,
+  isIdentifier
 } from '@aiql-org/core';
 import { 
   DocPage, 
@@ -18,7 +22,10 @@ import {
   DocTask, 
   DocGraphNode, 
   DocGraphEdge, 
-  DocPropertyDetail 
+  DocPropertyDetail,
+  DocConsensus,
+  DocCoordinate,
+  DocIntent 
 } from './types.js';
 
 export class DocExtractor {
@@ -43,11 +50,19 @@ export class DocExtractor {
         else if (intent.intentType === '!Task') {
           items.push(this.extractTask(intent));
         }
+        
+        // Generic Intent Fallback
+        else {
+          items.push(this.extractGenericIntent(intent));
+        }
 
-        // !Rule (if implemented as intent in older versions, but v2.0 has specific node)
       } else if (isRuleDefinition(node)) {
         const docRule = this.extractRule(node as RuleDefinition);
         items.push(docRule);
+      } else if (isConsensusNode(node)) {
+        items.push(this.extractConsensus(node));
+      } else if (isCoordinateNode(node)) {
+        items.push(this.extractCoordinate(node));
       }
     }
 
@@ -59,31 +74,32 @@ export class DocExtractor {
   }
 
   private extractClass(intent: Intent): DocClass {
-    // !DefineClass(name:Agent)
-    const name = intent.contextParams?.name || 'UnknownClass';
-    const properties: DocPropertyDetail[] = [];
+    const className = intent.contextParams?.name || 'Unknown';
     let superClass: string | undefined;
+    const properties: DocPropertyDetail[] = [];
 
+    // Parse statements to find properties and inheritance
     for (const stmt of intent.statements) {
-      const relationName = stmt.relation.name;
-      
-      // [subclass_of]
+      // Clean relation name (remove [ ])
+      const relationName = stmt.relation.name.replace(/^\[|\]$/g, '');
+
+      // subclass_of
       if (relationName === 'subclass_of') {
          superClass = this.exprToString(stmt.object);
       }
-      // [has_property] or [has_capability]
+      // has_property or has_capability
       else if (relationName === 'has_property' || relationName === 'has_capability') {
          properties.push({
            name: this.exprToString(stmt.object),
-           attributes: stmt.attributes
+           attributes: stmt.attributes as Record<string, unknown> | undefined
          });
       }
     }
 
     return {
-      id: name,
+      id: className,
       type: 'class',
-      name,
+      name: className,
       superClass,
       properties,
       metadata: {
@@ -116,7 +132,7 @@ export class DocExtractor {
       subject: this.exprToString(stmt.subject),
       relation: stmt.relation.name,
       object: this.exprToString(stmt.object),
-      parameters: stmt.attributes
+      parameters: stmt.attributes as Record<string, unknown> | undefined
     }));
 
     return {
@@ -128,6 +144,57 @@ export class DocExtractor {
       steps,
       metadata: {
         version: intent.version
+      }
+    };
+  }
+
+  private extractConsensus(node: ConsensusNode): DocConsensus {
+    return {
+      id: node.identifier || 'consensus',
+      type: 'consensus',
+      name: 'Consensus Protocol',
+      topic: this.exprToString(node.topic),
+      participants: node.participants.map(p => this.exprToString(p)),
+      threshold: node.threshold,
+      metadata: {
+        version: node.version,
+        context: node.contextParams
+      }
+    };
+  }
+
+  private extractCoordinate(node: CoordinateNode): DocCoordinate {
+    return {
+      id: node.identifier || 'coordinate',
+      type: 'coordinate',
+      name: 'Coordination Protocol',
+      goal: this.exprToString(node.goal),
+      participants: node.participants.map(p => this.exprToString(p)),
+      strategy: node.strategy,
+      metadata: {
+        version: node.version,
+        context: node.contextParams
+      }
+    };
+  }
+
+  private extractGenericIntent(intent: Intent): DocIntent {
+    const steps = intent.statements.map(stmt => ({
+      subject: this.exprToString(stmt.subject),
+      relation: stmt.relation.name,
+      object: this.exprToString(stmt.object),
+      parameters: stmt.attributes as Record<string, unknown> | undefined
+    }));
+
+    return {
+      id: intent.identifier || 'intent',
+      type: 'intent',
+      name: intent.intentType,
+      intentType: intent.intentType,
+      statements: steps,
+      metadata: {
+        version: intent.version,
+        context: intent.contextParams
       }
     };
   }
@@ -148,8 +215,13 @@ export class DocExtractor {
   }
 
   private exprToString(expr: Expression): string {
-    if (isConcept(expr)) return `<${expr.name}>`;
-    if (isLiteral(expr)) return String(expr.value);
+    if (isIdentifier(expr)) return expr.name;
+    if (isConcept(expr)) {
+      // Parser might include <> in name already
+      const cleanName = expr.name.replace(/^<|>$/g, '');
+      return `<${cleanName}>`;
+    }
+    if (isLiteral(expr)) return JSON.stringify(expr.value);
     // Fallback
     return 'Expr'; 
   }

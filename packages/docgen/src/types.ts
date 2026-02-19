@@ -1,5 +1,5 @@
 
-import { Node } from '@aiql-org/core';
+
 
 export interface DocItemSource {
   file: string;
@@ -11,12 +11,12 @@ export interface DocMetadata {
   origin?: string;
   citations?: string[];
   group?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface DocItem {
   id: string;
-  type: 'class' | 'property' | 'intent' | 'rule' | 'task' | 'concept';
+  type: 'class' | 'property' | 'intent' | 'rule' | 'task' | 'concept' | 'consensus' | 'coordinate';
   name: string;
   description?: string;
   metadata?: DocMetadata;
@@ -33,7 +33,7 @@ export interface DocPropertyDetail {
   name: string;
   cardinality?: string;
   range?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface DocProperty extends DocItem {
@@ -63,11 +63,32 @@ export interface DocTask extends DocItem {
   steps: DocTaskStep[];
 }
 
+export interface DocConsensus extends DocItem {
+  type: 'consensus';
+  topic: string;
+  participants: string[]; // Expression strings
+  threshold: number;
+}
+
+export interface DocCoordinate extends DocItem {
+  type: 'coordinate';
+  goal: string;
+  participants: string[];
+  strategy: string;
+}
+
+export interface DocIntent extends DocItem {
+  type: 'intent';
+  intentType: string;
+  statements: DocTaskStep[]; // Reuse step structure for general statements
+
+}
+
 export interface DocTaskStep {
   subject: string;
   relation: string;
   object: string;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
 }
 
 export interface DocGraphNode {

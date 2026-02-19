@@ -52,6 +52,7 @@ COPY --from=builder /build/package.json ./
 COPY --from=builder /build/packages/core/package.json ./packages/core/
 COPY --from=builder /build/packages/soul/package.json ./packages/soul/
 COPY --from=builder /build/packages/utils/package.json ./packages/utils/
+COPY --from=builder /build/packages/docgen/package.json ./packages/docgen/
 COPY --from=builder /build/packages/cli/package.json ./packages/cli/
 
 # Install production dependencies only
@@ -61,6 +62,7 @@ RUN npm ci --omit=dev --workspaces 2>/dev/null || npm install --omit=dev
 COPY --from=builder /build/packages/core/dist/ ./packages/core/dist/
 COPY --from=builder /build/packages/soul/dist/ ./packages/soul/dist/
 COPY --from=builder /build/packages/utils/dist/ ./packages/utils/dist/
+COPY --from=builder /build/packages/docgen/dist/ ./packages/docgen/dist/
 COPY --from=builder /build/packages/cli/dist/ ./packages/cli/dist/
 
 # Copy example AIQL files for immediate use

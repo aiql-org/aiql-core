@@ -15,7 +15,7 @@ export interface ExampleCategory {
 }
 
 export const examples: { version: string; categories: ExampleCategory[] } = {
-  "version": "2.7.0",
+  "version": "2.8.0",
   "categories": [
     {
       "category": "🚀 Getting Started",

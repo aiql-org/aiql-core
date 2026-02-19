@@ -13,7 +13,8 @@
       "@aiql-org/soul",
       "@aiql-org/utils",
       "@aiql-org/examples",
-      "@aiql-org/playground"
+      "@aiql-org/playground",
+      "@aiql-org/docgen"
     ]
   ],
   "linked": [],
