@@ -1,5 +1,12 @@
 # @aiql-org/soul
 
+## 2.9.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.9.0
+
 ## 2.8.0
 
 ### Patch Changes

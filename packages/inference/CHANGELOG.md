@@ -1,5 +1,13 @@
 # @aiql-org/inference
 
+## 2.9.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @aiql-org/core@2.9.0
+  - @aiql-org/security@2.9.0
+
 ## 2.8.0
 
 ### Patch Changes

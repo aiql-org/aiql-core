@@ -1,5 +1,14 @@
 # @aiql-org/core
 
+## 2.9.0
+
+### Patch Changes
+
+- feat(docgen): Added support for parsed Swarm Intelligence protocols (!Consensus, !Coordinate)
+  feat(docgen): Added support for generic intents (!Query, !Assert)
+  feat(docgen): Improve class extraction and property rendering
+  feat(docgen): Add Knowledge Graph visualization (mermaid)
+
 ## 2.8.0
 
 ### Minor Changes
