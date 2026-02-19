@@ -8,6 +8,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/aiql-playground.js",
       "require": "./dist/aiql-playground.umd.js"
     }
