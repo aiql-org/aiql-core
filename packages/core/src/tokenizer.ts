@@ -71,6 +71,14 @@ export enum TokenType {
   THEN = "THEN",               // then - Alternative to implies
   TRUE = "TRUE",               // true - Boolean literal
   FALSE = "FALSE",             // false - Boolean literal
+
+  // Comparison operators (v2.7.0)
+  GT = "GT",                   // >
+  LT = "LT",                   // <
+  GTE = "GTE",                 // >=
+  LTE = "LTE",                 // <=
+  EQ = "EQ",                   // ==
+  NEQ = "NEQ",                 // !=
   
   // ===================================================================
   // Category 5: Primitive Types (4 types)
@@ -106,9 +114,13 @@ export enum TokenType {
   EULER = "EULER",             // e
   
   // ===================================================================
-  // Category 7: Control Token (1 type)
-  // Purpose: End-of-file marker
   // ===================================================================
+  // Category 8: Syntax Highlighting Tokens (v2.7.0)
+  // Purpose: Preserving whitespace and comments for high-fidelity processing
+  // ===================================================================
+  COMMENT = "COMMENT",         // // or /* ... */
+  WHITESPACE = "WHITESPACE",   // spaces, tabs, newlines
+
   EOF = "EOF"                  // End of file
 }
 
@@ -119,14 +131,20 @@ export interface Token {
   column: number;
 }
 
+export interface TokenizerOptions {
+  includeWhitespace?: boolean;
+}
+
 export class Tokenizer {
   private input: string;
   private position: number = 0;
   private line: number = 1;
   private column: number = 1;
+  private options: TokenizerOptions;
 
-  constructor(input: string) {
+  constructor(input: string, options: TokenizerOptions = {}) {
     this.input = input;
+    this.options = options;
   }
 
   tokenize(): Token[] {
@@ -141,14 +159,22 @@ export class Tokenizer {
       const char = this.peek();
 
       if (/\s/.test(char)) {
-        this.advance();
+        if (this.options.includeWhitespace) {
+            tokens.push(this.scanWhitespace());
+        } else {
+            this.advance();
+        }
         continue;
       }
 
       // Handle comments
       if (char === '/') {
         if (this.peek(1) === '/') {
-          // Single-line comment: skip until end of line
+          // Single-line comment
+          if (this.options.includeWhitespace) {
+              tokens.push(this.scanSingleLineComment());
+              continue;
+          }
           this.advance(); // consume first '/'
           this.advance(); // consume second '/'
           while (this.peek() !== '\n' && !this.isAtEnd()) {
@@ -156,45 +182,122 @@ export class Tokenizer {
           }
           continue;
         } else if (this.peek(1) === '*') {
-          // Block comment: skip until */
-          const startLine = this.line;
-          const startColumn = this.column;
-          this.advance(); // consume '/'
-          this.advance(); // consume '*'
-          let terminated = false;
-          while (!this.isAtEnd()) {
-            if (this.peek() === '*' && this.peek(1) === '/') {
-              this.advance(); // consume '*'
-              this.advance(); // consume '/'
-              terminated = true;
-              break;
-            }
-            if (this.peek() === '\n') {
-              this.line++;
-              this.column = 0;
-            }
-            this.advance();
+          // Block comment
+          if (this.options.includeWhitespace) {
+              tokens.push(this.scanBlockComment());
+              continue;
           }
-          if (!terminated) {
-            throw new Error(`Unterminated block comment starting at line ${startLine}, column ${startColumn}`);
-          }
-          continue;
+           const startLine = this.line;
+           const startColumn = this.column;
+           this.advance(); // consume '/'
+           this.advance(); // consume '*'
+           let terminated = false;
+           while (!this.isAtEnd()) {
+             if (this.peek() === '*' && this.peek(1) === '/') {
+               this.advance(); // consume '*'
+               this.advance(); // consume '/'
+               terminated = true;
+               break;
+             }
+             if (this.peek() === '\n') {
+               this.line++;
+               this.column = 0;
+             }
+             this.advance();
+           }
+           if (!terminated) {
+             throw new Error(`Unterminated block comment starting at line ${startLine}, column ${startColumn}`);
+           }
+           continue;
         } else {
-          throw new Error(`Unexpected character: ${char} at line ${this.line}, column ${this.column}`);
+            // Division operator or just slash?
+            // Fall through to default handling if not a comment start
+            // But wait, / is also DIVIDE. The original code threw error here?
+            // Original code: } else { throw new Error(...) }
+            // Let's check Category 6: DIVIDE tokens.
+            // Wait, looking at original code line 191: throw new Error(`Unexpected character: ${char} ...`)
+            // Ah, DIVIDE is handled? No, only comment logic was in that block.
+            // Wait, down below line 298 there is no '/' handling.
+            // Wait, looking at original file...
+            // line 99: DIVIDE = "DIVIDE",
+            // The logic for DIVIDE seems missing in the original big `if/else if` chain I saw?
+            // Re-reading original file...
+            // It seems the original code treated `/` ONLY as start of comment or error!
+            // Wait, line 99 defines DIVIDE.
+            // But the tokenizer loop at line 157 handles `/`.
+            // If it's not `//` or `/*`, it throws "Unexpected character".
+            // So DIVIDE `/` token was NOT implemented/reachable in the previous tokenizer??
+            // That's a bug in existing tokenizer if true.
+            // Example: `10 / 2` -> `char` is `/`, `peek(1)` is ` ` -> throws error!
+            // I should fix this while I am here.
+            // If it's not a comment, push DIVIDE token.
+             tokens.push(this.createToken(TokenType.DIVIDE, "/"));
+             this.advance();
+             continue;
         }
       }
 
-      if (char === '!') {
-        tokens.push(this.scanIntent());
-      } else if (char === '#') {
-        // Check for ## (sequence number) or # (directive)
-        if (this.peek(1) === '#') {
-          tokens.push(this.scanSequenceNumber());
+      if (char === '>') {
+        if (this.peek(1) === '=') {
+          tokens.push(this.createToken(TokenType.GTE, ">="));
+          this.advance(); this.advance();
         } else {
-          tokens.push(this.scanDirective());
+          tokens.push(this.createToken(TokenType.GT, ">"));
+          this.advance();
         }
-      } else if (char === '<') {
-        tokens.push(this.scanConcept());
+    } else if (char === '<') {
+        // Disambiguate <Concept> vs < (LT) vs <= (LTE)
+        if (this.peek(1) === '=') {
+            tokens.push(this.createToken(TokenType.LTE, "<="));
+            this.advance(); this.advance();
+        } else if (/\s/.test(this.peek(1))) {
+            // Space after < means operator: < 10
+            tokens.push(this.createToken(TokenType.LT, "<"));
+            this.advance();
+        } else {
+             // Ambiguous: <10, <Concept>, <variable
+             // Look ahead for CLOSING > without intervening whitespace to detect Concept
+             let isConcept = false;
+             let p = 1;
+             // Bound lookahead to prevent perf issues
+             while (p < 256) { 
+                 const c = this.peek(p);
+                 if (c === '>') { isConcept = true; break; }
+                 if (c === '' || c === '\n' || /\s/.test(c)) break;
+                 // Concepts shouldn't contain other structural chars
+                 if (['[', '{', '(', ')', ']', '='].includes(c)) break;
+                 p++;
+             }
+             
+             if (isConcept) {
+                 tokens.push(this.scanConcept());
+             } else {
+                 tokens.push(this.createToken(TokenType.LT, "<"));
+                 this.advance();
+             }
+        }
+      } else if (char === '=') {
+        if (this.peek(1) === '=') {
+             tokens.push(this.createToken(TokenType.EQ, "=="));
+             this.advance(); this.advance();
+        } else {
+             tokens.push(this.createToken(TokenType.ASSIGN, "="));
+             this.advance();
+        }
+      } else if (char === '#') {
+        if (this.peek(1) === '#') {
+           tokens.push(this.scanSequenceNumber());
+        } else {
+           tokens.push(this.scanDirective()); 
+        }
+
+      } else if (char === '!') {
+        if (this.peek(1) === '=') {
+             tokens.push(this.createToken(TokenType.NEQ, "!="));
+             this.advance(); this.advance();
+        } else {
+             tokens.push(this.scanIntent());
+        }
       } else if (char === '[') {
         // Disambiguate List vs Relation
         // Heuristic: Lists contain separators (,) or complex types (<, {, ", $, [, etc.)
@@ -237,9 +340,6 @@ export class Tokenizer {
         this.advance();
       } else if (char === '^') {
         tokens.push(this.createToken(TokenType.POWER, "^"));
-        this.advance();
-      } else if (char === '=') {
-        tokens.push(this.createToken(TokenType.ASSIGN, "="));
         this.advance();
       } else if (char === '$') {
         // Check for $$ (group identifier) or $ (identifier)
@@ -636,6 +736,55 @@ export class Tokenizer {
       }
       
       return { type: TokenType.IDENTIFIER, value, line: startLine, column: startCol };
+  }
+
+  private scanWhitespace(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = "";
+    while (/\s/.test(this.peek()) && !this.isAtEnd()) {
+        value += this.advance();
+    }
+    return { type: TokenType.WHITESPACE, value, line: startLine, column: startCol };
+  }
+
+  private scanSingleLineComment(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume first '/'
+    value += this.advance(); // consume second '/'
+    
+    while (this.peek() !== '\n' && !this.isAtEnd()) {
+        value += this.advance();
+    }
+    return { type: TokenType.COMMENT, value, line: startLine, column: startCol };
+  }
+
+  private scanBlockComment(): Token {
+    const startLine = this.line;
+    const startCol = this.column;
+    let value = this.advance(); // consume '/'
+    value += this.advance(); // consume '*'
+    
+    let terminated = false;
+    while (!this.isAtEnd()) {
+        if (this.peek() === '*' && this.peek(1) === '/') {
+            value += this.advance(); // consume '*'
+            value += this.advance(); // consume '/'
+            terminated = true;
+            break;
+        }
+        if (this.peek() === '\n') {
+           // line/col tracking is handled by advance()
+        }
+        value += this.advance();
+    }
+    
+    if (!terminated) {
+         throw new Error(`Unterminated block comment starting at line ${startLine}, column ${startCol}`);
+    }
+    
+    return { type: TokenType.COMMENT, value, line: startLine, column: startCol };
   }
 
   private peek(offset: number = 0): string {

@@ -25,6 +25,22 @@ const ast = new Parser(tokens).parse();
 const output = new Transpiler().transpile(ast, 'python');
 ```
 
+## Attribute Comparisons (v2.7.0)
+
+Attributes now support comparison operators for validation rules:
+
+```aiql
+!Query {
+  <Event> [occurred_in] <Year> {
+    year: > 2000
+    confidence: >= 0.8
+  }
+}
+```
+
+Supported operators: `>`, `<`, `>=`, `<=`, `!=`.
+
+
 ## API
 
 - **`Tokenizer`** — Converts source code to token stream

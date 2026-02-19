@@ -21,11 +21,30 @@ export default defineConfig({
       fileName: (format) => `aiql-playground.${format === 'es' ? 'js' : 'umd.js'}`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: [
+        'react', 
+        'react-dom', 
+        'react/jsx-runtime',
+        'prism-react-renderer',
+        'framer-motion',
+        'lucide-react',
+        'clsx',
+        'tailwind-merge',
+        '@aiql-org/core',
+        '@aiql-org/examples'
+      ],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'ReactJSXRuntime',
+          'prism-react-renderer': 'PrismReactRenderer',
+          'framer-motion': 'FramerMotion',
+          'lucide-react': 'LucideReact',
+          'clsx': 'clsx',
+          'tailwind-merge': 'tailwindMerge',
+          '@aiql-org/core': 'AIQLCore',
+          '@aiql-org/examples': 'AIQLExamples',
         },
       },
     },

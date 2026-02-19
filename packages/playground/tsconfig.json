@@ -8,7 +8,8 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "outDir": "dist",
     "declaration": true,
-    "noEmit": false
+    "noEmit": false,
+    "resolveJsonModule": true
   },
   "include": ["src"]
 }

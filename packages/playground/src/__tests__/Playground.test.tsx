@@ -36,8 +36,10 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock @aiql-org/core
-vi.mock('@aiql-org/core', () => {
+vi.mock('@aiql-org/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@aiql-org/core')>();
   return {
+    ...actual,
     Transpiler: vi.fn().mockImplementation(function() {
       return {
         transpile: (arg1: unknown, arg2?: string) => {
@@ -87,6 +89,12 @@ vi.mock('@aiql-org/examples', () => ({
 
 // Mock lucide-react to avoid icon rendering issues if any
 // (Optional, usually fine to render, but sometimes useful in JSDOM)
+
+// Mock GraphVisualizer to isolate Playground tests
+vi.mock('../GraphVisualizer', () => ({
+  default: () => <div data-testid="graph-visualizer">Mock Graph Visualizer</div>,
+  GraphVisualizer: () => <div data-testid="graph-visualizer">Mock Graph Visualizer</div>
+}));
 
 // Global mocks
 globalThis.fetch = vi.fn();
@@ -165,9 +173,9 @@ describe('Playground Component', () => {
         (swipeContainer as any)._test_triggerDragEnd(-100);
     });
 
-    // Expect tab switch (PYTHON -> JSON)
-    // We mock transpiler to return '{\n  "mock": "json"\n}' for JSON
-    const jsonContent = await screen.findByText(/"mock": "json"/);
-    expect(jsonContent).toBeInTheDocument();
+    // Expect tab switch (GRAPH -> PYTHON)
+    // We mock transpiler to return "# AIQL v1.0.0\nprint('Mock Python')" for Python
+    const pythonContent = await screen.findByText(/Mock Python/);
+    expect(pythonContent).toBeInTheDocument();
   });
 });

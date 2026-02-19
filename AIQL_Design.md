@@ -52,7 +52,7 @@ Every new feature or change MUST update the following in a single commit:
 
 **AIQL (Artificial Intelligence Quantum Language)** is a general-purpose AGI programming language designed for AI reasoning, knowledge representation, and computational execution. It enables AI agents to express structured reasoning through a graph-based syntax with support for queries, assertions, logic, mathematical operations, and quantum-proof security. AIQL bridges semantic understanding with algorithmic execution, allowing AI to reason about AND run code.
 
-**Current Version:** v2.6.0  
+**Current Version:** v2.7.0  
 **Language:** TypeScript (ES Modules)  
 **Runtime:** Node.js v20.0.0+  
 **Architecture:** npm workspaces monorepo — Tokenizer → Parser → AST → Transpiler → InferenceEngine → OntologyReasoner + TrustRegistry + QuantumSemantics  
@@ -228,6 +228,13 @@ The AIQL SDK is organized as an **npm workspaces monorepo** with 8 packages:
    - `#encrypt("recipient")` - KYBER post-quantum encryption
    - `#secure("signer", "recipient")` - Combined sign + encrypt
    - Automatic key generation and management
+
+7. **Attribute Comparisons - v2.7.0**
+   - **Operators:** `>`, `<`, `>=`, `<=`, `!=`
+   - **Usage:** `{ year: > 2000, confidence: >= 0.8 }`
+   - **Implicit Subject:** Attribute key is the left operand
+   - **Full AST Support:** `ComparisonExpression` node type
+   - **Transpilation:** Supported in Python, SQL, JSON, YAML
 
 8. **Comment Support**
    - Single-line: `// comment`

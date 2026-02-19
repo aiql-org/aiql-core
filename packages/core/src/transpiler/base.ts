@@ -241,6 +241,14 @@ export abstract class TranspilerBase {
              };
              return `(${left} ${opMap[expr.operator]} ${right})`;
         }
+        if (AST.isComparisonExpression(expr)) {
+             const left = this.expressionToString(expr.left);
+             const right = this.expressionToString(expr.right);
+             const opMap: Record<AST.ComparisonOperator, string> = {
+                 'GT': '>', 'LT': '<', 'GTE': '>=', 'LTE': '<=', 'EQ': '==', 'NEQ': '!='
+             };
+             return `(${left} ${opMap[expr.operator]} ${right})`;
+        }
         if (AST.isSetExpression(expr)) {
              const left = this.expressionToString(expr.left);
              const right = this.expressionToString(expr.right);

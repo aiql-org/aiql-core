@@ -563,6 +563,78 @@ test('Transpiler: transpiles affective intents to soul.process', () => {
 
 
 // =============================================================================
+// Attribute Comparisons (v2.7.0)
+// =============================================================================
+console.log('\n--- Attribute Comparisons ---');
+
+test('Tokenizer: handles comparison operators', () => {
+  const tokens = new Tokenizer('year: > 2000').tokenize();
+  assert(tokens.some(t => t.type === 'GT'), 'Should have GT token');
+});
+
+test('Parser: parses attribute comparisons (GT)', () => {
+    const ast = parseAIQL('!Query { <Event> [occurred_in] <Year> { year: > 2000 } }');
+    const intent = ast.body[0] as AST.Intent;
+    const stmt = intent.statements[0];
+    const comp = stmt.attributes!['year'] as AST.ComparisonExpression;
+    
+    assert(comp.type === 'ComparisonExpression', 'Should be ComparisonExpression');
+    assert(comp.operator === 'GT', 'Should be GT');
+    assert((comp.left as AST.Identifier).name === 'year', 'Left should be key');
+    assert((comp.right as AST.Literal).value === 2000, 'Right should be value');
+});
+
+test('Parser: parses attribute comparisons (LTE)', () => {
+    const ast = parseAIQL('!Query { <Task> [priority] <Level> { level: <= 5 } }');
+    const intent = ast.body[0] as AST.Intent;
+    const stmt = intent.statements[0];
+    const comp = stmt.attributes!['level'] as AST.ComparisonExpression;
+    
+    assert(comp.operator === 'LTE', 'Should be LTE');
+});
+
+test('Parser: parses attribute comparisons (EQ/NEQ)', () => {
+    const ast = parseAIQL('!Query { <X> [y] <Z> { a: == 1, b: != 2 } }');
+    const intent = ast.body[0] as AST.Intent;
+    const stmt = intent.statements[0];
+    const compA = stmt.attributes!['a'] as AST.ComparisonExpression;
+    const compB = stmt.attributes!['b'] as AST.ComparisonExpression;
+    
+    assert(compA.operator === 'EQ', 'Should be EQ');
+    assert(compB.operator === 'NEQ', 'Should be NEQ');
+});
+
+test('Transpiler: transpiles attribute comparisons to Python', () => {
+    const ast = parseAIQL('!Query { <Event> [occurred] <Year> { year: > 2000 } }');
+    const python = transpiler.transpile(ast, 'python');
+    
+    // attributes are stringified in Python context dict currently
+    // The expressionToPython update handles the conversion TO string
+    assert(python.includes('(year > 2000)'), 'Should contain transpiled comparison'); 
+});
+
+// =============================================================================
+// Regression Tests (v2.7.1)
+// =============================================================================
+console.log('\n--- Regression Tests ---');
+
+test('Tokenizer: handles directives', () => {
+    const tokens = new Tokenizer('#sign("agent")').tokenize();
+    assert(tokens.some(t => t.type === 'DIRECTIVE'), 'Should have DIRECTIVE token');
+});
+
+test('Tokenizer: handles numeric concepts (ambiguous start)', () => {
+    const tokens = new Tokenizer('<1>').tokenize();
+    assert(tokens[0].type === 'CONCEPT', 'Should identify <1> as CONCEPT');
+    assert(tokens[0].value === '<1>', 'Should have value <1>');
+});
+
+test('Tokenizer: handles LT with space', () => {
+    const tokens = new Tokenizer('x < y').tokenize(); // space
+    assert(tokens.some(t => t.type === 'LT'), 'Should identify LT with space');
+});
+
+// =============================================================================
 // Summary
 // =============================================================================
 console.log('\n=== Test Summary ===');

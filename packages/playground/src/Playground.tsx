@@ -1,20 +1,105 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { Activity, Play, Terminal, Cpu, Share2, FileJson, FileCode, FileText, Sparkles, Copy, Check, ChevronDown, Zap, Database, Scale, BookCheck, type LucideIcon } from 'lucide-react';
-import { Transpiler, Tokenizer, Parser, version } from '@aiql-org/core';
+import { Activity, Play, Terminal, Cpu, Share2, FileJson, FileCode, FileText, Sparkles, Copy, Check, ChevronDown, Zap, Database, Scale, BookCheck, Eye, EyeOff, type LucideIcon } from 'lucide-react';
+import { Transpiler, Tokenizer, Parser } from '@aiql-org/core';
+import { AiqlHighlighter } from './AiqlHighlighter';
+import { Highlight, themes } from 'prism-react-renderer';
 import type * as AST from '@aiql-org/core';
+import { version as packageVersion } from '../package.json';
 import { examples } from '@aiql-org/examples';
 
-// ... (helpers) - We need to simulate the GraphVisualizer or stub it for now? 
-// The original code had GraphVisualizer but I didn't see the import in the read file snippet (it was chopped off or implicit?)
-// Wait, looking at the read file, I didn't see GraphVisualizer import. 
-// Ah, line 745: <GraphVisualizer ast={parsedAst} />.
-// I must have missed the import or it was further down/up.
-// Let's assume there is a GraphVisualizer component. I need to find where it is.
-// It's likely in separate file. I should check `src/components/GraphVisualizer.tsx` in aiql-org-web.
-// If it exists, I need to migrate it too.
+function formatExpr(expr: AST.Expression): string {
+    if (expr.type === 'Concept') return `<${expr.name}>`;
+    if (expr.type === 'Literal') return `"${expr.value}"`;
+    if (expr.type === 'Identifier') return expr.name;
+    return '?';
+}
 
-// Let's check for GraphVisualizer first.
+// --- Graph Visualization Components ---
+
+// Graph Visualizer Component
+const GraphVisualizer = ({ ast }: { ast: AST.Program | null }) => {
+    if (!ast || ast.body.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-full text-gray-500">
+                <div className="text-center">
+                    <div className="mb-4 inline-flex p-4 bg-gray-500/5 rounded-full">
+                        <Share2 size={48} className="opacity-20" />
+                    </div>
+                    <p className="font-mono text-sm">No graph data to visualize</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {ast.body.filter((item: any): item is AST.Intent => item.type === 'Intent').map((intent: any, idx: number) => {
+                const cmd = intent as AST.Intent;
+
+                // Handle Graph Nodes
+                if (Array.isArray(cmd.statements) && cmd.statements.length > 0) {
+                    return (
+                        <div key={idx} className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 hover:border-purple-500/50 transition-all">
+                            <div className="flex flex-col gap-2 mb-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3 text-purple-400 font-bold">
+                                        <div className="p-2 bg-purple-500/20 rounded-lg shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                                            <Share2 size={20} className="drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+                                        </div>
+                                        <span>{cmd.intentType}</span>
+                                        {cmd.scope && <span className="text-xs text-gray-400">({cmd.scope})</span>}
+                                    </div>
+                                    {cmd.confidence && (
+                                        <span className="text-xs font-mono text-gray-400 px-2 py-1 bg-gray-500/10 rounded">
+                                            @{cmd.confidence.toFixed(2)}
+                                        </span>
+                                    )}
+                                </div>
+                                {cmd.contextParams && Object.keys(cmd.contextParams).length > 0 && (
+                                    <div className="flex flex-wrap gap-2 ml-11">
+                                        {Object.entries(cmd.contextParams).map(([key, value]) => (
+                                            <span key={key} className="text-xs px-2 py-0.5 bg-purple-500/5 rounded text-purple-300 border border-purple-500/10 font-mono">
+                                                {key}:{value}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="h-px bg-purple-500/20 w-full mb-3" />
+
+                            <div className="space-y-3">
+                                {cmd.statements.map((node: AST.Statement, i: number) => (
+                                    <div key={i} className="flex items-center gap-3 text-sm">
+                                        <span className="px-3 py-1 bg-purple-500/20 rounded font-mono text-purple-200">
+                                            {formatExpr(node.subject)}
+                                        </span>
+                                        <span className="text-gray-500 text-xs">
+                                            -{node.relation.name}→
+                                        </span>
+                                        <span className="px-3 py-1 bg-purple-500/20 rounded font-mono text-purple-200">
+                                            {formatExpr(node.object)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div key={idx} className="bg-gray-500/10 border border-gray-500/30 rounded-lg p-4 text-gray-400 text-sm">
+                        Empty graph for {cmd.intentType}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+// --- End Graph Visualization Components --- //
 
 const TabButton = ({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: LucideIcon; label: string }) => (
     <button
@@ -33,7 +118,7 @@ const TabButton = ({ active, onClick, icon: Icon, label }: { active: boolean; on
 
 const Playground = () => {
   const exampleCategories = examples.categories;
-  const loadedCoreVersion = version;
+  const loadedCoreVersion = packageVersion;
   
   // Initialize state with first example
   const [input, setInput] = useState(() => {
@@ -51,10 +136,11 @@ const Playground = () => {
   const [coqOutput, setCoqOutput] = useState('');
   const [leanOutput, setLeanOutput] = useState('');
   const [mdOutput, setMdOutput] = useState("");
+  const [ast, setAst] = useState<AST.Program | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   type TabType = 'python' | 'json' | 'yaml' | 'sql' | 'coq' | 'lean' | 'markdown' | 'graph';
-  const [activeTab, setActiveTab] = useState<TabType>('python');
+  const [activeTab, setActiveTab] = useState<TabType>('graph');
   const [isRunning, setIsRunning] = useState(false);
   const [runResult, setRunResult] = useState<string | null>(null);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
@@ -63,6 +149,7 @@ const Playground = () => {
   const [skillCopied, setSkillCopied] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [inspectMode, setInspectMode] = useState(false);
 
   // Separated transpilation logic (no side effects on input)
   const runTranspilation = useCallback((text: string) => {
@@ -72,6 +159,7 @@ const Playground = () => {
       const tokens = tokenizer.tokenize();
       const parser = new Parser(tokens);
       const ast = parser.parse();
+      setAst(ast);
       
       const transpiler = new Transpiler();
       setOutput(transpiler.transpile(ast, 'python'));
@@ -266,13 +354,13 @@ version: 1.0.0
             </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[800px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[800px] items-stretch">
           
           {/* Left Column: Input + Visualizer (6 cols) */}
           <div className="flex flex-col gap-6 h-full">
             
             {/* Code Input */}
-            <div className="flex-1 glass-panel rounded-xl flex flex-col overflow-hidden shadow-2xl relative group border border-white/10 bg-black/40 backdrop-blur-md">
+            <div className="flex-1 glass-panel rounded-xl flex flex-col shadow-2xl relative group border border-white/10 bg-black/40 backdrop-blur-md h-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"/>
                 
                 <div className="flex justify-between items-center px-4 py-3 border-b border-white/5 bg-black/20">
@@ -283,8 +371,21 @@ version: 1.0.0
 
                     {/* Example Dropdown */}
                     <div className="relative z-[100] flex items-center gap-3">
-                        <div className="hidden md:block text-[10px] uppercase font-bold tracking-wider text-gray-500">
-                             Examples: <span className="text-green-500">Published</span>
+                        <button 
+                            onClick={() => setInspectMode(!inspectMode)}
+                            className={`flex items-center gap-2 px-2 py-1 rounded text-[10px] font-bold tracking-wider transition-all border ${
+                                inspectMode 
+                                    ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.2)]' 
+                                    : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
+                            }`}
+                            title={inspectMode ? "Exit Inspect Mode" : "Inspect Tokens"}
+                        >
+                            {inspectMode ? <Eye size={12} /> : <EyeOff size={12} />}
+                            INSPECT
+                        </button>
+
+                        <div className="hidden md:block text-[10px] font-bold tracking-wider text-gray-500">
+                             EXAMPLES: <span className="text-green-500">v{loadedCoreVersion}</span>
                         </div>
                         <button 
                             onClick={() => setShowExamples(!showExamples)}
@@ -350,12 +451,20 @@ version: 1.0.0
                     </div>
                 </div>
                 
-                <div className="relative flex-1">
+                <div className="relative flex-1 grid">
+                    {/* Auto-expanding textarea hack: Highlighter sets height, textarea fills it */}
+                    {/* In Inspect Mode: Pointer events enabled on highlighter, disabled on textarea */}
+                    <div className={`col-start-1 row-start-1 min-h-[600px] p-4 ${inspectMode ? 'pointer-events-auto select-text cursor-help' : 'pointer-events-none select-none'} transition-colors duration-200`} aria-hidden="true">
+                        <AiqlHighlighter code={input} />
+                    </div>
                     <textarea 
                         value={input}
                         onChange={(e) => handleInputChange(e.target.value)}
-                        className="absolute inset-0 w-full h-full bg-transparent border-none resize-none focus:outline-none p-4 font-mono text-sm leading-relaxed text-gray-200 placeholder-gray-700 custom-scrollbar"
+                        className={`col-start-1 row-start-1 w-full h-full bg-transparent border-none resize-none focus:outline-none p-4 font-mono text-sm leading-relaxed text-transparent placeholder-gray-700 custom-scrollbar overflow-hidden whitespace-pre-wrap break-all z-10 ${
+                            inspectMode ? 'pointer-events-none caret-transparent' : 'caret-white'
+                        }`}
                         spellCheck={false}
+                        disabled={inspectMode}
                     />
                 </div>
             </div>
@@ -397,12 +506,12 @@ version: 1.0.0
           {/* Right Column: Output Panel */}
             <motion.div 
                 data-testid="swipe-container"
-                className="flex flex-col h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-2xl"
+                className="flex flex-col h-full bg-black/40 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl"
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 onDragEnd={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
                     const swipe = info.offset.x;
-                    const tabs = ['python', 'json', 'yaml', 'sql', 'coq', 'lean', 'markdown', 'graph'];
+                    const tabs = ['graph', 'python', 'json', 'yaml', 'sql', 'coq', 'lean', 'markdown'];
                     const currentIndex = tabs.indexOf(activeTab);
                     
                     if (swipe < -50 && currentIndex < tabs.length - 1) {
@@ -414,6 +523,7 @@ version: 1.0.0
             >
                 {/* Tabs */}
                 <div className="flex bg-black/60 border-b border-white/5 overflow-x-auto custom-scrollbar no-scrollbar">
+                   <TabButton active={activeTab === 'graph'} onClick={() => setActiveTab('graph')} icon={Share2} label="Graph" />
                    <TabButton active={activeTab === 'python'} onClick={() => setActiveTab('python')} icon={Terminal} label="Python" />
                    <TabButton active={activeTab === 'json'} onClick={() => setActiveTab('json')} icon={FileJson} label="JSON" />
                    <TabButton active={activeTab === 'yaml'} onClick={() => setActiveTab('yaml')} icon={FileText} label="YAML" />
@@ -421,7 +531,6 @@ version: 1.0.0
                    <TabButton active={activeTab === 'coq'} onClick={() => setActiveTab('coq')} icon={Scale} label="Coq" />
                    <TabButton active={activeTab === 'lean'} onClick={() => setActiveTab('lean')} icon={BookCheck} label="Lean" />
                    <TabButton active={activeTab === 'markdown'} onClick={() => setActiveTab('markdown')} icon={FileText} label="Docs" />
-                   <TabButton active={activeTab === 'graph'} onClick={() => setActiveTab('graph')} icon={Share2} label="Graph" />
                 </div>
 
                 <div className="flex-1 relative overflow-hidden bg-gray-900/50">
@@ -443,34 +552,118 @@ version: 1.0.0
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute inset-0 overflow-auto custom-scrollbar p-4"
+                            className="w-full h-full p-4"
                         >
                             {activeTab === 'python' && (
-                                <pre className="font-mono text-sm text-blue-300 whitespace-pre-wrap">{output}</pre>
+                                <Highlight theme={themes.vsDark} code={output} language="python">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                             {activeTab === 'json' && (
-                                <pre className="font-mono text-sm text-orange-300 whitespace-pre-wrap">{jsonOutput}</pre>
+                                <Highlight theme={themes.vsDark} code={jsonOutput} language="json">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                             {activeTab === 'yaml' && (
-                                <pre className="font-mono text-sm text-emerald-300 whitespace-pre-wrap">{yamlOutput}</pre>
+                                <Highlight theme={themes.vsDark} code={yamlOutput} language="yaml">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                             {activeTab === 'sql' && (
-                                <pre className="font-mono text-sm text-cyan-300 whitespace-pre-wrap">{sqlOutput}</pre>
+                                <Highlight theme={themes.vsDark} code={sqlOutput} language="sql">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                              {activeTab === 'coq' && (
-                                <pre className="font-mono text-sm text-pink-300 whitespace-pre-wrap">{coqOutput}</pre>
+                                <Highlight theme={themes.vsDark} code={coqOutput} language="coq">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                              {activeTab === 'lean' && (
-                                <pre className="font-mono text-sm text-indigo-300 whitespace-pre-wrap">{leanOutput}</pre>
+                                <Highlight theme={themes.vsDark} code={leanOutput} language="lean">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
                             {activeTab === 'markdown' && (
-                                <div className="prose prose-invert prose-sm max-w-none">
-                                    <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{mdOutput}</pre>
-                                </div>
+                                <Highlight theme={themes.vsDark} code={mdOutput} language="markdown">
+                                    {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                                        <pre className={className} style={{...style, background: 'transparent', margin: 0, fontSize: '0.875rem', overflow: 'auto', whiteSpace: 'pre-wrap'}}>
+                                            {tokens.map((line, i) => (
+                                                <div key={i} {...getLineProps({ line })}>
+                                                    {line.map((token, key) => (
+                                                        <span key={key} {...getTokenProps({ token })} />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    )}
+                                </Highlight>
                             )}
-                            {activeTab === 'graph' && (
-                                <div className="text-gray-400 italic p-4">Graph visualization component deferred.</div>
-                                // <GraphVisualizer ast={parsedAst} />
+                            {activeTab === 'graph' && ast && (
+                                <GraphVisualizer ast={ast} />
+                            )}
+                            {activeTab === 'graph' && !ast && (
+                                <div className="text-gray-400 italic p-4">No valid AST available.</div>
                             )}
                         </motion.div>
                     </AnimatePresence>

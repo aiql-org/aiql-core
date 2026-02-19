@@ -1,0 +1,31 @@
+
+// AIQL Attribute Comparisons Example (v2.7.0)
+// Demonstrates using >, <, >=, <=, != in attribute values
+
+!Query {
+  <Event> [occurred_in] <Year> {
+    year: > 2000,
+    confidence: >= 0.8
+  }
+}
+
+!Query {
+  <Product> [costs] <Amount> {
+    price: < 100,
+    currency: "USD"
+  }
+}
+
+!Query {
+  <Sensor> [reading] <Temperature> {
+    value: >= 25.5,
+    status: != "error"
+  }
+}
+
+!Query {
+  <Task> [priority] <Level> {
+    level: <= 3,
+    active: true
+  }
+}

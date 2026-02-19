@@ -235,8 +235,28 @@ export interface UnaryExpression extends Node {
   argument: Expression;
 }
 
+// Comparison Expressions (v2.7.0)
+export type ComparisonOperator = 'GT' | 'LT' | 'GTE' | 'LTE' | 'EQ' | 'NEQ';
+
+export interface ComparisonExpression extends Node {
+  type: 'ComparisonExpression';
+  operator: ComparisonOperator;
+  left: Expression;
+  right: Expression;
+}
+
 // Unified Expression Type
-export type Expression = Concept | Literal | MathExpression | SetExpression | FunctionApplication | LambdaExpression | Identifier | UnaryExpression | SpatialExpression;
+export type Expression = 
+  | Concept 
+  | Literal 
+  | MathExpression 
+  | SetExpression 
+  | FunctionApplication 
+  | LambdaExpression 
+  | Identifier 
+  | UnaryExpression 
+  | SpatialExpression
+  | ComparisonExpression;
 
 export function isUnaryExpression(node: Expression): node is UnaryExpression {
   return node.type === 'UnaryExpression';
@@ -313,6 +333,10 @@ export function isFunctionApplication(node: Expression): node is FunctionApplica
 
 export function isLambdaExpression(node: Expression): node is LambdaExpression {
   return node.type === 'LambdaExpression';
+}
+
+export function isComparisonExpression(node: Expression): node is ComparisonExpression {
+  return node.type === 'ComparisonExpression';
 }
 
 // ===================================================================

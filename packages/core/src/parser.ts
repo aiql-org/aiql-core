@@ -737,11 +737,41 @@ export class Parser {
               } else if (this.match(TokenType.FALSE)) {
                   value = false;
               } else {
-                  // Allow arbitrary expressions (variables, math, concepts) as attribute values
-                  try {
-                      value = this.parseExpression();
-                  } catch {
-                      throw this.error(this.peek(), "Expect attribute value (string, number, boolean, or expression)");
+                  // Check for comparison operators (v2.7.0): year: > 2000
+                  // Implicit left operand is the attribute key
+                  if (this.check(TokenType.GT) || this.check(TokenType.LT) || 
+                      this.check(TokenType.GTE) || this.check(TokenType.LTE) ||
+                      this.check(TokenType.EQ) || this.check(TokenType.NEQ)) {
+                      
+                      const opToken = this.advance();
+                      let op: AST.ComparisonOperator;
+                      switch(opToken.type) {
+                          case TokenType.GT: op = 'GT'; break;
+                          case TokenType.LT: op = 'LT'; break;
+                          case TokenType.GTE: op = 'GTE'; break;
+                          case TokenType.LTE: op = 'LTE'; break;
+                          case TokenType.EQ: op = 'EQ'; break;
+                          case TokenType.NEQ: op = 'NEQ'; break;
+                          default: throw new Error("Unreachable");
+                      }
+                      
+                      const right = this.parseExpression();
+                      
+                      // Construct ComparisonExpression
+                      value = {
+                          type: 'ComparisonExpression',
+                          operator: op,
+                          left: { type: 'Identifier', name: key },
+                          right: right
+                      } as AST.ComparisonExpression;
+                      
+                  } else {
+                      // Allow arbitrary expressions (variables, math, concepts) as attribute values
+                      try {
+                          value = this.parseExpression();
+                      } catch {
+                          throw this.error(this.peek(), "Expect attribute value (string, number, boolean, expression, or comparison)");
+                      }
                   }
               }
               attributes[key] = value;
